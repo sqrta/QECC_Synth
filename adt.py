@@ -4,7 +4,7 @@ import copy
 import itertools
 from sympy import Matrix
 
-from sympy import symbols,simplify,Poly
+from sympy import symbols, simplify, Poly
 
 X = np.array([[0, 1], [1, 0]], dtype=complex)
 Y = np.array([[0, -1j], [1j, 0]])
@@ -55,16 +55,19 @@ def pauli_dot(a, b):
     result = rule[(a, b)]
     return result
 
+
 def vec2stabilizer(vec):
     n = int(len(vec)/2)
     xvec = vec[:n]
     zvec = vec[n:]
-    a = "".join(['x' if i==1 else 'i' for i in xvec])
-    b = "".join(['z' if i==1 else 'i' for i in zvec])
+    a = "".join(['x' if i == 1 else 'i' for i in xvec])
+    b = "".join(['z' if i == 1 else 'i' for i in zvec])
     return stabilizer(a)*stabilizer(b)
+
 
 def checkM2Stabilizers(M):
     return [vec2stabilizer(vec) for vec in M]
+
 
 class pauli:
     def __init__(self, value, sign=1) -> None:
@@ -104,6 +107,15 @@ class stabilizer:
     def weight(self):
         return self.length-self.term().count("I")
 
+    def Wx(self, tag):
+        return self.term().count("X")+self.term().count("Y")
+
+    def Wz(self, tag):
+        return self.term().count("Z")+self.term().count("Y")
+    
+    def W(self, tag):
+        return self.term().count(tag)
+
     def prefix(self):
         return product([a.sign for a in self.value])
 
@@ -121,9 +133,13 @@ class stabilizer:
 
 
 class check_matrix:
-    def __init__(self, stabilizers, label=None) -> None:
+    def __init__(self, stabilizers, label=None, symmetry=None) -> None:
         self.matrix = self.setMatrix(stabilizers)
         self.n = stabilizers[0].length
+        if symmetry:
+            self.symmetry = symmetry
+        else:
+            self.symmetry = [[i] for i in range(self.n)]
         if label == None:
             self.label = bidict({i: i for i in range(self.n)})
             # {qubit label : column}
@@ -145,14 +161,14 @@ class check_matrix:
 
     def swapColumn(self, a, b):
         self.matrix[:, [a, b]] = self.matrix[:, [b, a]]
-    
-    def swapRow(self,a, b):
+
+    def swapRow(self, a, b):
         self.matrix[[a, b], :] = self.matrix[[b, a], :]
 
     def swapLeg(self, a, b):
-        self.swapColumn(a,b)
+        self.swapColumn(a, b)
         self.swapColumn(a+self.n, b + self.n)
-        self.swapLabel(a,b)
+        self.swapLabel(a, b)
 
     def swapLabel(self, a, b):
         # swap the label of two column
@@ -188,8 +204,8 @@ class check_matrix:
                 self.matrix[i] += self.matrix[target]
         self.Mod2()
         return target
-    
-    def find1(self,column,default=[-1]):
+
+    def find1(self, column, default=[-1]):
         target = -1
         for i in range(self.matrix.shape[0]-1, -1, -1):
             if self.matrix[i, column] == 1:
@@ -197,7 +213,7 @@ class check_matrix:
                 if target not in default:
                     break
         return target
-    
+
     def setTraceForm(self, column):
         index1 = list(range(self.n))
         index1.remove(column)
@@ -213,7 +229,7 @@ class check_matrix:
         # print(self.matrix)
         self.row_echelon()
         target = self.setOnlyOne1(self.n)
-        
+
         if target > 0:
             if self.matrix[0, 0] != 0:
                 self.matrix[[1, target], :] = self.matrix[[target, 1], :]
@@ -223,24 +239,48 @@ class check_matrix:
     def resetLabel(self):
         self.n = int(self.matrix.shape[1]/2)
         self.label = bidict({i: i for i in range(self.n)})
-    
-    def removeZeroRow(self):
-        self.matrix = self.matrix[~np.all(self.matrix == 0, axis=1)]
 
-    def trace(self, other, label1, label2):
+    def removeZeroRow(self):
+        count = ~np.all(self.matrix == 0, axis=1)
+        self.matrix = self.matrix[count]  
+
+    def trace(self, other_tensor, label1, label2):
         # column1 = self.label[label1]
         # column2 = other.label[label2]
+
         column1 = label1
         column2 = label2
+        # print("trace", label1, column1, label2, column2)
         this = copy.deepcopy(self)
+        other = copy.deepcopy(other_tensor)
+        this.symmetry = set_symmetry(self.symmetry, column1)
+        this.symmetry += set_symmetry(other.symmetry, column2, shift=self.n-1)
         this.setTraceForm(column1)
         other.setTraceForm(column2)
         # print(this.n, other.n)
         # print(this.matrix)
         # print(other.matrix)
         if this.matrix[1, self.n] == 0:
+            print("branch")
             if other.matrix[1, other.n] != 0:
-                return other.trace(this)
+
+                width = this.n + other.n - 2
+                height = this.matrix.shape[0] + other.matrix.shape[0]-2
+                M = np.zeros((height, 2 * width), dtype=np.int16)
+                M[0, 0:this.n-1] = this.matrix[0, 1: this.n]
+                M[0, this.n-1:width] = this.matrix[0, 0]*other.matrix[0,
+                                                                      1:other.n] + this.matrix[0, this.n] * other.matrix[1, 1:other.n]
+                M[0, width:width+this.n-1] = this.matrix[0, this.n+1:]
+                M[0, width+this.n-1:] = this.matrix[0, 0] * other.matrix[0,
+                                                                         other.n+1:] + this.matrix[0, this.n]*other.matrix[1, other.n+1:]
+                M[1:this.matrix.shape[0], 0:this.n-1] = this.matrix[1:, 1: this.n]
+                M[1:this.matrix.shape[0], width:width +
+                    this.n-1] = this.matrix[1:, this.n+1:]
+                M[this.matrix.shape[0]:, this.n -
+                    1:width] = other.matrix[2:, 1:other.n]
+                M[this.matrix.shape[0]:, width+this.n -
+                    1:] = other.matrix[2:, other.n+1:]
+                print(M)
             else:
                 width = this.n + other.n - 2
                 height = this.matrix.shape[0] + other.matrix.shape[0]-1
@@ -250,50 +290,69 @@ class check_matrix:
                 M[0, 0:this.n-1] = f*this.matrix[0, 1: this.n]
                 M[0, this.n-1:width] = f*other.matrix[0, 1:other.n]
                 M[0, width:width+this.n-1] = f*this.matrix[0, this.n+1:]
-                M[0, width+this.n-1:] = f* other.matrix[0, other.n+1:]
-                M[1:this.matrix.shape[0], 0:this.n-1] = this.matrix[1:this.matrix.shape[0], 1: this.n]
-                M[1:this.matrix.shape[0], width:width+this.n-1] = this.matrix[1:this.matrix.shape[0], this.n+1:]
-                M[this.matrix.shape[0]:, this.n-1:width] = other.matrix[1:other.matrix.shape[0], 1:other.n]
-                M[this.matrix.shape[0]:, width+this.n-1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
+                M[0, width+this.n-1:] = f * other.matrix[0, other.n+1:]
+                M[1:this.matrix.shape[0], 0:this.n -
+                    1] = this.matrix[1:this.matrix.shape[0], 1: this.n]
+                M[1:this.matrix.shape[0], width:width+this.n -
+                    1] = this.matrix[1:this.matrix.shape[0], this.n+1:]
+                M[this.matrix.shape[0]:, this.n -
+                    1:width] = other.matrix[1:other.matrix.shape[0], 1:other.n]
+                M[this.matrix.shape[0]:, width+this.n -
+                    1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
         else:
             if other.matrix[1, other.n] != 0:
+                print("trace")
                 width = this.n + other.n - 2
-                height = this.matrix.shape[0] + other.matrix.shape[0] - 2 
+                height = this.matrix.shape[0] + other.matrix.shape[0] - 2
                 M = np.zeros((height, 2 * width), dtype=np.int16)
                 M[0:2, 0:this.n-1] = this.matrix[0:2, 1: this.n]
                 M[0:2, this.n-1:width] = other.matrix[0:2, 1:other.n]
                 M[0:2, width:width+this.n-1] = this.matrix[0:2, this.n+1:]
                 M[0:2, width+this.n-1:] = other.matrix[0:2, other.n+1:]
                 M[2:this.matrix.shape[0], 0:this.n-1] = this.matrix[2:, 1: this.n]
-                M[2:this.matrix.shape[0], width:width+this.n-1] = this.matrix[2:, this.n+1:]
-                M[this.matrix.shape[0]:, this.n-1:width] = other.matrix[2:, 1:other.n]
-                M[this.matrix.shape[0]:, width+this.n-1:] = other.matrix[2:, other.n+1:]
+                M[2:this.matrix.shape[0], width:width +
+                    this.n-1] = this.matrix[2:, this.n+1:]
+                M[this.matrix.shape[0]:, this.n -
+                    1:width] = other.matrix[2:, 1:other.n]
+                M[this.matrix.shape[0]:, width+this.n -
+                    1:] = other.matrix[2:, other.n+1:]
             else:
-                i = other.matrix[0,0]
+                print("2branch")
+                i = other.matrix[0, 0]
                 j = other.matrix[0, other.n]
                 width = this.n + other.n - 2
                 height = this.matrix.shape[0] + other.matrix.shape[0]-2
                 M = np.zeros((height, 2 * width), dtype=np.int16)
-                M[0, 0:this.n-1] = i*this.matrix[0, 1: this.n] - j*this.matrix[1, 1: this.n]
+                M[0, 0:this.n-1] = i*this.matrix[0, 1: this.n] - \
+                    j*this.matrix[1, 1: this.n]
                 M[0, this.n-1:width] = other.matrix[0, 1:other.n]
-                M[0, width:width+this.n-1] = i*this.matrix[0, this.n+1:] - j * this.matrix[1, this.n+1:]
+                M[0, width:width+this.n-1] = i*this.matrix[0,
+                                                           this.n+1:] - j * this.matrix[1, this.n+1:]
                 M[0, width+this.n-1:] = other.matrix[0, other.n+1:]
-                M[1:this.matrix.shape[0]-1, 0:this.n-1] = this.matrix[2:this.matrix.shape[0], 1: this.n]
-                M[1:this.matrix.shape[0]-1, width:width+this.n-1] = this.matrix[2:this.matrix.shape[0], this.n+1:]
-                M[this.matrix.shape[0]-1:, this.n-1:width] = other.matrix[1:other.matrix.shape[0], 1:other.n]
-                M[this.matrix.shape[0]-1:, width+this.n-1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
-        this.matrix=M
+                M[1:this.matrix.shape[0]-1, 0:this.n -
+                    1] = this.matrix[2:this.matrix.shape[0], 1: this.n]
+                M[1:this.matrix.shape[0]-1, width:width+this.n -
+                    1] = this.matrix[2:this.matrix.shape[0], this.n+1:]
+                M[this.matrix.shape[0]-1:, this.n -
+                    1:width] = other.matrix[1:other.matrix.shape[0], 1:other.n]
+                M[this.matrix.shape[0]-1:, width+this.n -
+                    1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
+        this.matrix = M
         this.Mod2()
         this.removeZeroRow()
         this.n = this.n + other.n - 2
         this.resetLabel()
         return this
-    
+
     def selfTrace(self, label1, label2):
         # column1 = self.label[label1]
         # column2 = self.label[label2]
+        # print("self", label1, column1, label2, column2)
+
         column1 = label1
         column2 = label2
+        self.symmetry = set_symmetry(self.symmetry, max(column1, column2))
+        self.symmetry = set_symmetry(self.symmetry, min(column1, column2))
         index1 = list(range(self.n))
         index1.remove(column1)
         index1.remove(column2)
@@ -302,44 +361,72 @@ class check_matrix:
         index2 = [i+self.n for i in index1]
         index = index1 + index2
         this = copy.deepcopy(self)
-        this.matrix = this.matrix[:, index]  
+        this.matrix = this.matrix[:, index]
         this.row_echelon()
         c1row = this.setOnlyOne1(1)
         cnrow = this.setOnlyOne1(this.n)
         cn1row = this.find1(this.n+1, [cnrow])
         cn1row = this.setOnlyOne1(this.n+1)
-        this.matrix[0]+=this.matrix[1]
-        this.matrix[cnrow]+=this.matrix[cn1row]
+        this.matrix[0] += this.matrix[1]
+        this.matrix[cnrow] += this.matrix[cn1row]
         this.matrix = np.delete(this.matrix, (1, cn1row), axis=0)
         this.matrix = np.delete(this.matrix, (0, 1, this.n, this.n+1), axis=1)
         this.n -= 2
         this.Mod2()
         return this
+
     def delete(self, rows, axis=0):
         self.matrix = np.delete(self.matrix, rows, axis=axis)
+
+    def move2firstCol(self, column):
+        index1 = list(range(self.n))
+        index1.remove(column)
+        index1.insert(0, column)
+        index2 = [i+self.n for i in index1]
+        index = index1 + index2
+        self.matrix = self.matrix[:, index]
+
     def setLogical(self, label):
         column = label
-        self.swapLeg(0, column)
+        self.move2firstCol(column)
         self.row_echelon()
         row = self.setOnlyOne1(self.n)
         self.swapRow(row, 1)
         LogicOp = self.matrix[0:2, :]
         self.matrix = self.matrix[2:, :]
         self.delete([self.n, 0], axis=1)
+        self.n -= 1
         return LogicOp
 
-def Az_poly(generator):    
+
+def set_symmetry(groups, remove, shift=0):
+    symmetry = []
+    for group in groups:
+        tmp = []
+        for item in group:
+            if item < remove:
+                tmp.append(item+shift)
+            elif item > remove:
+                tmp.append(item-1+shift)
+        if len(tmp) > 0:
+            symmetry.append(tmp)
+    return symmetry
+
+
+def Az_poly(generator, stab_group=None):
     n = generator[0].length
-    stab_group = stabilizer_group(generator)
+    if not stab_group:
+        stab_group = stabilizer_group(generator)
     count = [0] * (n+1)
     for item in stab_group:
         count[item.weight()] += 1
     return count
 
-def Bz_poly(generator, k):
+
+def Bz_poly(generator, k, stab_group=None):
     n = generator[0].length
-    x=symbols('x')
-    poly_coeff = Az_poly(generator)
+    x = symbols('x')
+    poly_coeff = Az_poly(generator, stab_group)
     poly = 0
     for i in range(len(poly_coeff)):
         z = (1-x)/2
@@ -368,25 +455,47 @@ def stabilizer_group(generator):
     n = generator[0].length
     stab_group = set()
     stab_group.add(stabilizer("i"*n))
-    for sub in subsets:
+    length = len(subsets)
+    print(f"length: {length}")
+    percent = max(length // 100, 1)
+    for i in range(length):
+        sub = subsets[i]
+        # if i%percent == 0:
+        #     print(f"{i//percent}%")
         if len(sub) > 0:
             stab_group.add(product(sub))
     # print("end", len(stab_group))
     return stab_group
 
+
 def codelize(stabilizers):
     return [stabilizer(i) for i in stabilizers]
 
-def distance(generator, k):
-    Az_coeff = Az_poly(generator)
-    Bz_coeff = Bz_poly(generator, k)
-    print(Az_coeff,Bz_coeff)
+
+def distance(generator, k ,stab_group = None):
+    if not stab_group:
+        stab_group = stabilizer_group(generator)
+    Az_coeff = Az_poly(generator, stab_group)
+    Bz_coeff = Bz_poly(generator, k, stab_group)
+    print(Az_coeff, Bz_coeff)
     for d in range(len(Az_coeff)):
-        if Az_coeff[d]!=Bz_coeff[d]:
+        if Az_coeff[d] != Bz_coeff[d]:
             return d
 
 
+def Azx(stab_group, x, y, z, w):
+    n = next(iter(stab_group)).length
+    result = 0
+    for term in stab_group:
+        wx = term.Wx("X")
+        wz = term.Wz("z")
+        result+=x**wx*y**(n-wx)*z**wz*w**(n-wz)
+    return result
+
+def Bzx(k, stab_group, x, y, z, w):
+    return 2**k * Azx(stab_group, w-z, z+w, (y-x)/2, (x+y)/2)
+
 if __name__ == "__main__":
     code513 = codelize(["xzzxi", 'ixzzx', 'xixzz', 'zxixz'])
-    
+
     print(distance(code513, 1))

@@ -4,11 +4,96 @@ import copy
 import itertools
 from sympy import Matrix
 
+debug = False
+
 from sympy import symbols, simplify, Poly
 
 X = np.array([[0, 1], [1, 0]], dtype=complex)
 Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
+
+
+
+class codeTN:
+    def __init__(self, stabilizers, name = "", symmetry = None) -> None:
+        self.stabs = [stabilizer(i) for i in stabilizers]
+        self.name = name
+        self.length = self.stabs[0].length
+        if not symmetry:
+            self.symmetry = list(range(self.length))
+        else:
+            self.symmetry = symmetry
+
+    def __getitem__(self, indices):
+        return self.stabs[indices]
+
+    def __len__(self):
+        return len(self.stabs)
+
+class Tensor:
+    def __init__(self, tensor) -> None:
+        self.tensor = tensor
+        self.size = tensor[0].length
+        self.tracted = []
+        self.name = tensor.name
+
+class TNNetwork:
+    def __init__(self, initTensor) -> None:
+        self.tensorList = [initTensor]
+        self.insList = []
+        self.Logical = []
+        self.traceCount = 0
+        self.selfTraceCount = 0
+
+    def trace(self, localIndex, leg1, tensor, leg2):
+        if localIndex >= len(self.tensorList):
+            raise ValueError(localIndex, len(self.tensorList))
+        local = self.tensorList[localIndex]
+        if leg1 in local.tracted or leg1 >= local.size:
+            raise ValueError(leg1, local.tracted)
+        local.tracted.append(leg1)
+        tensor.tracted.append(leg2)
+        self.insList.append(["trace", localIndex, leg1, len(self.tensorList), leg2])
+        self.tensorList.append(tensor)
+        
+
+    def selfTrace(self, index1, leg1, index2, leg2):
+        tn1 = self.tensorList[index1]
+        tn2 = self.tensorList[index2]
+        if leg1 in tn1.tracted or leg2 in tn2.tracted:
+            raise ValueError(leg1, leg2, tn1.tracted, tn2.tracted)
+        tn1.tracted.append(leg1)
+        tn2.tracted.append(leg2)
+        self.insList.append(["self", index1, leg1, index2, leg2])
+        self.selfTraceCount+=1
+
+    def setLogical(self, index, leg):
+        self.tensorList[index].tracted.append(leg)
+        self.Logical.append((index,leg))
+
+    def get_n(self):
+        return sum([tensor.size - len(tensor.tracted) for tensor in self.tensorList])
+    
+    def get_k(self):
+        return len(self.Logical)
+    
+    def show(self):
+        print(str(self))
+
+    def __str__(self):
+        return str(self.insList) + "\n" + str([t.name for t in self.tensorList])+ "\n"
+
+    def equiv_trace_leg(self):
+        candidate = []
+        for i in range(len(self.tensorList)):
+            t = self.tensorList[i]
+            if len(t.tracted) >= t.size:
+                continue
+            tmp = [(i,item) for item in range(t.size) if item not in t.tracted]
+            if t.name == 'code604':
+                tmp = tmp[0:1]
+            candidate += tmp
+        return candidate
 
 
 class bidict(dict):
@@ -398,7 +483,6 @@ class check_matrix:
         self.n -= 1
         return LogicOp
 
-
 def set_symmetry(groups, remove, shift=0):
     symmetry = []
     for group in groups:
@@ -425,13 +509,13 @@ def Az_poly(generator, stab_group=None):
 
 def Bz_poly(generator, k, stab_group=None):
     n = generator[0].length
-    x = symbols('x')
+    lx = symbols('lx')
     poly_coeff = Az_poly(generator, stab_group)
     poly = 0
     for i in range(len(poly_coeff)):
-        z = (1-x)/2
-        w = (1+3*x)/2
-        poly += poly_coeff[i]*z**i*w**(n-i)
+        lz = (1-lx)/2
+        lw = (1+3*lx)/2
+        poly += poly_coeff[i]*lz**i*lw**(n-i)
     poly = Poly(simplify(2**k*poly))
     return poly.all_coeffs()[-1::-1]
 
@@ -451,25 +535,27 @@ def Bz(w, z, generator, k):
 
 def stabilizer_group(generator):
     subsets = allsubset(generator)
-    # print(len(subsets))
+    
     n = generator[0].length
     stab_group = set()
     stab_group.add(stabilizer("i"*n))
     length = len(subsets)
-    print(f"length: {length}")
-    percent = max(length // 100, 1)
+    if debug:
+        print(f"subset lenght: {len(subsets)}")
+        print(f"length: {length}")
+    percent = max(length // 10, 1)
     for i in range(length):
         sub = subsets[i]
-        # if i%percent == 0:
-        #     print(f"{i//percent}%")
+        if i%percent == 0 and debug:
+            print(f"{10 * i//percent}%")
         if len(sub) > 0:
             stab_group.add(product(sub))
     # print("end", len(stab_group))
     return stab_group
 
 
-def codelize(stabilizers):
-    return [stabilizer(i) for i in stabilizers]
+def codelize(stabilizers, name = ""):
+    return codeTN(stabilizers, name)
 
 
 def distance(generator, k ,stab_group = None):

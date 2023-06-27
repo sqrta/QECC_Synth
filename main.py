@@ -2,17 +2,37 @@ from adt import *
 import itertools
 from enumerator import *
 
+px = 0.01
+pz = 0.05
+cm = check_matrix(code603)
+cm604 = check_matrix(code604)
+# a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
+a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),0,0).selfTrace(3, 4)
+a.setLogical(0)
+# a.setLogical(2)
+# a.setLogical(4)
+print(a.matrix)
+code = checkM2Stabilizers(a.matrix)
+print(code)
+print(distance(code, 1))
+stab_group = stabilizer_group(code)
+A = Azx(stab_group, px, 1 - px, pz, 1- pz)
+B = Bzx(1, stab_group, px, 1 - px, pz, 1- pz)
+print(A, B, B-A)
+exit(0)
 
-stab_group = stabilizer_group(code603)
-count=0
-weight_count = [0 for i in range(8)]
-for stab in stab_group:
-    if stab.value[0].value == 'I' and stab.value[1].value == 'I':
-        count+=1
-        weight_count[stab.weight()]+=1
-        print(stab)
-print(weight_count)
-exit(0)    
+
+code = code11_1_5
+stab_group = stabilizer_group(code)
+
+d=distance(code, 2, stab_group)
+print(f"distance: {d}, n: {code[0].length}")
+
+A = Azx(stab_group, px, 1 - px, pz, 1- pz)
+B = Bzx(2, stab_group, px, 1 - px, pz, 1- pz)
+print(A, B, B-A)
+exit(0)
+ 
 
 code = codelize(['xxxx', 'zzzz'])
 cm = check_matrix(code603, symmetry=[[0,1,2,3], [4,5]])
@@ -92,12 +112,8 @@ code = checkM2Stabilizers(e.matrix)
 print(e.matrix)
 
 
-code13_1_4 = codelize(['xiixixxiiixxi', 'ixixixixiiiii',
-'iixxiixxiixxi',
-'iiiixxxxiiiii',
-'iiiiiiiixiixx',
-'iiiiiiiiixxxx','ziiziizziiizz','izizizziiiiii', 'iizziziziiizz','iiiizzzziiiii', 'iiiiiiiiziziz', 'iiiiiiiiizzzz'])
-code17_1_3 = codelize(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii","iiixxiiiiiixxixxi","iiiiixixiixxiiixx","iiiiiixixixxiiixx","iiiiiiiiixxxxiiii","iiiiiiiiiiiiixxxx","ziiiiizziiiiiiiii","iziiiiizziizziiii","iiziiiiiiiziziizz","iiiziiizziiiiizzi","iiiiziizziziziziz","iiiiizzzziiiiiiii","iiiiiiiiizzzziiii","iiiiiiiiiiiiizzzz"])
+
+
 e = cm.trace(cm,0,0).trace(cm, 2, 0)
 e.setLogical(2)
 a = cm.trace(cm, 0, 4).selfTrace(0, 9)
@@ -107,16 +123,9 @@ c.setLogical(2)
 print("c", c.matrix.shape)
 print(c.matrix)
 code = checkM2Stabilizers(c.matrix)
-# code = code17_1_3
-stab_group = stabilizer_group(code)
 
-d=distance(code, 1, stab_group)
-print(f"distance: {d}, n: {code[0].length}")
-px = 0.01
-pz = 0.05
-A = Azx(stab_group, px, 1 - px, pz, 1- pz)
-B = Bzx(1, stab_group, px, 1 - px, pz, 1- pz)
-print(A, B, B-A)
+code17_1_3 = codelize(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii","iiixxiiiiiixxixxi","iiiiixixiixxiiixx","iiiiiixixixxiiixx","iiiiiiiiixxxxiiii","iiiiiiiiiiiiixxxx","ziiiiizziiiiiiiii","iziiiiizziizziiii","iiziiiiiiiziziizz","iiiziiizziiiiizzi","iiiiziizziziziziz","iiiiizzzziiiiiiii","iiiiiiiiizzzziiii","iiiiiiiiiiiiizzzz"])
+
 
 # print(distance(code13_1_4, 1))
 # print(check_matrix(code13_1_4).matrix)

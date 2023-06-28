@@ -51,7 +51,7 @@ def search(initial):
                     f.write(content+"\n\n")
             if (d,error) not in exist_set:
                 exist_set.add((d,error))
-                if len(top.tensorList)<maxTensor:
+                if len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
                     dangleLegs = top.equiv_trace_leg()
                     for code in candidate_code:
                         for leg in dangleLegs:
@@ -65,6 +65,8 @@ def search(initial):
                         for j in range(i+1, len(dangleLegs)):
                             first,second = dangleLegs[i],dangleLegs[j]
                             if first[0]==second[0]:
+                                continue
+                            if top.largerSelfTrace(('self',first[0],first[1],second[0],second[1])):
                                 continue
                             tmp = copy.deepcopy(top)
                             tmp.selfTrace(first[0],first[1],second[0],second[1])

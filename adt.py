@@ -94,6 +94,22 @@ class TNNetwork:
                 tmp = tmp[0:1]
             candidate += tmp
         return candidate
+    
+    def largerSelfTrace(self, new_ins):
+        for ins in self.insList:
+            if ins[0]!="self":
+                continue
+            if selfTraceALargerB(ins, new_ins):
+                return True
+        return False
+    
+def selfTraceALargerB(a, b):
+    for i in range(1,5):
+        if a[i]>b[i]:
+            return True
+        elif a[i]<b[i]:
+            return False
+    return False
 
 
 class bidict(dict):
@@ -583,5 +599,6 @@ def Bzx(k, stab_group, x, y, z, w):
 
 if __name__ == "__main__":
     code513 = codelize(["xzzxi", 'ixzzx', 'xixzz', 'zxixz'])
-
-    print(distance(code513, 1))
+    a = ('self',1,1,0,4)
+    b = ('self', 1,1,1,3)
+    print(selfTraceALargerB(a,b))

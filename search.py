@@ -29,8 +29,8 @@ def search(initial):
     import time
     start = time.time()
     queue = [TNNetwork(initial)]
-    maxTensor = 3
-    selfTraceDepth = 2
+    maxTensor = 4
+    selfTraceDepth = 3
     candidate_code = [code603, code604]
     exist_set = set()
     minError = 1 

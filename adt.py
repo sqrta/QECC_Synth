@@ -12,7 +12,16 @@ X = np.array([[0, 1], [1, 0]], dtype=complex)
 Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
 
-
+def buildProg(insList, initial):
+    tn = TNNetwork(initial)
+    for ins in insList:
+        if ins[0] == 'trace':
+            tn.trace(ins[1], ins[2], ins[3], ins[4])
+        elif ins[0] == "self":
+            tn.selfTrace(ins[1], ins[2], ins[3], ins[4])
+        elif ins[0] == "setLog":
+            tn.setLogical(ins[1], ins[2])
+    return tn
 
 class codeTN:
     def __init__(self, stabilizers, name = "", symmetry = None) -> None:
@@ -31,11 +40,12 @@ class codeTN:
         return len(self.stabs)
 
 class Tensor:
-    def __init__(self, tensor) -> None:
+    def __init__(self, tensor, index = 0) -> None:
         self.tensor = tensor
         self.size = tensor[0].length
         self.tracted = []
         self.name = tensor.name
+        self.index = index
 
 class TNNetwork:
     def __init__(self, initTensor) -> None:
@@ -402,7 +412,7 @@ class check_matrix:
                     1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
         else:
             if other.matrix[1, other.n] != 0:
-                print("trace")
+                # print("trace")
                 width = this.n + other.n - 2
                 height = this.matrix.shape[0] + other.matrix.shape[0] - 2
                 M = np.zeros((height, 2 * width), dtype=np.int16)

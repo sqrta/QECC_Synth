@@ -2,23 +2,106 @@ from adt import *
 import itertools
 from enumerator import *
 
+def prog2TNN(insList, tensorList):
+    progList = []
+    tensorList = [eval(t) for t in tensorList]
+    for ins in insList:
+        if ins[0]=="trace":
+            index = ins[3]
+            ins[3] = Tensor(tensorList[index])
+        progList.append(ins)
+    return buildProg(progList, Tensor(tensorList[0]))
+
+def TNN2CM(tn):
+    insList = tn.insList
+    tnList = tn.tensorList
+    cm = check_matrix(tnList[0].tensor)
+    def getMIndex(traceIndex):
+        return sum([len(t.tracted) for t in tnList[:traceIndex]])
+    for ins in insList:
+        if ins[0] == "trace":
+            traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
+            matrixIndex = getMIndex(traceIndex)
+            newOne = tnList[newOneIndex]
+            newTNindex = newOne.tracted.index(newOneleg)    
+            print('trace', matrixIndex, newTNindex)
+            tmp = cm.trace(check_matrix(newOne.tensor), matrixIndex, newTNindex)
+            cm = tmp
+            newOne.tracted.pop(0)
+            tnList[traceIndex].tracted.pop(0)
+        if ins[0] == "self":
+            index1, leg1, index2, leg2 = ins[1:]
+            mIndex1 = getMIndex(index1)
+            mIndex2 = getMIndex(index2)
+            print(ins)
+            print('self', mIndex1, mIndex2)
+            cm = cm.selfTrace(mIndex1, mIndex2)
+            tnList[index1].tracted.pop(0)
+            tnList[index2].tracted.pop(0)
+    return cm
+
+def prog2Cm(insList, tnList):
+    tracted = [[] for i in range(len(tnList))]
+    cm = check_matrix(tnList[0])
+    def getMIndex(traceIndex, traceLeg):
+        index = 0
+        for i in range(traceIndex):
+            index+=tnList[i].length - len(tracted[i])
+        count = 0
+        for tractedLeg in tracted[traceIndex]:
+            if tractedLeg<traceLeg:
+                count+=1
+        index += traceLeg - count
+        return index
+    
+    for ins in insList:
+        if ins[0]=="trace":
+            traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
+            matrixIndex = getMIndex(traceIndex, traceLeg)
+            newOne = tnList[newOneIndex] 
+            print('trace', matrixIndex, newOneleg)
+            cm = cm.trace(check_matrix(newOne), matrixIndex, newOneleg)
+            tracted[traceIndex].append(traceLeg)
+            tracted[newOneIndex].append(newOneleg)
+        if ins[0] == "self":
+            index1, leg1, index2, leg2 = ins[1:]
+            mIndex1 = getMIndex(index1, leg1)
+            mIndex2 = getMIndex(index2, leg2)
+            print(ins)
+            print('self', mIndex1, mIndex2)
+            cm = cm.selfTrace(mIndex1, mIndex2)
+            tracted[index1].append(leg1)
+            tracted[index2].append(leg2)
+    return cm
 px = 0.01
 pz = 0.05
-cm = check_matrix(code603)
-cm604 = check_matrix(code604)
+
+insList = [['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1]]
+tnList = ['code603', 'code604', 'code604', 'code604']
+tensorList  = [eval(t) for t in tnList]
+
+a = prog2Cm(insList, tensorList)
+tn = prog2TNN(insList, tnList)
+
+
+# cm = check_matrix(code603)
 # a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
-a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),0,0).selfTrace(3, 4)
+# a = check_matrix(code603).trace(check_matrix(code604),0,0).trace(check_matrix(code604),0,0).selfTrace(3, 4)
 a.setLogical(0)
 # a.setLogical(2)
 # a.setLogical(4)
 print(a.matrix)
 code = checkM2Stabilizers(a.matrix)
 print(code)
-print(distance(code, 1))
+print(f"n: {a.n}, d: {distance(code, 1)}")
+import time
+start = time.time()
 stab_group = stabilizer_group(code)
 A = Azx(stab_group, px, 1 - px, pz, 1- pz)
 B = Bzx(1, stab_group, px, 1 - px, pz, 1- pz)
 print(A, B, B-A)
+end = time.time()
+print(end-start)
 exit(0)
 
 

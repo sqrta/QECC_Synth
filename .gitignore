@@ -1,4 +1,7 @@
 data
 found
 output
-__pycache__/
+__pycache__/*
+15_1_4 code.txt
+__pycache__/adt.cpython-38.pyc
+__pycache__/enumerator.cpython-38.pyc

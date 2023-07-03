@@ -87,7 +87,6 @@ def parse(program):
             tnEnum = tmp
             newOne.tracted.pop(0)
             tnList[traceIndex].tracted.pop(0)
-
         if ins[0] == "self":
             index1, leg1, index2, leg2 = ins[1:]
             mIndex1 = getMIndex(index1)

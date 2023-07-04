@@ -41,7 +41,7 @@ def get_BPoly(APoly, n, k):
 def distance_from_poly(A_expr, n, k):
     Az_coeff = simp_poly(A_expr).all_coeffs()[-1::-1]
     Bz_coeff = get_BPoly(A_expr, n, k)
-    print("A B", Az_coeff, Bz_coeff)
+    # print("A B", Az_coeff, Bz_coeff)
     for d in range(len(Az_coeff)):
         if Az_coeff[d] != Bz_coeff[d]:
             return d

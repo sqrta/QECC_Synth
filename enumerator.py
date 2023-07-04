@@ -108,7 +108,7 @@ if __name__ == "__main__":
     n = 5
     px = 0.01
     pz = 0.05
-    d,error = eval_code(code5_1_3_m, 1)
+    d,error = eval_code(code11_1_5, 1)
     print(f"d: {d}, error: {error}")
 
 

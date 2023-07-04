@@ -78,16 +78,20 @@ pz = 0.05
 
 insList = [['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1]]
 tnList = ['code603', 'code604', 'code604', 'code604']
+insList = [['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['self', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['self', 0, 4, 1, 4]]         
+tnList = ['code604', 'code604']
 tensorList  = [eval(t) for t in tnList]
 
 a = prog2Cm(insList, tensorList)
 tn = prog2TNN(insList, tnList)
 
 
+
 # cm = check_matrix(code603)
 # a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
 # a = check_matrix(code603).trace(check_matrix(code604),0,0).trace(check_matrix(code604),0,0).selfTrace(3, 4)
 a.setLogical(0)
+print(tn.get_n())
 # a.setLogical(2)
 # a.setLogical(4)
 print(a.matrix)

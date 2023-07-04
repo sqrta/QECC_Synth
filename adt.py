@@ -32,7 +32,13 @@ class codeTN:
             self.symmetry = list(range(self.length))
         else:
             self.symmetry = symmetry
-
+        
+    def merge(self):
+        stab_list = []
+        length = int(len(self.stabs) / 2 )
+        for i in range(length):
+            stab_list.append(self.stabs[i] * self.stabs[i+length])
+        self.stabs = stab_list
     def __getitem__(self, indices):
         return self.stabs[indices]
 
@@ -528,6 +534,7 @@ def Az_poly(generator, stab_group=None):
     if not stab_group:
         stab_group = stabilizer_group(generator)
     count = [0] * (n+1)
+    print("len",len(stab_group))
     for item in stab_group:
         count[item.weight()] += 1
     return count
@@ -539,11 +546,14 @@ def Bz_poly(generator, k, stab_group=None):
     poly_coeff = Az_poly(generator, stab_group)
     poly = 0
     for i in range(len(poly_coeff)):
-        lz = (1-lx)/2
-        lw = (1+3*lx)/2
+        lz = (1-lx)
+        lw = (1+3*lx)
         poly += poly_coeff[i]*lz**i*lw**(n-i)
+    print(poly)
     poly = Poly(simplify(2**k*poly))
-    return poly.all_coeffs()[-1::-1]
+    coeffs = poly.all_coeffs()[-1::-1]
+    coeffs = [i//coeffs[0] for i in coeffs]
+    return coeffs
 
 
 def Az(w, z, generator, k):
@@ -563,8 +573,7 @@ def stabilizer_group(generator):
     subsets = allsubset(generator)
     
     n = generator[0].length
-    stab_group = set()
-    stab_group.add(stabilizer("i"*n))
+    stab_group = [stabilizer("i"*n)]
     length = len(subsets)
     if debug:
         print(f"subset lenght: {len(subsets)}")
@@ -572,10 +581,11 @@ def stabilizer_group(generator):
     percent = max(length // 10, 1)
     for i in range(length):
         sub = subsets[i]
+
         if i%percent == 0 and debug:
             print(f"{10 * i//percent}%")
-        if len(sub) > 0:
-            stab_group.add(product(sub))
+        if len(sub) > 0:           
+            stab_group.append(product(sub))
     # print("end", len(stab_group))
     return stab_group
 

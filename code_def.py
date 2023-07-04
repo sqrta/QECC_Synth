@@ -12,14 +12,15 @@ code603 = codeTN(['iixxxx', 'iizzzz', 'xixxii', 'ixixix', 'zizizi', 'iziizz'], "
 code804 = codeTN(['iiiixxxx', 'iixxiixx', 'ixixixix', 'xxxxxxxx','iiiizzzz', 'iizziizz', 'iziziziz', 'zzzzzzzz'], "code803")
 code713 = codeTN(['iiixxxx', 'ixxiixx', 'xixixix', 'iiizzzz', 'izziizz', 'ziziziz'], "code713")
 code422 = codeTN(['xxxx', 'zzzz'], "code422")
-code11_1_5 = codeTN(["xiiiixiiiii","ixiiixiiiii","iixiixiiiii","iiixixiiiii","iiiixxiiiii","iiiiiixiiix","iiiiiiixiix","iiiiiiiixix","iiiiiiiiixx","iziziiizzii","izizzziizzi","iziiziiiizz","izzzizziizi","iizziizzizz","iizziizzziz","izizzzzzizz","iiizizizizi","iziziizizii","zzzzzziiiii"])
-stab_list = []
-length = int(len(code11_1_5.stabs) / 2 )
-for i in range(length):
-    stab_list.append(code11_1_5.stabs[i] * code11_1_5[i+length])
-code11_1_5.stabs = stab_list
+code11_1_5 = codeTN(["ziiiiziiiii","iziiiziiiii","iiziiziiiii","iiiziziiiii","iiiizziiiii","iiiiiiziiiz","iiiiiiiziiz","iiiiiiiiziz","iiiiiiiiizz","ixixiiixxii","ixixxxiixxi","ixiixiiiixx","ixxxixxiixi","iixxiixxixx","iixxiixxxix","ixixxxxxixx","iiixixixixi","ixixiixixii","xxxxxxiiiii"])
+code5_1_3_m = codeTN(["xiixx","ixiix","iixxi","ziziz","ziizz","ziizz","izzzz"])
+# stab_list = []
+# length = int(len(code11_1_5.stabs) / 2 )
+# for i in range(length):
+#     stab_list.append(code11_1_5.stabs[i] * code11_1_5[i+length])
+# code11_1_5.stabs = stab_list
 
 if __name__ == "__main__":
     px = 0.01
     pz = 0.05
-    print(code11_1_5.stabs)
+    print(distance(code13_1_4, 1))

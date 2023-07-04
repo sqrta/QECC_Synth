@@ -28,10 +28,16 @@ def search(initial):
     with open("found", 'w') as f:
         while len(queue)>0:
             top = queue.pop(0)
+            if len(top.tensorList)<=4:
+                continue
             logLeg = top.equiv_trace_leg()[0]
             setlog = copy.deepcopy(top)
             setlog.setLogical(logLeg[0], logLeg[1])
-            d, error = eval_tn(setlog)
+            try:
+                d, error = eval_tn(setlog)
+            except:
+                print(str(setlog))
+                exit(0)
             n = setlog.get_n()
             if d>=3:
                 content = str(setlog) + f"error: {error}, n: {n}, d: {d}"

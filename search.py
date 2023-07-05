@@ -24,55 +24,60 @@ def search(initial):
     candidate_code = [code604, code603]
     exist_set = set()
     minError = {}
-    maxD = 3
-    with open("found", 'w') as f:
-        while len(queue)>0:
-            top = queue.pop(0)
-            logLeg = top.equiv_trace_leg()[0]
-            setlog = copy.deepcopy(top)
-            setlog.setLogical(logLeg[0], logLeg[1])
-            try:
-                d, error = eval_tn(setlog)
-            except:
-                print(str(setlog))
-                exit(0)
-            n = setlog.get_n()
-            if d>=3:
-                content = str(setlog) + f"error: {error}, n: {n}, d: {d}"
-                # print(content)
-                if (n,d) not in minError.keys():
-                    minError[(n,d)] = error
-                    print(content)
-                elif error < minError[(n,d)]:
-                    minError[(n,d)] = error
-                    print(content)
-                    f.write(content+"\n\n")
-                    
-            if (d,error) not in exist_set:
-                exist_set.add((d,error))
-                if len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
-                    dangleLegs = top.equiv_trace_leg()
-                    for i in range(len(candidate_code)):
-                        code = candidate_code[i]
-                        if i< top.tensorList[-1].index:
-                            continue
-                        for leg in dangleLegs:
-                            for tractLeg in code.symmetry:
-                                tmp = copy.deepcopy(top)
-                                tmp.trace(leg[0],leg[1],Tensor(code,i), tractLeg)
-                                queue.append(tmp)
-                if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>4:
-                    dangleLegs = top.equiv_trace_leg()
-                    for i in range(len(dangleLegs)-1):
-                        for j in range(i+1, len(dangleLegs)):
-                            first,second = dangleLegs[i],dangleLegs[j]
-                            if first[0]==second[0]:
-                                continue
-                            if top.largerSelfTrace(('self',first[0],first[1],second[0],second[1])):
-                                continue
+    count = 0
+    f = open("found", 'w')
+    while len(queue)>0:
+        count+=1
+        if count%10000==0:
+            f.close()
+            f= open(f"found{count}",'w')
+        top = queue.pop(0)
+        logLeg = top.equiv_trace_leg()[0]
+        setlog = copy.deepcopy(top)
+        setlog.setLogical(logLeg[0], logLeg[1])
+        try:
+            d, error = eval_tn(setlog)
+        except:
+            print(str(setlog))
+            exit(0)
+        n = setlog.get_n()
+        if d>=3:
+            content = str(setlog) + f"error: {error}, n: {n}, d: {d}"
+            # print(content)
+            if (n,d) not in minError.keys():
+                minError[(n,d)] = error
+                print(content)
+                f.write(content+"\n\n")
+            elif error < minError[(n,d)]:
+                minError[(n,d)] = error
+                print(content)
+                f.write(content+"\n\n")
+                
+        if (d,error) not in exist_set:
+            exist_set.add((d,error))
+            if len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
+                dangleLegs = top.equiv_trace_leg()
+                for i in range(len(candidate_code)):
+                    code = candidate_code[i]
+                    if i< top.tensorList[-1].index:
+                        continue
+                    for leg in dangleLegs:
+                        for tractLeg in code.symmetry:
                             tmp = copy.deepcopy(top)
-                            tmp.selfTrace(first[0],first[1],second[0],second[1])
+                            tmp.trace(leg[0],leg[1],Tensor(code,i), tractLeg)
                             queue.append(tmp)
+            if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>4:
+                dangleLegs = top.equiv_trace_leg()
+                for i in range(len(dangleLegs)-1):
+                    for j in range(i+1, len(dangleLegs)):
+                        first,second = dangleLegs[i],dangleLegs[j]
+                        if first[0]==second[0]:
+                            continue
+                        if top.largerSelfTrace(('self',first[0],first[1],second[0],second[1])):
+                            continue
+                        tmp = copy.deepcopy(top)
+                        tmp.selfTrace(first[0],first[1],second[0],second[1])
+                        queue.append(tmp)
     end = time.time()
     print(f"use {end-start}s")
     return minError

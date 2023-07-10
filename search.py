@@ -29,6 +29,7 @@ def search(initial):
     while len(queue)>0:
         count+=1
         if count%10000==0:
+            f.write(str(minError))
             f.close()
             f= open(f"found{count}",'w')
         top = queue.pop(0)

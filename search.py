@@ -21,7 +21,7 @@ def search(initial):
     queue = [TNNetwork(initial)]
     maxTensor = 4
     selfTraceDepth = 3
-    candidate_code = [code604, code603]
+    candidate_code = [code603, code604]
     exist_set = set()
     minError = {}
     count = 0
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     pz = 0.05
     import time
     start = time.time()
-    minE = search(Tensor(code604, 0))
+    minE = search(Tensor(code603, 0))
     print(minE)
 
     # t604 = Tensor(code604)

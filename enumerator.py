@@ -74,7 +74,6 @@ def parse(program):
     insList = program.insList
     tnList = program.tensorList
     tnEnum = get_enum_tensor(tnList[0].tensor, tnList[0].tracted)
-    print(tnEnum.shape)
     def getMIndex(traceIndex):
         return sum([len(t.tracted) for t in tnList[:traceIndex]])
     for ins in insList:

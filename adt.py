@@ -276,6 +276,9 @@ class check_matrix:
                     matrix[i, j] = 1
                 elif c == 'Z':
                     matrix[i, n + j] = 1
+                elif c=="Y":
+                    matrix[i, j] = 1
+                    matrix[i, n + j] = 1
         return matrix
 
     def swapColumn(self, a, b):
@@ -437,6 +440,8 @@ class check_matrix:
                     1:] = other.matrix[2:, other.n+1:]
             else:
                 print("2branch")
+                print(this.matrix)
+                print(other.matrix)
                 i = other.matrix[0, 0]
                 j = other.matrix[0, other.n]
                 width = this.n + other.n - 2
@@ -456,6 +461,7 @@ class check_matrix:
                     1:width] = other.matrix[1:other.matrix.shape[0], 1:other.n]
                 M[this.matrix.shape[0]-1:, width+this.n -
                     1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
+                print(M)
         this.matrix = M
         this.Mod2()
         this.removeZeroRow()
@@ -551,7 +557,6 @@ def Bz_poly(generator, k, stab_group=None):
         lz = (1-lx)
         lw = (1+3*lx)
         poly += poly_coeff[i]*lz**i*lw**(n-i)
-    print(poly)
     poly = Poly(simplify(2**k*poly))
     coeffs = poly.all_coeffs()[-1::-1]
     coeffs = [i//coeffs[0] for i in coeffs]

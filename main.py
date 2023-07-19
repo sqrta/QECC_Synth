@@ -24,7 +24,8 @@ def TNN2CM(tn):
             matrixIndex = getMIndex(traceIndex)
             newOne = tnList[newOneIndex]
             newTNindex = newOne.tracted.index(newOneleg)    
-            print('trace', matrixIndex, newTNindex)
+            # print('trace', matrixIndex, newTNindex)
+
             tmp = cm.trace(check_matrix(newOne.tensor), matrixIndex, newTNindex)
             cm = tmp
             newOne.tracted.pop(0)
@@ -59,7 +60,6 @@ def prog2Cm(insList, tnList):
             traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
             matrixIndex = getMIndex(traceIndex, traceLeg)
             newOne = tnList[newOneIndex] 
-            print('trace', matrixIndex, newOneleg)
             cm = cm.trace(check_matrix(newOne), matrixIndex, newOneleg)
             tracted[traceIndex].append(traceLeg)
             tracted[newOneIndex].append(newOneleg)
@@ -67,8 +67,6 @@ def prog2Cm(insList, tnList):
             index1, leg1, index2, leg2 = ins[1:]
             mIndex1 = getMIndex(index1, leg1)
             mIndex2 = getMIndex(index2, leg2)
-            print(ins)
-            print('self', mIndex1, mIndex2)
             cm = cm.selfTrace(mIndex1, mIndex2)
             tracted[index1].append(leg1)
             tracted[index2].append(leg2)
@@ -90,12 +88,12 @@ tn = prog2TNN(insList, tnList)
 n = tn.get_n()
 d,error = eval_tn(tn)
 print(f"n: {n}, d: {d}, error: {error}")
-exit(0)
+
 # cm = check_matrix(code603)
 # a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
 # a = check_matrix(code603).trace(check_matrix(code604),0,0).trace(check_matrix(code604),0,0).selfTrace(3, 4)
-a.setLogical(0)
-print("n", tn.get_n())
+a.setLogical(2)
+
 # a.setLogical(2)
 # a.setLogical(4)
 print(a.matrix)
@@ -109,7 +107,7 @@ A = Azx(stab_group, px, 1 - px, pz, 1- pz)
 B = Bzx(1, stab_group, px, 1 - px, pz, 1- pz)
 print(A, B, B-A)
 end = time.time()
-print(end-start)
+print(f"time: {end-start}")
 exit(0)
 
 

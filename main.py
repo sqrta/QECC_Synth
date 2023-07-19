@@ -61,15 +61,25 @@ def prog2Cm(insList, tnList):
             matrixIndex = getMIndex(traceIndex, traceLeg)
             newOne = tnList[newOneIndex] 
             cm = cm.trace(check_matrix(newOne), matrixIndex, newOneleg)
+            # print(matrixIndex, newOneleg)
             tracted[traceIndex].append(traceLeg)
             tracted[newOneIndex].append(newOneleg)
-        if ins[0] == "self":
+        elif ins[0] == "self":
             index1, leg1, index2, leg2 = ins[1:]
             mIndex1 = getMIndex(index1, leg1)
             mIndex2 = getMIndex(index2, leg2)
             cm = cm.selfTrace(mIndex1, mIndex2)
+            # print(mIndex1, mIndex2)
             tracted[index1].append(leg1)
             tracted[index2].append(leg2)
+        elif ins[0] == "setLog":
+            index1, leg1 = ins[1:]
+            mIndex1 = getMIndex(index1, leg1)
+            cm.setLogical(mIndex1)
+            # print(mIndex1)
+            tracted[index1].append(leg1)
+        else:
+            raise NameError(f"no ops as {ins[0]}")
     return cm
 px = 0.01
 pz = 0.05
@@ -77,9 +87,9 @@ pz = 0.05
 insList = [['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1], ['setLog',0,0]]
 tnList = ['code603', 'code604', 'code604', 'code604']
 # insList = [['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['self', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['self', 0, 4, 1, 4]]         
-# tnList = ['code604', 'code604']
+tnList = ['code604', 'code604']
 tnList = ['code603','codeS', 'codeH', 'codeH', 'code603']
-insList = [['trace', 0, 4, 1, 0], ['trace', 0, 3, 2, 0], ['trace', 0, 5, 3, 0],['trace', 1, 1, 4, 2], ['self', 4, 3, 2, 1], ['self', 4, 5, 3, 1], ['setLog', 0, 2]]
+insList = [['trace', 0, 4, 1, 0], ['trace', 0, 3, 2, 0], ['trace', 0, 5, 3, 0],['trace', 1, 1, 4, 4], ['self', 4, 3, 2, 1], ['self', 4, 5, 3, 1], ['setLog', 0, 2]]
 tensorList  = [eval(t) for t in tnList]
 
 a = prog2Cm(insList, tensorList)
@@ -91,8 +101,8 @@ print(f"n: {n}, d: {d}, error: {error}")
 
 # cm = check_matrix(code603)
 # a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
-# a = check_matrix(code603).trace(check_matrix(code604),0,0).trace(check_matrix(code604),0,0).selfTrace(3, 4)
-a.setLogical(2)
+# a = check_matrix(code603).trace(check_matrix(codeS),4,0).trace(check_matrix(codeH),3,0).trace(check_matrix(codeH),3,0).trace(check_matrix(code603),3,4).selfTrace(3, 8).selfTrace(3, 7)
+# a.setLogical(2)
 
 # a.setLogical(2)
 # a.setLogical(4)

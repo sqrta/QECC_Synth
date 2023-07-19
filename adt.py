@@ -239,10 +239,11 @@ class stabilizer:
         return product([a.sign for a in self.value])
 
     def __eq__(self, other) -> bool:
-        return self.prefix() == other.prefix() and self.term() == other.term()
+        # return self.prefix() == other.prefix() and self.term() == other.term()
+        return self.term() == other.term()
 
     def __str__(self) -> str:
-        return f"{str(self.prefix())}*{self.term()}"
+        return f"{self.term()}"
 
     def __repr__(self) -> str:
         return str(self)
@@ -580,7 +581,8 @@ def stabilizer_group(generator):
     subsets = allsubset(generator)
     
     n = generator[0].length
-    stab_group = [stabilizer("i"*n)]
+    stab_group = set()
+    stab_group.add(stabilizer("i"*n))
     length = len(subsets)
     if debug:
         print(f"subset lenght: {len(subsets)}")
@@ -592,7 +594,7 @@ def stabilizer_group(generator):
         if i%percent == 0 and debug:
             print(f"{10 * i//percent}%")
         if len(sub) > 0:           
-            stab_group.append(product(sub))
+            stab_group.add(product(sub))
     # print("end", len(stab_group))
     return stab_group
 

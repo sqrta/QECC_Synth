@@ -21,6 +21,8 @@ def buildProg(insList, initial):
             tn.selfTrace(ins[1], ins[2], ins[3], ins[4])
         elif ins[0] == "setLog":
             tn.setLogical(ins[1], ins[2])
+        else:
+            raise NameError(f"no ops as {ins[0]}")
     return tn
 
 class codeTN:
@@ -610,12 +612,26 @@ def Azx(stab_group, x, y, z, w):
     result = 0
     for term in stab_group:
         wx = term.Wx("X")
-        wz = term.Wz("z")
+        wz = term.Wz("Z")
         result+=x**wx*y**(n-wx)*z**wz*w**(n-wz)
     return result
 
 def Bzx(k, stab_group, x, y, z, w):
     return 2**k * Azx(stab_group, w-z, z+w, (y-x)/2, (x+y)/2)
+
+def ABzx(stab_group, x,y,z,w,k):
+    n = next(iter(stab_group)).length
+    Ax = 0
+    Bx = 0
+    def Nerror(x,y,z,w,wx,wz):
+        return x**wx*y**(n-wx)*z**wz*w**(n-wz)
+    for term in stab_group:
+        wx = term.Wx("X")
+        wz = term.Wz("Z")
+        Ax += Nerror(x,y,z,w,wx,wz)
+        Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
+    return 2**k*Bx-Ax
+
 
 if __name__ == "__main__":
     code513 = codelize(["xzzxi", 'ixzzx', 'xixzz', 'zxixz'])

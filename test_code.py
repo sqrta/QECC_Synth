@@ -12,7 +12,10 @@ with open(filename, "r") as f:
         z = xz[1].replace(' ','').replace("1", 'z').replace('0', 'i').replace(']', '').replace('\n', '')
         xlist.append(x)
         zlist.append(z)
+    px = 0.01
+    pz = 0.05
     code = codeTN(xlist+zlist)
     code.merge()
-    d,error = eval_code(code, 1)
-    print(f"d: {d}, error: {error}")
+    stab_group = stabilizer_group(code)
+    error = ABzx(stab_group, px, 1 - px, pz, 1- pz, 1)
+    print(f"error: {error}")

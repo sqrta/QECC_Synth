@@ -74,6 +74,7 @@ def parse(program):
     insList = program.insList
     tnList = program.tensorList
     tnEnum = get_enum_tensor(tnList[0].tensor, tnList[0].tracted)
+    print(tnEnum.shape)
     def getMIndex(traceIndex):
         return sum([len(t.tracted) for t in tnList[:traceIndex]])
     for ins in insList:
@@ -103,6 +104,13 @@ def eval_code(code, k, px = 0.01, pz = 0.05):
     return distance_from_poly(simp_poly(APoly),n,k), xzNoise(n,k,APoly, px, pz)
 
 
+
+def eval_tn(tn, px=0.01, pz=0.05):
+    n = tn.get_n()
+    k = tn.get_k()
+
+    APoly = parse(tn)
+    return distance_from_poly(simp_poly(APoly), n, k), xzNoise(n, k, APoly, px, pz)
 
 if __name__ == "__main__":
     n = 5

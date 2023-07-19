@@ -7,13 +7,7 @@ def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn = buildProg(prog, initial)
     tn.show()
     return eval_tn(tn)
-
-def eval_tn(tn):
-    n = tn.get_n()
-    k = tn.get_k()
-
-    APoly = parse(tn)
-    return distance_from_poly(simp_poly(APoly), n, k), xzNoise(n, k, APoly, px, pz) 
+ 
 
 def search(initial):
     import time

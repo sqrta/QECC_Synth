@@ -14,6 +14,8 @@ code713 = codeTN(['iiixxxx', 'ixxiixx', 'xixixix', 'iiizzzz', 'izziizz', 'zizizi
 code422 = codeTN(['xxxx', 'zzzz'], "code422")
 code11_1_5 = codeTN(["ziiiiziiiii","iziiiziiiii","iiziiziiiii","iiiziziiiii","iiiizziiiii","iiiiiiziiiz","iiiiiiiziiz","iiiiiiiiziz","iiiiiiiiizz","iiiiiiiiiii","ixixiiixxii","ixixxxiixxi","ixiixiiiixx","ixxxixxiixi","iixxiixxixx","iixxiixxxix","ixixxxxxixx","iiixixixixi","ixixiixixii","xxxxxxiiiii"])
 code5_1_3_m = codeTN(["xiixx","ixiix","iixxi", "iiiii","ziziz","ziizz","ziizz","izzzz"])
+codeH = codeTN(["xz", "zx"], "H", symmetry=[0])
+codeS = codeTN(["xy", "yx"], "S", symmetry=[0])
 # stab_list = []
 # length = int(len(code11_1_5.stabs) / 2 )
 # for i in range(length):
@@ -26,3 +28,5 @@ if __name__ == "__main__":
     px = 0.01
     pz = 0.05
     print(distance(code11_1_5, 1))
+    stab_group = stabilizer_group(code513)
+    print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 1))

@@ -16,8 +16,17 @@ Y = 1j * X @ Z
 I = np.array([[1,0],
               [0,1]])
 
+H = np.array([[1,1],
+              [1,-1]])
+
+S = np.array([[1,0],
+              [0,1j]])
+
+bell = np.array([1,0,0,1])
+init = tensor([S,I]).dot(bell)
+print(init)
+
 n = 2
-init = np.array([1,0,0,1j])
 paulis = {'X':X, 'Y': Y, 'Z':Z, 'I': I}
 print(tensor([X,I]))
 for i in paulis.keys():

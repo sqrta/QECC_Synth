@@ -9,13 +9,12 @@ def eval_prog(prog, initial, px=0.01, pz = 0.05):
     return eval_tn(tn)
  
 
-def search(initial):
+def search(initial, candidate_code, candidate_bound):
     import time
     start = time.time()
     queue = [TNNetwork(initial)]
-    maxTensor = 4
-    selfTraceDepth = 3
-    candidate_code = [code603, code604]
+    maxTensor = sum(candidate_bound)
+    selfTraceDepth = 2
     exist_set = set()
     minError = {}
     count = 0
@@ -52,9 +51,12 @@ def search(initial):
             exist_set.add((d,error))
             if len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
                 dangleLegs = top.equiv_trace_leg()
+                exist = [a.index for a in top.tensorList] 
                 for i in range(len(candidate_code)):
                     code = candidate_code[i]
-                    if i< top.tensorList[-1].index:
+                    # if i< top.tensorList[-1].index:
+                    #     continue
+                    if exist.count(i) >= candidate_bound[i]:
                         continue
                     for leg in dangleLegs:
                         for tractLeg in code.symmetry:
@@ -83,7 +85,8 @@ if __name__ == "__main__":
     pz = 0.05
     import time
     start = time.time()
-    minE = search(Tensor(code603, 0))
+    candidate_code = [code603, codeH, codeS]
+    minE = search(Tensor(code603, 0), candidate_code, candidate_bound=[2,2, 1])
     print(minE)
 
     # t604 = Tensor(code604)

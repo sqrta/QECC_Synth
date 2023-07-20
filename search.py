@@ -26,7 +26,13 @@ def search(initial, candidate_code, candidate_bound):
             f.close()
             f= open(f"found{count}",'w')
         top = queue.pop(0)
-        logLeg = top.equiv_trace_leg()[0]
+        logLeg = None
+        for leg in top.equiv_trace_leg():
+            if leg[0]==0 and leg[1]>1:
+                logLeg = leg
+                break
+        if not logLeg:
+            logLeg = top.equiv_trace_leg()[0]
         setlog = copy.deepcopy(top)
         setlog.setLogical(logLeg[0], logLeg[1])
         try:
@@ -53,7 +59,8 @@ def search(initial, candidate_code, candidate_bound):
                 dangleLegs = top.equiv_trace_leg()
                 exist = [a.index for a in top.tensorList] 
                 for i in range(len(candidate_code)):
-                    code = candidate_code[i]
+                    codeName = candidate_code[i]
+                    code = eval(codeName)
                     # if i< top.tensorList[-1].index:
                     #     continue
                     if exist.count(i) >= candidate_bound[i]:
@@ -61,7 +68,7 @@ def search(initial, candidate_code, candidate_bound):
                     for leg in dangleLegs:
                         for tractLeg in code.symmetry:
                             tmp = copy.deepcopy(top)
-                            tmp.trace(leg[0],leg[1],Tensor(code,i), tractLeg)
+                            tmp.trace(leg[0],leg[1],Tensor(codeName,i), tractLeg)
                             queue.append(tmp)
             if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>4:
                 dangleLegs = top.equiv_trace_leg()
@@ -85,8 +92,8 @@ if __name__ == "__main__":
     pz = 0.05
     import time
     start = time.time()
-    candidate_code = [code603, codeH, codeS]
-    minE = search(Tensor(code603, 0), candidate_code, candidate_bound=[2,2, 1])
+    candidate_code = ['code603', 'codeH', 'codeS']
+    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[2,2, 1])
     print(minE)
 
     # t604 = Tensor(code604)

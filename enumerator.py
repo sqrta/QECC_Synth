@@ -74,7 +74,7 @@ def show2Dsimp(enumerator):
 def parse(program):
     insList = program.insList
     tnList = program.tensorList
-    tnEnum = get_enum_tensor(tnList[0].tensor, tnList[0].tracted)
+    tnEnum = get_enum_tensor(tnList[0].tensor(), tnList[0].tracted)
     def getMIndex(traceIndex):
         return sum([len(t.tracted) for t in tnList[:traceIndex]])
     for ins in insList:
@@ -82,7 +82,7 @@ def parse(program):
             traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
             matrixIndex = getMIndex(traceIndex)
             newOne = tnList[newOneIndex]
-            newTensor = get_enum_tensor(newOne.tensor, newOne.tracted)
+            newTensor = get_enum_tensor(newOne.tensor(), newOne.tracted)
             newTNindex = newOne.tracted.index(newOneleg)    
             tmp = np.tensordot(tnEnum, newTensor, axes= [matrixIndex, newTNindex])
             tnEnum = tmp

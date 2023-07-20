@@ -71,7 +71,8 @@ def show2Dsimp(enumerator):
             print(simp_poly(col))
         print("")
 
-def parse(program):
+def parse(tn):
+    program = copy.deepcopy(tn)
     insList = program.insList
     tnList = program.tensorList
     tnEnum = get_enum_tensor(tnList[0].tensor(), tnList[0].tracted)

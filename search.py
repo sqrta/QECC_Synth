@@ -35,12 +35,13 @@ def search(initial, candidate_code, candidate_bound):
             logLeg = top.equiv_trace_leg()[0]
         setlog = copy.deepcopy(top)
         setlog.setLogical(logLeg[0], logLeg[1])
+        n = setlog.get_n()
         try:
             d, error = eval_tn(setlog)
         except:
             print(str(setlog))
             exit(0)
-        n = setlog.get_n()
+        
         if d>=3:
             content = str(setlog) + f"error: {error}, n: {n}, d: {d}"
             # print(content)

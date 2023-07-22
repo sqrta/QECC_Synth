@@ -90,12 +90,16 @@ tnList = ['code603', 'code604', 'code604', 'code604']
 tnList = ['code604', 'code604']
 tnList = ['code603','codeS', 'codeH', 'codeH', 'code603']
 insList = [['trace', 0, 4, 1, 0], ['trace', 0, 3, 2, 0], ['trace', 0, 5, 3, 0],['trace', 1, 1, 4, 4], ['self', 4, 3, 2, 1], ['self', 4, 5, 3, 1], ['setLog', 0, 2]]
-insList=[['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['setLog', 0,2]]
-tnList = ['code603', 'code603'] 
+insList=[['trace', 0, 0, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 0, 1, 4, 0], ['self', 3, 1, 4, 1], ['setLog', 0, 2]] 
+tnList = ['code603', 'code603', 'codeH', 'codeH', 'codeS']  
 tensorList  = [eval(t) for t in tnList]
 
 a = prog2Cm(insList, tensorList)
 tn = prog2TNN(insList, tnList)
+print(a.matrix)
+tmp = tn.toCm()
+print(tmp.rowWBound(), tmp.colWBound())
+
 # tn.setLogical(0,0)
 n = tn.get_n()
 d,error = eval_tn(tn)

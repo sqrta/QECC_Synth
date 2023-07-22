@@ -117,8 +117,8 @@ if __name__ == "__main__":
     n = 5
     px = 0.01
     pz = 0.05
-    print(get_enum_tensor(codeS, []))
-    d,error = eval_code(codet, 1)
+    print(get_enum_tensor(code513, []))
+    d,error = eval_code(code713, 1)
     print(f"d: {d}, error: {error}")
 
 

@@ -111,6 +111,49 @@ class TNNetwork:
             if selfTraceALargerB(ins, new_ins):
                 return True
         return False
+    
+    def toCm(self):
+        tnList = [t.tensor() for t in self.tensorList]
+        insList = self.insList
+        tracted = [[] for i in range(len(tnList))]
+        cm = check_matrix(tnList[0])
+        def getMIndex(traceIndex, traceLeg):
+            index = 0
+            for i in range(traceIndex):
+                index+=tnList[i].length - len(tracted[i])
+            count = 0
+            for tractedLeg in tracted[traceIndex]:
+                if tractedLeg<traceLeg:
+                    count+=1
+            index += traceLeg - count
+            return index
+        
+        for ins in insList:
+            if ins[0]=="trace":
+                traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
+                matrixIndex = getMIndex(traceIndex, traceLeg)
+                newOne = tnList[newOneIndex] 
+                cm = cm.trace(check_matrix(newOne), matrixIndex, newOneleg)
+                # print(matrixIndex, newOneleg)
+                tracted[traceIndex].append(traceLeg)
+                tracted[newOneIndex].append(newOneleg)
+            elif ins[0] == "self":
+                index1, leg1, index2, leg2 = ins[1:]
+                mIndex1 = getMIndex(index1, leg1)
+                mIndex2 = getMIndex(index2, leg2)
+                cm = cm.selfTrace(mIndex1, mIndex2)
+                # print(mIndex1, mIndex2)
+                tracted[index1].append(leg1)
+                tracted[index2].append(leg2)
+            elif ins[0] == "setLog":
+                index1, leg1 = ins[1:]
+                mIndex1 = getMIndex(index1, leg1)
+                cm.setLogical(mIndex1)
+                # print(mIndex1)
+                tracted[index1].append(leg1)
+            else:
+                raise NameError(f"no ops as {ins[0]}")
+        return cm
 
 code13_1_4 = codeTN(['xiixixxiiixxi', 'ixixixixiiiii',
 'iixxiixxiixxi',
@@ -140,8 +183,7 @@ code11_1_5.merge()
 if __name__ == "__main__":
     px = 0.01
     pz = 0.05
-    print(check_matrix(codeH).matrix)
-    exit(0)
+
     print(distance(code11_1_5, 1))
     stab_group = stabilizer_group(code11_1_5)
     print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 1))

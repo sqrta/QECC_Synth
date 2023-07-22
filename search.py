@@ -14,7 +14,7 @@ def search(initial, candidate_code, candidate_bound):
     start = time.time()
     queue = [TNNetwork(initial)]
     maxTensor = sum(candidate_bound)
-    selfTraceDepth = 2
+    selfTraceDepth = 4
     exist_set = set()
     minError = {}
     count = 0
@@ -40,17 +40,22 @@ def search(initial, candidate_code, candidate_bound):
             d, error = eval_tn(setlog)
         except:
             print(str(setlog))
+            print("error in eval!")
             exit(0)
         
         if d>=3:
-            content = str(setlog) + f"error: {error}, n: {n}, d: {d}"
+            cm = setlog.toCm()
+            rowW = cm.rowWBound()
+            colW = cm.colWBound()
+            content = str(setlog) + f"error: {error}, n: {n}, d: {d}, rowW: {rowW}, colW: {colW}"
             # print(content)
-            if (n,d) not in minError.keys():
-                minError[(n,d)] = error
+            key = (n,d,rowW,colW)
+            if key not in minError.keys():
+                minError[key] = error
                 print(content)
                 f.write(content+"\n\n")
-            elif error < minError[(n,d)]:
-                minError[(n,d)] = error
+            elif error < minError[key]:
+                minError[key] = error
                 print(content)
                 f.write(content+"\n\n")
                 
@@ -93,8 +98,8 @@ if __name__ == "__main__":
     pz = 0.05
     import time
     start = time.time()
-    candidate_code = ['code603', 'codeH', 'codeS']
-    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[2,2, 1])
+    candidate_code = ['code603', 'code604', 'codeH', 'codeS']
+    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[2, 2,2, 1])
     print(minE)
 
     # t604 = Tensor(code604)

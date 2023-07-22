@@ -205,6 +205,14 @@ class check_matrix:
                 M[i, j] = 0 if self.matrix[i, j] % 2 == 0 else 1
         self.matrix = M
 
+    def rowWBound(self):
+        stabs = [row[:self.n]+row[:self.n] for row in self.matrix]
+        count = [np.count_nonzero(row!=0) for row in stabs]
+        return max(count)
+    
+    def colWBound(self):
+        return self.matrix.shape[0]
+
     def setOnlyOne1(self, column):
         target = -1
         for i in range(self.matrix.shape[0]-1, -1, -1):

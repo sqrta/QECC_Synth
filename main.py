@@ -92,6 +92,8 @@ tnList = ['code603','codeS', 'codeH', 'codeH', 'code603']
 insList = [['trace', 0, 4, 1, 0], ['trace', 0, 3, 2, 0], ['trace', 0, 5, 3, 0],['trace', 1, 1, 4, 4], ['self', 4, 3, 2, 1], ['self', 4, 5, 3, 1], ['setLog', 0, 2]]
 insList=[['trace', 0, 0, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 0, 1, 4, 0], ['self', 3, 1, 4, 1], ['setLog', 0, 2]] 
 tnList = ['code603', 'code603', 'codeH', 'codeH', 'codeS']  
+insList = [['trace', 0, 0, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 1, 3, 0], ['self', 1, 1, 3, 1], ['setLog', 0, 3]]           
+tnList = ['code603', 'code604', 'codeH', 'codeS']
 tensorList  = [eval(t) for t in tnList]
 
 a = prog2Cm(insList, tensorList)

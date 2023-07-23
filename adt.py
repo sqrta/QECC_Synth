@@ -206,7 +206,8 @@ class check_matrix:
         self.matrix = M
 
     def rowWBound(self):
-        stabs = [row[:self.n]+row[:self.n] for row in self.matrix]
+        stabs = [row[:self.n]+row[self.n:] for row in self.matrix]
+        print(stabs)
         count = [np.count_nonzero(row!=0) for row in stabs]
         return max(count)
     

@@ -32,9 +32,9 @@ def search(initial, candidate_code, candidate_bound):
         #         logLeg = leg
         #         break
         # if not logLeg:
-        logLeg = top.equiv_trace_leg()[0]
-        
-        for secLeg in top.equiv_trace_leg():
+        legs = top.equiv_trace_leg()
+        logLeg = legs[0]    
+        for secLeg in legs[1:]:
             setlog = copy.deepcopy(top)
             setlog.setLogical(logLeg[0], logLeg[1])
             setlog.setLogical(secLeg[0], secLeg[1])

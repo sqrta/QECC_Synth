@@ -117,6 +117,7 @@ def eval_tn(tn, px=0.01, pz=0.05):
     return d, noise
 
 def Poly2Distance(APoly, BPoly):
+
     Az_coeff = simp_poly(APoly).all_coeffs()[-1::-1]
     Bz_coeff = simp_poly(BPoly).all_coeffs()[-1::-1]
     # print(Az_coeff)

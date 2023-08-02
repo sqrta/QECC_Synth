@@ -172,6 +172,7 @@ code5_1_3_m = codeTN(["xiixx","ixiix","iixxi", "iiiii","ziziz","ziizz","ziizz","
 codeH = codeTN(["xz", "zx", "yy"], "H", symmetry=[0])
 codeS = codeTN(["xy", "yx"], "S", symmetry=[0])
 codet = codeTN(['ixiiz', 'izxix', 'ziixi', 'yiizy', 'iiziz'])
+codeGHZ = codeTN(['izz','xxx', 'zzi'], "GHZ", symmetry=[0])
 # stab_list = []
 # length = int(len(code11_1_5.stabs) / 2 )
 # for i in range(length):
@@ -183,8 +184,8 @@ code11_1_5.merge()
 if __name__ == "__main__":
     px = 0.01
     pz = 0.05
-
-    print(distance(code11_1_5, 1))
-    stab_group = stabilizer_group(code11_1_5)
-    print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 1))
+    code = code422
+    print(distance(code, 2))
+    stab_group = stabilizer_group(code)
+    print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 2))
     

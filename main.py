@@ -84,28 +84,53 @@ def prog2Cm(insList, tnList):
 px = 0.01
 pz = 0.05
 
-insList = [['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1], ['setLog',0,0]]
-tnList = ['code603', 'code604', 'code604', 'code604']
+prog15_14 = ([['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1], ['setLog',0,0]], ['code603', 'code604', 'code604', 'code604'])
 # insList = [['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['self', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['self', 0, 4, 1, 4]]         
 tnList = ['code604', 'code604']
 tnList = ['code603','codeS', 'codeH', 'codeH', 'code603']
 insList = [['trace', 0, 4, 1, 0], ['trace', 0, 3, 2, 0], ['trace', 0, 5, 3, 0],['trace', 1, 1, 4, 4], ['self', 4, 3, 2, 1], ['self', 4, 5, 3, 1], ['setLog', 0, 2]]
 insList=[['trace', 0, 0, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 0, 1, 4, 0], ['self', 3, 1, 4, 1], ['setLog', 0, 2]] 
 tnList = ['code603', 'code603', 'codeH', 'codeH', 'codeS']  
-insList = [['trace', 0, 0, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 1, 3, 0], ['self', 1, 1, 3, 1], ['setLog', 0, 3]]           
-tnList = ['code603', 'code604', 'codeH', 'codeS']
+
+# 713 4 6 code
+prog713_4_6 = ([['trace', 0, 5, 1, 0], ['trace', 0, 0, 2, 0], ['trace', 0, 1, 3, 0], ['trace', 1, 1, 4, 0], ['self', 2, 1, 3, 1], ['setLog', 0, 2]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
+
+#713 5 6 code
+
+prog713_5_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 5, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 1, 1, 1], ['setLog', 0, 4]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
+
+prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 3, 1, 4, 0], ['self', 0, 1, 1, 2], ['setLog', 0, 2]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
+
+prog422 = ([['setLog', 0, 0], ['setLog', 0, 1]],['code603'])
+prog = prog422
+
+
+insList = prog[0]
+tnList = prog[1]
 tensorList  = [eval(t) for t in tnList]
+
 
 a = prog2Cm(insList, tensorList)
 tn = prog2TNN(insList, tnList)
-print(a.matrix)
-tmp = tn.toCm()
-print(tmp.rowWBound(), tmp.colWBound())
-
-# tn.setLogical(0,0)
 n = tn.get_n()
-d,error = eval_tn(tn)
-print(f"n: {n}, d: {d}, error: {error}")
+k = tn.get_k()
+
+tmp = tn.toCm()
+tmp.row_echelon()
+rw = tmp.rowWBound()
+cw = tmp.colWBound()
+# tn.setLogical(0,0)
+
+d,error = eval_TN(tn)
+
+print(f"n: {n}, d: {d}, rW: {rw}, cW: {cw} error: {error}")
+print(eval_tn(tn))
+print(tmp.matrix)
+code = checkM2Stabilizers(tmp.matrix)
+print(code)
+
+stab_group = stabilizer_group(code)
+print(ABzx(stab_group, px, 1 - px, pz, 1- pz, k))
 
 # cm = check_matrix(code603)
 # a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
@@ -114,18 +139,16 @@ print(f"n: {n}, d: {d}, error: {error}")
 
 # a.setLogical(2)
 # a.setLogical(4)
-print(a.matrix)
-code = checkM2Stabilizers(a.matrix)
-print(code)
-print(f"n: {a.n}, d: {distance(code, 1)}")
-import time
-start = time.time()
-stab_group = stabilizer_group(code)
-A = Azx(stab_group, px, 1 - px, pz, 1- pz)
-B = Bzx(1, stab_group, px, 1 - px, pz, 1- pz)
-print(A, B, B-A)
-end = time.time()
-print(f"time: {end-start}")
+
+# print(f"n: {a.n}, d: {distance(code, 1)}")
+# import time
+# start = time.time()
+# stab_group = stabilizer_group(code)
+# A = Azx(stab_group, px, 1 - px, pz, 1- pz)
+# B = Bzx(1, stab_group, px, 1 - px, pz, 1- pz)
+# print(A, B, B-A)
+# end = time.time()
+# print(f"time: {end-start}")
 exit(0)
 
 

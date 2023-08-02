@@ -1,7 +1,7 @@
 from adt import *
 import itertools
 from enumerator import *
-
+import traceback
 
 def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn = buildProg(prog, initial)
@@ -26,39 +26,47 @@ def search(initial, candidate_code, candidate_bound):
             f.close()
             f= open(f"found{count}",'w')
         top = queue.pop(0)
-        logLeg = None
-        for leg in top.equiv_trace_leg():
-            if leg[0]==0 and leg[1]>1:
-                logLeg = leg
-                break
-        if not logLeg:
-            logLeg = top.equiv_trace_leg()[0]
-        setlog = copy.deepcopy(top)
-        setlog.setLogical(logLeg[0], logLeg[1])
-        n = setlog.get_n()
-        try:
-            d, error = eval_tn(setlog)
-        except:
-            print(str(setlog))
-            print("error in eval!")
-            exit(0)
+        # logLeg = None
+        # for leg in top.equiv_trace_leg():
+        #     if leg[0]==0 and leg[1]>1:
+        #         logLeg = leg
+        #         break
+        # if not logLeg:
+        logLeg = top.equiv_trace_leg()[0]
         
-        if d>=3:
-            cm = setlog.toCm()
-            rowW = cm.rowWBound()
-            colW = cm.colWBound()
-            content = str(setlog) + f"error: {error}, n: {n}, d: {d}, rowW: {rowW}, colW: {colW}"
-            # print(content)
-            key = (n,d,rowW,colW)
-            if key not in minError.keys():
-                minError[key] = error
-                print(content)
-                f.write(content+"\n\n")
-            elif error < minError[key]:
-                minError[key] = error
-                print(content)
-                f.write(content+"\n\n")
-                
+        for secLeg in top.equiv_trace_leg():
+            setlog = copy.deepcopy(top)
+            setlog.setLogical(logLeg[0], logLeg[1])
+            setlog.setLogical(secLeg[0], secLeg[1])
+            n = setlog.get_n()
+            k =setlog.get_k()
+            try:
+                d, error = eval_TN(setlog)
+            except Exception: 
+                print(str(setlog))
+                traceback.print_exc()             
+                print("error in eval!")
+                exit(0)
+            
+            if d>=3:
+                cm = setlog.toCm()
+                rowW = cm.rowWBound()
+                colW = cm.colWBound()
+                content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, rowW: {rowW}, colW: {colW}"
+                # print(content)
+                key = (n,d,rowW,colW)
+                if key not in minError.keys() or error < minError[key]:
+                    minError[key] = error
+                    print(content)
+                    f.write(content+"\n\n")
+                # elif :
+                #     minError[key] = error
+                #     print(content)
+                #     f.write(content+"\n\n")
+        hash = copy.deepcopy(top)
+        hash.setLogical(logLeg[0], logLeg[1])
+        d, error = eval_TN(hash)
+    
         if (d,error) not in exist_set:
             exist_set.add((d,error))
             if len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
@@ -98,8 +106,8 @@ if __name__ == "__main__":
     pz = 0.05
     import time
     start = time.time()
-    candidate_code = ['code603', 'code604', 'codeH', 'codeS']
-    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[2, 2,2, 1])
+    candidate_code = ['code603', 'code604', 'codeH', 'codeS', 'codeGHZ']
+    minE = search(Tensor('code604', 0), candidate_code, candidate_bound=[1, 2,2, 2,1])
     print(minE)
 
     # t604 = Tensor(code604)

@@ -207,12 +207,17 @@ class check_matrix:
 
     def rowWBound(self):
         stabs = [row[:self.n]+row[self.n:] for row in self.matrix]
-
         count = [np.count_nonzero(row!=0) for row in stabs]
         return max(count)
     
     def colWBound(self):
-        return self.matrix.shape[0]
+        stabs = [row[:self.n]+row[self.n:] for row in self.matrix]
+        count = [0] * self.n
+        for row in stabs:
+            for i in range(self.n):
+                if row[i]!=0:
+                    count[i]+=1
+        return max(count)
 
     def setOnlyOne1(self, column):
         target = -1
@@ -507,6 +512,7 @@ def distance(generator, k ,stab_group = None):
     if not stab_group:
         stab_group = stabilizer_group(generator)
     Az_coeff = Az_poly(generator, stab_group)
+    print(Az_coeff)
     Bz_coeff = Bz_poly(generator, k, stab_group)
     print(Az_coeff, Bz_coeff)
     for d in range(len(Az_coeff)):
@@ -537,6 +543,7 @@ def ABzx(stab_group, x,y,z,w,k):
         wz = term.Wz("Z")
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
+    print(Ax, 2**k*Bx)
     return 2**k*Bx-Ax
 
 

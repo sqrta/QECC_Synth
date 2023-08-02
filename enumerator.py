@@ -2,6 +2,7 @@ import numpy as np
 from numpy.polynomial import Polynomial
 from numpy.polynomial.polynomial import polyval3d
 from sympy import symbols, simplify, Poly
+from sympy.core.add import Add
 from sympy.abc import x, y, z,i,j
 from code_def import *
 from adt import *
@@ -54,9 +55,9 @@ def BxzNoise(n, k, APoly, x, y, z, w):
     return 2**k * AxzNoise(n, APoly, w-z, z+w, (y-x)/2, (x+y)/2)
 
 def simp_poly(enum_poly):
-    if isinstance(enum_poly, int):
-        return enum_poly
-    return Poly(enum_poly.subs([(y,x),(z,x)]))
+    if isinstance(enum_poly, Poly) or isinstance(enum_poly, Add):
+        return Poly(enum_poly.subs([(y,x),(z,x)]))
+    return enum_poly
 
 def xzNoise(n, k, APoly, px, pz):
     APoly = APoly.subs(y,x*z)
@@ -96,7 +97,7 @@ def parse(tn):
             tnEnum = np.trace(tnEnum, axis1= mIndex1, axis2= mIndex2)
             tnList[index1].tracted.pop(0)
             tnList[index2].tracted.pop(0)
-    return tnEnum[0]        
+    return tnEnum       
 
 def eval_code(code, k, px = 0.01, pz = 0.05):
     n = code.length
@@ -109,9 +110,37 @@ def eval_code(code, k, px = 0.01, pz = 0.05):
 def eval_tn(tn, px=0.01, pz=0.05):
     n = tn.get_n()
     k = tn.get_k()
+    enum = parse(tn)
+    APoly = enum.take(0)
+    d = distance_from_poly(simp_poly(APoly), n, k)
+    noise = xzNoise(n, k, APoly, px, pz)
+    return d, noise
 
-    APoly = parse(tn)
-    return distance_from_poly(simp_poly(APoly), n, k), xzNoise(n, k, APoly, px, pz)
+def Poly2Distance(APoly, BPoly):
+    Az_coeff = simp_poly(APoly).all_coeffs()[-1::-1]
+    Bz_coeff = simp_poly(BPoly).all_coeffs()[-1::-1]
+    # print(Az_coeff)
+    # print(Bz_coeff)
+    for d in range(len(Az_coeff)):
+        if Az_coeff[d] != Bz_coeff[d]:
+            return d
+        
+def ABError(n, APoly, BPoly, px, pz):
+    wx = 1 - px
+    wz = 1 - pz
+    Azx = wx**n*wz**n*APoly.subs([(x,px/wx), (z,pz/wz)])
+    Bzx = wx**n*wz**n*BPoly.subs([(x,px/wx), (z,pz/wz)])
+    return Bzx - Azx
+
+def eval_TN(tn, px=0.01, pz=0.05):
+    n = tn.get_n()
+    k = tn.get_k()
+    enum = parse(tn)
+    APoly = enum.take(0)
+    BPoly = np.sum(enum)
+    d = Poly2Distance(APoly, BPoly)
+    error = ABError(n, APoly.subs([(y,x*z)]), BPoly.subs([(y,x*z)]), px, pz)
+    return d, error
 
 if __name__ == "__main__":
     n = 5

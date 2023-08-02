@@ -102,7 +102,7 @@ prog713_5_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 5, 3,
 prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 3, 1, 4, 0], ['self', 0, 1, 1, 2], ['setLog', 0, 2]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
 
 prog422 = ([['setLog', 0, 0], ['setLog', 0, 1]],['code603'])
-debug = ([['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['self', 0, 2, 1, 2], ['setLog', 0, 3], ['setLog', 0, 3]],['code604', 'codeGHZ'])
+debug = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['self', 1, 1, 2, 1], ['setLog', 0, 3], ['setLog', 3, 1]],['code604', 'codeH', 'codeH', 'codeS'])
 prog = debug
 
 

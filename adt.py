@@ -208,6 +208,8 @@ class check_matrix:
     def rowWBound(self):
         stabs = [row[:self.n]+row[self.n:] for row in self.matrix]
         count = [np.count_nonzero(row!=0) for row in stabs]
+        if len(count)==0:
+            return 0
         return max(count)
     
     def colWBound(self):
@@ -217,6 +219,8 @@ class check_matrix:
             for i in range(self.n):
                 if row[i]!=0:
                     count[i]+=1
+        if len(count)==0:
+            return 0
         return max(count)
 
     def setOnlyOne1(self, column):

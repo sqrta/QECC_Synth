@@ -84,7 +84,7 @@ def search(initial, candidate_code, candidate_bound):
                             tmp = copy.deepcopy(top)
                             tmp.trace(leg[0],leg[1],Tensor(codeName,i), tractLeg)
                             queue.append(tmp)
-            if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>5:
+            if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>6:
                 dangleLegs = top.equiv_trace_leg()
                 for i in range(len(dangleLegs)-1):
                     for j in range(i+1, len(dangleLegs)):

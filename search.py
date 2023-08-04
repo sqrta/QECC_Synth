@@ -32,8 +32,7 @@ def search(initial, candidate_code, candidate_bound):
         #         logLeg = leg
         #         break
         legs = top.equiv_trace_leg()
-        logLeg = legs[0]  
-        print(count)          
+        logLeg = legs[0]        
         if count>21000:
             for secLeg in legs[1:]:
                 setlog = copy.deepcopy(top)

@@ -139,7 +139,6 @@ def eval_TN(tn, px=0.01, pz=0.05):
     k = tn.get_k()
     enum = parse(tn)
     APoly = enum.take(0)
-    print(simp_poly(APoly))
     BPoly = np.sum(enum)
     d = Poly2Distance(APoly, BPoly)
     error = ABError(n, APoly.subs([(y,x*z)]), BPoly.subs([(y,x*z)]), px, pz)

@@ -31,34 +31,35 @@ def search(initial, candidate_code, candidate_bound):
         #     if leg[0]==0 and leg[1]>1:
         #         logLeg = leg
         #         break
-        # if not logLeg:
         legs = top.equiv_trace_leg()
-        logLeg = legs[0]    
-        for secLeg in legs[1:]:
-            setlog = copy.deepcopy(top)
-            setlog.setLogical(logLeg[0], logLeg[1])
-            setlog.setLogical(secLeg[0], secLeg[1])
-            n = setlog.get_n()
-            k =setlog.get_k()
-            try:
-                d, error = eval_TN(setlog)
-            except Exception: 
-                print(str(setlog))
-                traceback.print_exc()             
-                print("error in eval!")
-                exit(0)
-            
-            if d>=3:
-                cm = setlog.toCm()
-                rowW = cm.rowWBound()
-                colW = cm.colWBound()
-                content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, rowW: {rowW}, colW: {colW}"
-                # print(content)
-                key = (n,d,rowW,colW)
-                if key not in minError.keys() or error < minError[key]:
-                    minError[key] = error
-                    print(content)
-                    f.write(content+"\n\n")
+        logLeg = legs[0]  
+        print(count)          
+        if count>21000:
+            for secLeg in legs[1:]:
+                setlog = copy.deepcopy(top)
+                setlog.setLogical(logLeg[0], logLeg[1])
+                setlog.setLogical(secLeg[0], secLeg[1])
+                n = setlog.get_n()
+                k =setlog.get_k()
+                try:
+                    d, error = eval_TN(setlog)
+                except Exception: 
+                    print(str(setlog))
+                    traceback.print_exc()             
+                    print("error in eval!")
+                    exit(0)
+                
+                if d>=3:
+                    cm = setlog.toCm()
+                    rowW = cm.rowWBound()
+                    colW = cm.colWBound()
+                    content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, rowW: {rowW}, colW: {colW}"
+                    # print(content)
+                    key = (n,d,rowW,colW)
+                    if key not in minError.keys() or error < minError[key]:
+                        minError[key] = error
+                        print(content)
+                        f.write(content+"\n\n")
                 # elif :
                 #     minError[key] = error
                 #     print(content)

@@ -21,7 +21,7 @@ def search(initial, candidate_code, candidate_bound):
     f = open("found", 'w')
     while len(queue)>0:
         count+=1
-        if count%10000==0:
+        if count%5000==0:
             f.write(str(minError))
             f.close()
             f= open(f"found{count}",'w')
@@ -33,7 +33,7 @@ def search(initial, candidate_code, candidate_bound):
         #         break
         legs = top.equiv_trace_leg()
         logLeg = legs[0]        
-        if count>21000:
+        if count>51000:
             for secLeg in legs[1:]:
                 setlog = copy.deepcopy(top)
                 setlog.setLogical(logLeg[0], logLeg[1])

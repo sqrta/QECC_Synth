@@ -103,7 +103,9 @@ prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3,
 
 prog422 = ([['setLog', 0, 0], ['setLog', 0, 1]],['code603'])
 debug = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['trace', 0, 4, 5, 0], ['self', 3, 1, 4, 1], ['setLog', 0, 5], ['setLog', 5, 1]], ['code604', 'code604', 'code604', 'codeH', 'codeH', 'codeS'])
-prog = debug
+
+prog823_43 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 0, 5, 3, 1], ['setLog', 1, 1], ['setLog', 2, 1]],['code604', 'code604', 'code604', 'codeS', 'codeH'])
+prog = prog823_43
 
 insList = prog[0]
 tnList = prog[1]

@@ -39,6 +39,17 @@ def get_BPoly(APoly, n, k):
     poly = Poly(simplify(2**k*poly))
     return poly.all_coeffs()[-1::-1]
 
+def getK(APoly, n):
+    lx = symbols('lx')
+    poly_coeff = simp_poly(APoly).all_coeffs()[-1::-1]
+    poly = 0
+    for i in range(len(poly_coeff)):
+        lz = (1-lx)/2
+        lw = (1+3*lx)/2
+        poly += poly_coeff[i]*lz**i*lw**(n-i)
+    poly = Poly(simplify(poly))
+    return poly.all_coeffs()[-1]
+
 def distance_from_poly(A_expr, n, k):
     Az_coeff = simp_poly(A_expr).all_coeffs()[-1::-1]
     Bz_coeff = get_BPoly(A_expr, n, k)
@@ -119,8 +130,8 @@ def eval_tn(tn, px=0.01, pz=0.05):
 
 def Poly2Distance(APoly, BPoly):
 
-    Az_coeff = simp_poly(APoly).all_coeffs()[-1::-1]
-    Bz_coeff = simp_poly(BPoly).all_coeffs()[-1::-1]
+    Az_coeff = APoly.all_coeffs()[-1::-1]
+    Bz_coeff = BPoly.all_coeffs()[-1::-1]
     # print(Az_coeff)
     # print(Bz_coeff)
     for d in range(len(Az_coeff)):
@@ -140,9 +151,18 @@ def eval_TN(tn, px=0.01, pz=0.05):
     enum = parse(tn)
     APoly = enum.take(0)
     BPoly = np.sum(enum)
-    d = Poly2Distance(APoly, BPoly)
+    
+    tmp = simp_poly(BPoly)
+    simpA = simp_poly(APoly)
+    simpB = simp_poly(BPoly)
+    A1 = simpA.all_coeffs()[-1]
+    B1 = simpB.all_coeffs()[-1]
+    APoly = APoly / A1
+    BPoly = BPoly / B1
+    K = B1 / A1
+    d = Poly2Distance(simpA, simpB)
     error = ABError(n, APoly.subs([(y,x*z)]), BPoly.subs([(y,x*z)]), px, pz)
-    return d, error
+    return d, error, K
 
 if __name__ == "__main__":
     n = 5

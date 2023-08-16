@@ -21,7 +21,7 @@ def search(initial, candidate_code, candidate_bound):
     f = open("found", 'w')
     while len(queue)>0:
         count+=1
-        if count%5000==0:
+        if count%1000==0:
             f.write(str(minError))
             f.close()
             f= open(f"found{count}",'w')
@@ -33,7 +33,7 @@ def search(initial, candidate_code, candidate_bound):
         #         break
         legs = top.equiv_trace_leg()
         logLeg = legs[0]        
-        if count>51000:
+        if True:
             for secLeg in legs[1:]:
                 setlog = copy.deepcopy(top)
                 setlog.setLogical(logLeg[0], logLeg[1])
@@ -41,18 +41,18 @@ def search(initial, candidate_code, candidate_bound):
                 n = setlog.get_n()
                 k =setlog.get_k()
                 try:
-                    d, error = eval_TN(setlog)
+                    d, error, KS = eval_TN(setlog)
                 except Exception: 
                     print(str(setlog))
                     traceback.print_exc()             
                     print("error in eval!")
                     exit(0)
                 
-                if d>=3:
+                if d>=3 or KS!=1:
                     cm = setlog.toCm()
                     rowW = cm.rowWBound()
                     colW = cm.colWBound()
-                    content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, rowW: {rowW}, colW: {colW}"
+                    content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, KS:{KS}, rowW: {rowW}, colW: {colW}"
                     # print(content)
                     key = (n,d,rowW,colW)
                     if key not in minError.keys() or error < minError[key]:
@@ -65,7 +65,7 @@ def search(initial, candidate_code, candidate_bound):
                 #     f.write(content+"\n\n")
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error = eval_TN(hash)
+        d, error, K = eval_TN(hash)
     
         if (d,error) not in exist_set:
             exist_set.add((d,error))
@@ -107,7 +107,7 @@ if __name__ == "__main__":
     import time
     start = time.time()
     candidate_code = ['code603', 'code604', 'codeH', 'codeS', 'codeGHZ']
-    minE = search(Tensor('code604', 0), candidate_code, candidate_bound=[1, 2,2, 2,1])
+    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[2, 2,2, 2,1])
     print(minE)
 
     # t604 = Tensor(code604)

@@ -214,7 +214,7 @@ class check_matrix:
     
     def colWBound(self):
         stabs = [row[:self.n]+row[self.n:] for row in self.matrix]
-        count = [0] * self.n
+        count = [0 for i in range(self.n)]
         for row in stabs:
             for i in range(self.n):
                 if row[i]!=0:

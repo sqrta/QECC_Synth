@@ -102,10 +102,15 @@ prog713_5_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 5, 3,
 prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 3, 1, 4, 0], ['self', 0, 1, 1, 2], ['setLog', 0, 2]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
 
 prog422 = ([['setLog', 0, 0], ['setLog', 0, 1]],['code603'])
-debug = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['trace', 0, 4, 5, 0], ['self', 3, 1, 4, 1], ['setLog', 0, 5], ['setLog', 5, 1]], ['code604', 'code604', 'code604', 'codeH', 'codeH', 'codeS'])
+debug = ([['trace', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['setLog', 0, 0], ['setLog', 1, 0]], ['code603', 'code603'])
 
 prog823_43 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 0, 5, 3, 1], ['setLog', 1, 1], ['setLog', 2, 1]],['code604', 'code604', 'code604', 'codeS', 'codeH'])
-prog = prog823_43
+
+prog823_54 = ([['trace', 0, 0, 1, 0], ['trace', 1, 1, 2, 0], ['trace', 1, 2, 3, 0], ['trace', 3, 1, 4, 0], ['self', 1, 3, 2, 1], ['self', 2, 2, 4, 1], ['setLog', 0, 1], ['setLog', 2, 3]], ['code604', 'code604', 'code604', 'codeH', 'codeS'])
+prog823_43_2 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 3, 1], ['self', 0, 5, 2, 1], ['setLog', 1, 1], ['setLog', 4, 1]],['code604', 'code604', 'codeH', 'codeH', 'code604'])
+prog923_44 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 0, 5, 3, 1], ['setLog', 1, 1], ['setLog', 2, 1]],['code604', 'code604', 'code604', 'codeGHZ', 'codeH'])
+
+prog = debug
 
 insList = prog[0]
 tnList = prog[1]
@@ -116,26 +121,23 @@ a = prog2Cm(insList, tensorList)
 tn = prog2TNN(insList, tnList)
 n = tn.get_n()
 k = tn.get_k()
-print(n,k)
 
 tmp = tn.toCm()
 tmp.row_echelon()
 rw = tmp.rowWBound()
 cw = tmp.colWBound()
 # tn.setLogical(0,0)
-print(tmp.matrix)
 
-d,error = eval_TN(tn)
+d,error,K = eval_TN(tn)
 
-print(f"n: {n}, d: {d}, rW: {rw}, cW: {cw} error: {error}")
-print(eval_tn(tn))
-print(tmp.matrix)
+print(f"n: {n}, d: {d}, K:{K}, rW: {rw}, cW: {cw} error: {error}")
+
 code = checkM2Stabilizers(tmp.matrix)
 print(code)
-
+print(tmp.matrix)
 stab_group = stabilizer_group(code)
 print(ABzx(stab_group, px, 1 - px, pz, 1- pz, k))
-
+print(eval_tn(tn))
 # cm = check_matrix(code603)
 # a = cm.trace(check_matrix(code604),0,0).trace(check_matrix(code604),1,0).selfTrace(3, 9)
 # a = check_matrix(code603).trace(check_matrix(codeS),4,0).trace(check_matrix(codeH),3,0).trace(check_matrix(codeH),3,0).trace(check_matrix(code603),3,4).selfTrace(3, 8).selfTrace(3, 7)

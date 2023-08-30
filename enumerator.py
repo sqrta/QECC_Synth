@@ -23,6 +23,7 @@ def get_enum_tensor(code, indices):
         wy = stab.W("Y") - index.count(2)
         wz = stab.W("Z") - index.count(3)
         term = 1 if wx+wy+wz==0 else x**(wx )* y**wy * z**wz
+        # term = 1 if wx+wy+wz==0 else x**(wx )* x**wy * x**wz
         index = 0 if rank == 0 else tuple(index)
         enumerator[index] += term
     
@@ -53,7 +54,8 @@ def getK(APoly, n):
 def distance_from_poly(A_expr, n, k):
     Az_coeff = simp_poly(A_expr).all_coeffs()[-1::-1]
     Bz_coeff = get_BPoly(A_expr, n, k)
-    if debug:
+
+    if True:
         print("A B", Az_coeff, Bz_coeff)
     for d in range(len(Az_coeff)):
         if Az_coeff[d] != Bz_coeff[d]:
@@ -70,6 +72,11 @@ def simp_poly(enum_poly):
         return Poly(enum_poly.subs([(y,x),(z,x)]))
     except:
         return enum_poly
+    
+def normalize(poly):
+    eff = poly.all_coeffs()[-1]
+    return poly/eff
+    
 
 def xzNoise(n, k, APoly, px, pz):
     APoly = APoly.subs(y,x*z)
@@ -106,6 +113,10 @@ def parse(tn):
             index1, leg1, index2, leg2 = ins[1:]
             mIndex1 = getMIndex(index1)
             mIndex2 = getMIndex(index2)
+            # print(tnList[index1].tracted)
+            # print(tnList[index2].tracted)
+            # print(mIndex1, mIndex2)
+            # print("shape",tnEnum.shape)
             tnEnum = np.trace(tnEnum, axis1= mIndex1, axis2= mIndex2)
             tnList[index1].tracted.pop(0)
             tnList[index2].tracted.pop(0)
@@ -124,16 +135,20 @@ def eval_tn(tn, px=0.01, pz=0.05):
     k = tn.get_k()
     enum = parse(tn)
     APoly = enum.take(0)
-    d = distance_from_poly(simp_poly(APoly), n, k)
-    noise = xzNoise(n, k, APoly, px, pz)
+    # print("APoly",Poly(APoly))
+    simpA = simp_poly(APoly)
+    print("simp",simpA)
+    A1 = simpA.all_coeffs()[-1]
+    d = distance_from_poly(simpA/A1, n, k)
+    noise = xzNoise(n, k, APoly/A1, px, pz)
     return d, noise
 
 def Poly2Distance(APoly, BPoly):
-
-    Az_coeff = APoly.all_coeffs()[-1::-1]
-    Bz_coeff = BPoly.all_coeffs()[-1::-1]
-    # print(Az_coeff)
-    # print(Bz_coeff)
+    A1 = APoly.all_coeffs()[-1]
+    Az_coeff =[i / A1 for i in APoly.all_coeffs()[-1::-1]]
+    B1 = BPoly.all_coeffs()[-1]
+    Bz_coeff = [i / B1 for i in BPoly.all_coeffs()[-1::-1]]
+    print(Az_coeff,Bz_coeff)
     for d in range(len(Az_coeff)):
         if Az_coeff[d] != Bz_coeff[d]:
             return d
@@ -149,8 +164,12 @@ def eval_TN(tn, px=0.01, pz=0.05):
     n = tn.get_n()
     k = tn.get_k()
     enum = parse(tn)
-    APoly = enum.take(0)
-    BPoly = np.sum(enum)
+    try:
+        APoly = enum.take(0)
+        BPoly = np.sum(enum)
+    except AttributeError:
+        APoly = enum
+        BPoly = enum
     
     tmp = simp_poly(BPoly)
     simpA = simp_poly(APoly)
@@ -164,13 +183,26 @@ def eval_TN(tn, px=0.01, pz=0.05):
     error = ABError(n, APoly.subs([(y,x*z)]), BPoly.subs([(y,x*z)]), px, pz)
     return d, error, K
 
+def prog2TNN(insList, tensorList):
+    progList = []
+
+    for ins in insList:
+        if ins[0]=="trace":
+            index = ins[3]
+            ins[3] = Tensor(tensorList[index])
+        progList.append(ins)
+    return buildProg(progList, Tensor(tensorList[0]))
+
 if __name__ == "__main__":
     n = 5
     px = 0.01
     pz = 0.05
-    print(get_enum_tensor(code513, []))
-    d,error = eval_code(code713, 1)
-    print(f"d: {d}, error: {error}")
+    code = code823
+    #print(get_enum_tensor(code513, []))
+    d,error = eval_code(code, 2)
+    cm = TNNetwork(Tensor('code823')).toCm()
+    print(f"d: {d}, error: {error}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
+
 
 
     # tn = TNNetwork(Tensor(code603))

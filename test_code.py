@@ -2,6 +2,7 @@ from enumerator import *
 from adt import *
 
 filename = "tmp"
+k = 2
 with open(filename, "r") as f:
     lines = f.readlines()
     xlist = []
@@ -17,7 +18,7 @@ with open(filename, "r") as f:
     code = codeTN(xlist+zlist)
     code.merge()
     stab_group = stabilizer_group(code)
-    d = distance(code, 2, stab_group)
-    error = ABzx(stab_group, px, 1 - px, pz, 1- pz, 2)
+    d = distance(code, k, stab_group)
+    error = ABzx(stab_group, px, 1 - px, pz, 1- pz, k)
     cm = check_matrix(code)
     print(f"error: {error}, d: {d}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")

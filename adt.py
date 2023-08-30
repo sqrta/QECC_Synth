@@ -147,6 +147,7 @@ class check_matrix:
     def __init__(self, stabilizers, label=None, symmetry=None) -> None:
         self.matrix = self.setMatrix(stabilizers)
         self.n = stabilizers[0].length
+        self.LogicOp = []
         if symmetry:
             self.symmetry = symmetry
         else:
@@ -399,12 +400,20 @@ class check_matrix:
         this.matrix = this.matrix[:, index]
         this.row_echelon()
         c1row = this.setOnlyOne1(1)
+        this.swapRow(c1row, 1)
         cnrow = this.setOnlyOne1(this.n)
-        cn1row = this.find1(this.n+1, [cnrow])
+        this.swapRow(cnrow,2)
+        cnrow=2
+
+        cn1row = this.find1(this.n+1, [0,1,2])
         cn1row = this.setOnlyOne1(this.n+1)
         this.matrix[0] += this.matrix[1]
         this.matrix[cnrow] += this.matrix[cn1row]
-        this.matrix = np.delete(this.matrix, (1, cn1row), axis=0)
+        if c1row == 0:
+            todel = (cn1row,)
+        else:
+            todel = (1, cn1row)
+        this.matrix = np.delete(this.matrix, todel, axis=0)
         this.matrix = np.delete(this.matrix, (0, 1, this.n, this.n+1), axis=1)
         this.n -= 2
         this.Mod2()
@@ -427,10 +436,13 @@ class check_matrix:
         self.row_echelon()
         row = self.setOnlyOne1(self.n)
         self.swapRow(row, 1)
-        LogicOp = self.matrix[0:2, :]
-        self.matrix = self.matrix[2:, :]
+        cond = (self.matrix[:,0]!=0) | (self.matrix[:,self.n]!=0)
+        LogicOp = self.matrix[cond]
+        self.matrix = self.matrix[~cond]
+
         self.delete([self.n, 0], axis=1)
         self.n -= 1
+        self.LogicOp.append(LogicOp) 
         return LogicOp
 
 def set_symmetry(groups, remove, shift=0):
@@ -452,10 +464,11 @@ def Az_poly(generator, stab_group=None):
     if not stab_group:
         stab_group = stabilizer_group(generator)
     count = [0] * (n+1)
-    print("len",len(stab_group))
     for item in stab_group:
         count[item.weight()] += 1
-    return count
+    result = []
+    norm = count[0]
+    return [i//norm for i in count]
 
 
 def Bz_poly(generator, k, stab_group=None):
@@ -516,7 +529,6 @@ def distance(generator, k ,stab_group = None):
     if not stab_group:
         stab_group = stabilizer_group(generator)
     Az_coeff = Az_poly(generator, stab_group)
-    print(Az_coeff)
     Bz_coeff = Bz_poly(generator, k, stab_group)
     print(Az_coeff, Bz_coeff)
     for d in range(len(Az_coeff)):
@@ -536,7 +548,7 @@ def Azx(stab_group, x, y, z, w):
 def Bzx(k, stab_group, x, y, z, w):
     return 2**k * Azx(stab_group, w-z, z+w, (y-x)/2, (x+y)/2)
 
-def ABzx(stab_group, x,y,z,w,k):
+def ABzx(stab_group, x,y,z,w,k,K=1):
     n = next(iter(stab_group)).length
     Ax = 0
     Bx = 0
@@ -548,7 +560,50 @@ def ABzx(stab_group, x,y,z,w,k):
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
     print(Ax, 2**k*Bx)
-    return 2**k*Bx-Ax
+    return 2**k/K*Bx-Ax
+    
+def prog2Cm(insList, tnList):
+    
+    tracted = [[] for i in range(len(tnList))]
+    cm = check_matrix(tnList[0])
+    def getMIndex(traceIndex, traceLeg):
+        index = 0
+        for i in range(traceIndex):
+            index+=tnList[i].length - len(tracted[i])
+        count = 0
+        for tractedLeg in tracted[traceIndex]:
+            if tractedLeg<traceLeg:
+                count+=1
+        index += traceLeg - count
+        return index
+    
+    for ins in insList:
+        if ins[0]=="trace":
+            traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
+            matrixIndex = getMIndex(traceIndex, traceLeg)
+            newOne = tnList[newOneIndex] 
+            cm = cm.trace(check_matrix(newOne), matrixIndex, newOneleg)
+            # print(matrixIndex, newOneleg)
+            tracted[traceIndex].append(traceLeg)
+            tracted[newOneIndex].append(newOneleg)
+        elif ins[0] == "self":
+            index1, leg1, index2, leg2 = ins[1:]
+            mIndex1 = getMIndex(index1, leg1)
+            mIndex2 = getMIndex(index2, leg2)
+            cm = cm.selfTrace(mIndex1, mIndex2)
+            # print(mIndex1, mIndex2)
+            tracted[index1].append(leg1)
+            tracted[index2].append(leg2)
+        elif ins[0] == "setLog":
+            index1, leg1 = ins[1:]
+            mIndex1 = getMIndex(index1, leg1)
+            cm.setLogical(mIndex1)
+            # print(mIndex1)
+            tracted[index1].append(leg1)
+        else:
+            raise NameError(f"no ops as {ins[0]}")
+    cm.removeZeroRow()
+    return cm
 
 
 if __name__ == "__main__":

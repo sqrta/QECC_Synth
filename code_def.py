@@ -134,25 +134,24 @@ class TNNetwork:
                 matrixIndex = getMIndex(traceIndex, traceLeg)
                 newOne = tnList[newOneIndex] 
                 cm = cm.trace(check_matrix(newOne), matrixIndex, newOneleg)
-                # print(matrixIndex, newOneleg)
                 tracted[traceIndex].append(traceLeg)
                 tracted[newOneIndex].append(newOneleg)
             elif ins[0] == "self":
                 index1, leg1, index2, leg2 = ins[1:]
                 mIndex1 = getMIndex(index1, leg1)
                 mIndex2 = getMIndex(index2, leg2)
+
                 cm = cm.selfTrace(mIndex1, mIndex2)
-                # print(mIndex1, mIndex2)
                 tracted[index1].append(leg1)
                 tracted[index2].append(leg2)
             elif ins[0] == "setLog":
                 index1, leg1 = ins[1:]
                 mIndex1 = getMIndex(index1, leg1)
                 cm.setLogical(mIndex1)
-                # print(mIndex1)
                 tracted[index1].append(leg1)
             else:
                 raise NameError(f"no ops as {ins[0]}")
+        cm.removeZeroRow()
         return cm
 
 code13_1_4 = codeTN(['xiixixxiiixxi', 'ixixixixiiiii',
@@ -162,7 +161,7 @@ code13_1_4 = codeTN(['xiixixxiiixxi', 'ixixixixiiiii',
 'iiiiiiiiixxxx','ziiziizziiizz','izizizziiiiii', 'iizziziziiizz','iiiizzzziiiii', 'iiiiiiiiziziz', 'iiiiiiiiizzzz'], "code13_1_4")
 code17_1_3 = codeTN(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii","iiixxiiiiiixxixxi","iiiiixixiixxiiixx","iiiiiixixixxiiixx","iiiiiiiiixxxxiiii","iiiiiiiiiiiiixxxx","ziiiiizziiiiiiiii","iziiiiizziizziiii","iiziiiiiiiziziizz","iiiziiizziiiiizzi","iiiiziizziziziziz","iiiiizzzziiiiiiii","iiiiiiiiizzzziiii","iiiiiiiiiiiiizzzz"])
 code513 = codeTN(["xzzxi", 'ixzzx', 'xixzz', 'zxixz'], "code513")
-code604 = codeTN(["ixzzxi", 'iixzzx', 'ixixzz', 'izxixz', 'xxxxxx', 'zzzzzz'], "code604", symmetry=[0])
+code604 = codeTN(['ixzzxi', 'iixzzx', 'ixixzz', 'izxixz', 'xxxxxx', 'zzzzzz'], "code604", symmetry=[0])
 code603 = codeTN(['iixxxx', 'iizzzz', 'xixxii', 'ixixix', 'zizizi', 'iziizz'], "code603", symmetry=[0,2])
 code804 = codeTN(['iiiixxxx', 'iixxiixx', 'ixixixix', 'xxxxxxxx','iiiizzzz', 'iizziizz', 'iziziziz', 'zzzzzzzz'], "code803")
 code713 = codeTN(['iiixxxx', 'ixxiixx', 'xixixix', 'iiizzzz', 'izziizz', 'ziziziz'], "code713")
@@ -170,9 +169,10 @@ code422 = codeTN(['xxxx', 'zzzz'], "code422")
 code11_1_5 = codeTN(["ziiiiziiiii","iziiiziiiii","iiziiziiiii","iiiziziiiii","iiiizziiiii","iiiiiiziiiz","iiiiiiiziiz","iiiiiiiiziz","iiiiiiiiizz","iiiiiiiiiii","ixixiiixxii","ixixxxiixxi","ixiixiiiixx","ixxxixxiixi","iixxiixxixx","iixxiixxxix","ixixxxxxixx","iiixixixixi","ixixiixixii","xxxxxxiiiii"])
 code5_1_3_m = codeTN(["xiixx","ixiix","iixxi", "iiiii","ziziz","ziizz","ziizz","izzzz"])
 codeH = codeTN(["xz", "zx", "yy"], "H", symmetry=[0])
-codeS = codeTN(["xy", "yx"], "S", symmetry=[0])
+codeS = codeTN(["xy", "yx", ], "S", symmetry=[0])
 codet = codeTN(['ixiiz', 'izxix', 'ziixi', 'yiizy', 'iiziz'])
 codeGHZ = codeTN(['izz','xxx', 'zzi'], "GHZ", symmetry=[0])
+code823 = codeTN(['XZZXIIII', 'ZXZIIIII', 'IZXZIIII', 'IIIIXZZX', 'IIIIZXZI', 'IIIIIZXZ'])
 # stab_list = []
 # length = int(len(code11_1_5.stabs) / 2 )
 # for i in range(length):

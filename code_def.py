@@ -69,6 +69,7 @@ class TNNetwork:
         tn1 = self.tensorList[index1]
         tn2 = self.tensorList[index2]
         if leg1 in tn1.tracted or leg2 in tn2.tracted:
+            print(index1, leg1, index2, leg2)
             raise ValueError(leg1, leg2, tn1.tracted, tn2.tracted)
         tn1.tracted.append(leg1)
         tn2.tracted.append(leg2)
@@ -84,6 +85,7 @@ class TNNetwork:
         return sum([tensor.size - len(tensor.tracted) for tensor in self.tensorList])
     
     def get_k(self):
+
         return len(self.Logical)
     
     def show(self):
@@ -173,6 +175,10 @@ codeS = codeTN(["xy", "yx", ], "S", symmetry=[0])
 codet = codeTN(['ixiiz', 'izxix', 'ziixi', 'yiizy', 'iiziz'])
 codeGHZ = codeTN(['izz','xxx', 'zzi'], "GHZ", symmetry=[0])
 code823 = codeTN(['XZZXIIII', 'ZXZIIIII', 'IZXZIIII', 'IIIIXZZX', 'IIIIZXZI', 'IIIIIZXZ'])
+code0 = codeTN(['z'])
+codePlus = codeTN(['x'])
+code922 = codeTN(['XXXIIIIII', 'IIIXXXIII', 'IIIIIIXXX', 'ZIZZIZZIZ', 'IZZZIZZIZ', 'IIIIZZZIZ', 'IIIIIIIZZ'])
+code913 = codeTN(['ZZIIIIIII', 'XXIXXIIII', 'IZZIZZIII', 'IIXIIXIII', 'IIIXIIXII', 'IIIZZIZZI', 'IIIIXXIXX', 'IIIIIIIZZ'])
 # stab_list = []
 # length = int(len(code11_1_5.stabs) / 2 )
 # for i in range(length):
@@ -182,10 +188,13 @@ code5_1_3_m.merge()
 code11_1_5.merge()
 
 if __name__ == "__main__":
+
+    
     px = 0.01
     pz = 0.05
-    code = code422
-    print(distance(code, 2))
+    code = code913
+    print(Az_poly(code))
+    print('d', distance(code, 2))
     stab_group = stabilizer_group(code)
-    print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 2))
+    print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 1))
     

@@ -99,6 +99,7 @@ def parse(tn):
     def getMIndex(traceIndex):
         return sum([len(t.tracted) for t in tnList[:traceIndex]])
     for ins in insList:
+        print(ins)
         if ins[0] == "trace":
             traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
             matrixIndex = getMIndex(traceIndex)
@@ -197,9 +198,9 @@ if __name__ == "__main__":
     n = 5
     px = 0.01
     pz = 0.05
-    code = code823
+    code = code513
     #print(get_enum_tensor(code513, []))
-    d,error = eval_code(code, 2)
+    d,error = eval_code(code, 1)
     cm = TNNetwork(Tensor('code823')).toCm()
     print(f"d: {d}, error: {error}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
 

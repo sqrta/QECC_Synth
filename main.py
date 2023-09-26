@@ -37,11 +37,14 @@ pz = 0.05
 
 prog15_14 = ([['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1], ['setLog',0,0]], ['code603', 'code604', 'code604', 'code604'])
 # insList = [['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['self', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['self', 0, 4, 1, 4]]         
-tnList = ['code604', 'code604']
-tnList = ['code603','codeS', 'codeH', 'codeH', 'code603']
-insList = [['trace', 0, 4, 1, 0], ['trace', 0, 3, 2, 0], ['trace', 0, 5, 3, 0],['trace', 1, 1, 4, 4], ['self', 4, 3, 2, 1], ['self', 4, 5, 3, 1], ['setLog', 0, 2]]
-insList=[['trace', 0, 0, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 0, 1, 4, 0], ['self', 3, 1, 4, 1], ['setLog', 0, 2]] 
-tnList = ['code603', 'code603', 'codeH', 'codeH', 'codeS']  
+
+tnList = ['code603','code603', 'code603', 'code603']
+insList = [['trace', 0, 3, 1, 1], ['self', 0, 4, 1, 0], ['trace', 1, 3, 2, 1], ['self', 0, 1, 2, 0], ['trace', 1, 4, 3, 1],  ['setLog', 0, 0]]
+prog13_1_4 = (insList, tnList)
+
+insList=[['trace', 0, 3, 1, 0], ['trace', 1, 1, 2, 5], ['trace', 0, 4, 3, 0], ['trace', 0, 2, 4, 0], ['self', 2, 4, 3, 1],['self', 2, 2, 4, 1],  ['setLog', 0, 5]] 
+tnList = ['code603', 'codeS', 'code603', 'codeH', 'codeH']  
+prog513 = (insList, tnList)
 
 progStean = ([['trace', 0, 0, 1,0], ['self', 0, 1, 1, 1], ['setLog', 0, 2]], ['code603', 'code603'])
 
@@ -66,14 +69,51 @@ insList = [['trace', 0, 0, 1, 0],   ['self', 0, 1, 1, 1]]
 debug = (insList, tnList)
 
 prog823_54 = ([['trace', 0, 0, 1, 0], ['trace', 1, 1, 2, 0], ['trace', 1, 2, 3, 0], ['trace', 3, 1, 4, 0], ['self', 1, 3, 2, 1], ['self', 2, 2, 4, 1], ['setLog', 0, 1], ['setLog', 2, 3]], ['code604', 'code604', 'code604', 'codeH', 'codeS'])
-prog823_43_2 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 3, 1], ['self', 0, 5, 2, 1], ['setLog', 1, 1], ['setLog', 4, 1]],['code604', 'code604', 'codeH', 'codeH', 'code604'])
+prog823_43_2 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0],['self', 0, 5, 2, 1], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 3, 1],  ['setLog', 1, 1], ['setLog', 4, 1]],['code604', 'code604', 'codeH', 'codeH', 'code604'])
 prog923_44 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 0, 5, 3, 1], ['setLog', 1, 1], ['setLog', 2, 1]],['code604', 'code604', 'code604', 'codeGHZ', 'codeH'])
 
 prog16_2_3 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 2],['self',0,4,2,1],['self',0,5,1,1], ['setLog', 2, 3], ['setLog', 3, 1]],['code603', 'codeH', 'code604', 'code604', 'code603'])
 
 prog623_trick = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['self', 0, 2, 2, 1], ['setLog', 0, 3], ['setLog', 1, 1]], ['code603', 'code604', 'codeS'])
 
-prog = prog823_54
+tnList = ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus'] + ['code603', 'codePlus'] + ['code603'] + ['code603', 'codePlus'] + ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus']
+tens6 =  [0, 3, 5, 8, 10, 11, 13, 16, 18]
+instList = [['trace', 0, 5, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 4, 3, 4]] 
+instList += [['trace', 3, 5, 4, 0]]#, ['trace', 3, 2, 5, 2]] 
+# instList += [['trace', 5, 5, 6, 0], ['trace', 5, 4, 7, 0], ['trace', 5, 3, 8, 5]]
+# instList += [['trace', 8, 2, 9, 0], ['trace', 8, 4, 10, 4]]
+# instList += [['self', 10, 5, 3, 3], ['trace', 10, 2, 11, 2]]
+# instList += [['self', 11, 5, 0, 3], ['trace', 11, 4, 12, 0], ['trace', 11, 3, 13, 5]]
+# instList += [['trace', 13, 3, 14, 0], ['trace', 13, 2, 15, 0], ['trace', 13, 4, 16, 4]]
+# instList += [['self', 16, 5, 10, 3], ['trace', 16, 3, 17, 0], ['trace', 16, 2, 18, 2]]
+# instList += [['self', 18, 5, 8, 3], ['trace', 18, 3, 19, 0], ['trace', 18, 4, 20, 0]]
+
+# instList = [['trace', 0, 2, 1, 3],['trace', 1, 5, 2, 4],['trace', 0, 3, 3, 4],['trace', 3, 5, 4, 4],['trace', 4, 2, 5, 3],['trace', 3, 2, 6, 5],['trace', 6, 2, 7, 3],['trace', 7, 5, 8, 4],['trace', 0, 4, 9, 0],['trace', 3, 3, 10, 0],['trace', 6, 4, 11, 0],['trace', 2, 2, 12, 0],['trace', 5, 5, 13, 0], ['trace', 8, 2, 14, 0],['trace', 0, 5, 15, 0],['trace', 1, 4, 16, 0],['trace', 2, 5, 17, 0],['trace', 6, 3, 18, 0],['trace', 7, 2, 19, 0],['trace', 8, 3, 20, 0]]
+# instList += [['self', 1, 2, 4, 5],['self', 2, 3, 5, 4],['self', 4, 3, 7, 4],['self', 5, 2, 8, 5]]
+tens6u = [0,  5,  10,  13,  18]
+tens6d = [ 3, 8, 11, 16]
+instList += [['setLog', i, 1] for i in tens6[:2]]
+prog3t3_surface = (instList, tnList) 
+
+tnList = ['code603', 'code0', 'codePlus']  + ['code603', 'code0', 'codePlus'] + ['code603', 'code0', 'codePlus'] + ['code603', 'code0', 'codePlus']
+tens6 =  [0, 3, 6, 9]
+instList = [['trace', 0, 5, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 4, 3, 4]] 
+instList += [['trace', 3, 5, 4, 0], ['trace', 3, 2, 5, 0], ['trace', 3, 3, 6, 5]] 
+instList += [['trace', 6, 3, 7, 0], ['trace', 6, 4, 8, 0], ['trace', 6, 2, 9, 2]] 
+instList += [['self', 9, 5, 0, 3], ['trace', 9, 3, 10, 0], ['trace', 9, 4, 11, 0]] 
+instList += [['setLog', i, 1] for i in tens6]
+
+prog2t2_surface = (instList, tnList) 
+
+instList = [['setLog', 0, 0]]
+tnList = ['code603']
+prog512 = (instList, tnList)
+
+tnList = ['code603', 'code0', 'codePlus']
+instList = [['trace', 0, 5, 1, 0], ['trace', 0, 2, 2, 0], ['setLog', 0, 0]] 
+debug = (instList, tnList)
+
+prog = debug
 
 def eval_prog(prog):
 
@@ -98,7 +138,7 @@ def eval_prog(prog):
 
     d,error,K = eval_TN(tn)
 
-    print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error:.4e}")
+    print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error}")
 
     code = checkM2Stabilizers(tmp.matrix)
     print(code)

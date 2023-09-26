@@ -117,10 +117,10 @@ class stabilizer:
     def weight(self):
         return self.length-self.term().count("I")
 
-    def Wx(self, tag):
+    def Wx(self):
         return self.term().count("X")+self.term().count("Y")
 
-    def Wz(self, tag):
+    def Wz(self):
         return self.term().count("Z")+self.term().count("Y")
     
     def W(self, tag):
@@ -333,7 +333,7 @@ class check_matrix:
                 M[this.matrix.shape[0]:, width+this.n -
                     1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
         else:
-            if other.matrix[1, other.n] != 0:
+            if other.matrix.shape[0]>1 and other.matrix[1, other.n] != 0:
                 # print("trace")
                 width = this.n + other.n - 2
                 height = this.matrix.shape[0] + other.matrix.shape[0] - 2
@@ -351,8 +351,6 @@ class check_matrix:
                     1:] = other.matrix[2:, other.n+1:]
             else:
                 print("2branch")
-                print(this.matrix)
-                print(other.matrix)
                 i = other.matrix[0, 0]
                 j = other.matrix[0, other.n]
                 width = this.n + other.n - 2
@@ -372,7 +370,6 @@ class check_matrix:
                     1:width] = other.matrix[1:other.matrix.shape[0], 1:other.n]
                 M[this.matrix.shape[0]-1:, width+this.n -
                     1:] = other.matrix[1:other.matrix.shape[0], other.n+1:]
-                print(M)
         this.matrix = M
         this.Mod2()
         this.removeZeroRow()
@@ -465,7 +462,19 @@ def Az_poly(generator, stab_group=None):
         stab_group = stabilizer_group(generator)
     count = [0] * (n+1)
     for item in stab_group:
+
         count[item.weight()] += 1
+    result = []
+    norm = count[0]
+    return [i//norm for i in count]
+
+def Az_poly2(generator, stab_group=None):
+    n = generator[0].length
+    if not stab_group:
+        stab_group = stabilizer_group(generator)
+    count = [0] * (n+1)
+    for item in stab_group:
+        count[item.Wx()+item.Wz()] += 1
     result = []
     norm = count[0]
     return [i//norm for i in count]
@@ -540,8 +549,8 @@ def Azx(stab_group, x, y, z, w):
     n = next(iter(stab_group)).length
     result = 0
     for term in stab_group:
-        wx = term.Wx("X")
-        wz = term.Wz("Z")
+        wx = term.Wx()
+        wz = term.Wz()
         result+=x**wx*y**(n-wx)*z**wz*w**(n-wz)
     return result
 
@@ -555,8 +564,8 @@ def ABzx(stab_group, x,y,z,w,k,K=1):
     def Nerror(x,y,z,w,wx,wz):
         return x**wx*y**(n-wx)*z**wz*w**(n-wz)
     for term in stab_group:
-        wx = term.Wx("X")
-        wz = term.Wz("Z")
+        wx = term.Wx()
+        wz = term.Wz()
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
     print(Ax, 2**k*Bx)

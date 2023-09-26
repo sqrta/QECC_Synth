@@ -2,7 +2,7 @@ from enumerator import *
 from adt import *
 
 filename = "tmp"
-k = 2
+k = 1
 with open(filename, "r") as f:
     lines = f.readlines()
     xlist = []

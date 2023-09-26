@@ -106,8 +106,8 @@ if __name__ == "__main__":
     pz = 0.05
     import time
     start = time.time()
-    candidate_code = ['code603', 'code604', 'codeH', 'codeS', 'codeGHZ']
-    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[2, 2,2, 2,1])
+    candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
+    minE = search(Tensor('code804', 0), candidate_code, candidate_bound=[1,1, 2,2, 2,1])
     print(minE)
 
     # t604 = Tensor(code604)

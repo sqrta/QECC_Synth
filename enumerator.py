@@ -99,7 +99,6 @@ def parse(tn):
     def getMIndex(traceIndex):
         return sum([len(t.tracted) for t in tnList[:traceIndex]])
     for ins in insList:
-        print(ins)
         if ins[0] == "trace":
             traceIndex, traceLeg, newOneIndex, newOneleg = ins[1:]
             matrixIndex = getMIndex(traceIndex)
@@ -149,7 +148,7 @@ def Poly2Distance(APoly, BPoly):
     Az_coeff =[i / A1 for i in APoly.all_coeffs()[-1::-1]]
     B1 = BPoly.all_coeffs()[-1]
     Bz_coeff = [i / B1 for i in BPoly.all_coeffs()[-1::-1]]
-    print(Az_coeff,Bz_coeff)
+    # print(Az_coeff,Bz_coeff)
     for d in range(len(Az_coeff)):
         if Az_coeff[d] != Bz_coeff[d]:
             return d

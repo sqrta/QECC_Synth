@@ -48,7 +48,7 @@ def search(initial, candidate_code, candidate_bound):
                     print("error in eval!")
                     exit(0)
                 
-                if d>=3 or KS!=1:
+                if not d or d>=3 or KS!=1:
                     cm = setlog.toCm()
                     rowW = cm.rowWBound()
                     colW = cm.colWBound()

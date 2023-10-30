@@ -8,6 +8,30 @@ def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn.show()
     return eval_tn(tn)
  
+def chooseProg(setlog, minError, f):
+    n = setlog.get_n()
+    k = setlog.get_k()
+    try:
+        d, error, KS = eval_TN(setlog)
+    except Exception: 
+        print(str(setlog))
+        traceback.print_exc()             
+        print("error in eval!")
+        exit(0)
+    # if not d or d>=3 or KS!=1:
+    if d and d>=3:
+        cm = setlog.toCm()
+        rowW = cm.rowWBound()
+        colW = cm.colWBound()
+        content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, KS:{KS}, rowW: {rowW}, colW: {colW}"
+        # print(content)
+        key = (n,d,rowW,colW)
+        if key not in minError.keys() or error < minError[key]:
+            minError[key] = error
+            print(content)
+            f.write(content+"\n\n")
+    return d, error, KS
+
 
 def search(initial, candidate_code, candidate_bound):
     import time
@@ -33,39 +57,16 @@ def search(initial, candidate_code, candidate_bound):
         #         break
         legs = top.equiv_trace_leg()
         logLeg = legs[0]        
-        if True:
-            for secLeg in legs[1:]:
-                setlog = copy.deepcopy(top)
-                setlog.setLogical(logLeg[0], logLeg[1])
-                setlog.setLogical(secLeg[0], secLeg[1])
-                n = setlog.get_n()
-                k =setlog.get_k()
-                try:
-                    d, error, KS = eval_TN(setlog)
-                except Exception: 
-                    print(str(setlog))
-                    traceback.print_exc()             
-                    print("error in eval!")
-                    exit(0)
-                
-                if not d or d>=3 or KS!=1:
-                    cm = setlog.toCm()
-                    rowW = cm.rowWBound()
-                    colW = cm.colWBound()
-                    content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, KS:{KS}, rowW: {rowW}, colW: {colW}"
-                    # print(content)
-                    key = (n,d,rowW,colW)
-                    if key not in minError.keys() or error < minError[key]:
-                        minError[key] = error
-                        print(content)
-                        f.write(content+"\n\n")
-                # elif :
-                #     minError[key] = error
-                #     print(content)
-                #     f.write(content+"\n\n")
+        # if True:
+        #     for secLeg in legs[1:]:
+        #         setlog = copy.deepcopy(top)
+        #         setlog.setLogical(logLeg[0], logLeg[1])
+        #         setlog.setLogical(secLeg[0], secLeg[1])
+        #         chooseProg(setlog, minError, f)
+
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error, K = eval_TN(hash)
+        d, error, Ks = chooseProg(hash, minError, f)
     
         if (d,error) not in exist_set:
             exist_set.add((d,error))

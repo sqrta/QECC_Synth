@@ -28,7 +28,7 @@ def chooseProg(setlog, minError, f):
         key = (n,d,rowW,colW)
         if key not in minError.keys() or error < minError[key]:
             minError[key] = error
-            print(content)
+            # print(content)
             f.write(content+"\n\n")
     return d, error, KS
 
@@ -45,8 +45,8 @@ def search(initial, candidate_code, candidate_bound):
     f = open("found", 'w')
     while len(queue)>0:
         count+=1
-        print(count)
-        if count%1000==0:
+        # print(count)
+        if count%5000==0:
             f.write(str(minError))
             f.close()
             f= open(f"found{count}",'w')

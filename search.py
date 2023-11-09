@@ -45,6 +45,7 @@ def search(initial, candidate_code, candidate_bound):
     f = open("found", 'w')
     while len(queue)>0:
         count+=1
+        print(count)
         if count%1000==0:
             f.write(str(minError))
             f.close()

@@ -1,16 +1,24 @@
 import numpy as np
 from functools import reduce
+from numpy import kron
+import functools
 import copy
 import itertools
 from sympy import Matrix
 
 debug = False
 
+
+def tensor(op_list):
+    return functools.reduce(kron, op_list, 1)
 from sympy import symbols, simplify, Poly
 
 X = np.array([[0, 1], [1, 0]], dtype=complex)
-Y = np.array([[0, -1j], [1j, 0]])
+Y = np.array([[0, -1j], [1j, 0]], dtype=complex)
 Z = np.array([[1, 0], [0, -1]], dtype=complex)
+I = np.array([[1, 0], [0, 1]], dtype=complex)
+Pauli2MatrixDict = {'I':I, 'X':X, 'Y':Y, 'Z':Z}
+Int2Matrix = [I,X,Y,Z]
     
 def selfTraceALargerB(a, b):
     for i in range(1,5):
@@ -43,6 +51,23 @@ class bidict(dict):
 
 def findsubsets(s, n):
     return list(itertools.combinations(s, n))
+
+def numberToBase(n, b):
+    if n == 0:
+        return [0]
+    digits = []
+    while n:
+        digits.append(int(n % b))
+        n //= b
+    return digits[::-1]
+
+def intVec2M(vec, n):
+    v = [0]*(n-len(vec))+vec
+    return tensor([Int2Matrix[a] for a in v])
+
+def getAllPauli(n):
+    size = 4**n
+    return [intVec2M(numberToBase(i, 4), n) for i in range(size)]
 
 
 def allsubset(s):
@@ -89,6 +114,13 @@ class pauli:
         self.sign *= result[0]*other.sign
         self.value = result[1]
 
+    def toInt(self):
+        pauliMap = {'I':0, 'X':1, 'Y':2, 'Z':3}
+        return pauliMap[self.value]
+    
+    def Matrix(self):
+        return Pauli2MatrixDict[self.value]
+
     def __eq__(self, other) -> bool:
         return self.sign == other.sign and self.value == other.value
 
@@ -125,6 +157,12 @@ class stabilizer:
     
     def W(self, tag):
         return self.term().count(tag)
+    
+    def toInt(self):
+        return [p.toInt() for p in self.value]
+    
+    def toMatrix(self):
+        return tensor([a.Matrix() for a in self.value])
 
     def prefix(self):
         return product([a.sign for a in self.value])

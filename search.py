@@ -48,6 +48,9 @@ def search(initial, candidate_code, candidate_bound):
         # print(count)
         if count%5000==0:
             f.write(str(minError))
+            f.write(len(queue))
+            end = time.time()
+            f.write(f"\nuse {end-start}s")
             f.close()
             f= open(f"found{count}",'w')
         top = queue.pop(0)

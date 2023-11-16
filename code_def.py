@@ -165,7 +165,7 @@ code17_1_3 = codeTN(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii"
 code513 = codeTN(["xzzxi", 'ixzzx', 'xixzz', 'zxixz'], "code513")
 code604 = codeTN(['ixzzxi', 'iixzzx', 'ixixzz', 'izxixz', 'xxxxxx', 'zzzzzz'], "code604", symmetry=[0])
 code603 = codeTN(['iixxxx', 'iizzzz', 'xixxii', 'ixixix', 'zizizi', 'iziizz'], "code603", symmetry=[0,2])
-code804 = codeTN(['iiiixxxx', 'iixxiixx', 'ixixixix', 'xxxxxxxx','iiiizzzz', 'iizziizz', 'iziziziz', 'zzzzzzzz'], "code803")
+code804 = codeTN(['iiiixxxx', 'iixxiixx', 'ixixixix', 'xxxxxxxx','iiiizzzz', 'iizziizz', 'iziziziz', 'zzzzzzzz'], "code803", symmetry=[0, 1])
 code713 = codeTN(['iiixxxx', 'ixxiixx', 'xixixix', 'iiizzzz', 'izziizz', 'ziziziz'], "code713")
 code422 = codeTN(['xxxx', 'zzzz'], "code422")
 code11_1_5 = codeTN(["ziiiiziiiii","iziiiziiiii","iiziiziiiii","iiiziziiiii","iiiizziiiii","iiiiiiziiiz","iiiiiiiziiz","iiiiiiiiziz","iiiiiiiiizz","iiiiiiiiiii","ixixiiixxii","ixixxxiixxi","ixiixiiiixx","ixxxixxiixi","iixxiixxixx","iixxiixxxix","ixixxxxxixx","iiixixixixi","ixixiixixii","xxxxxxiiiii"])

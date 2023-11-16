@@ -1,6 +1,7 @@
 from adt import *
 import itertools
 from enumerator import *
+from statistics import mean
 
 def TNN2CM(TN):
     tn = copy.deepcopy(TN)
@@ -32,8 +33,71 @@ def TNN2CM(TN):
             tnList[index2].tracted.pop(0)
     return cm
 
-px = 0.01
-pz = 0.05
+def eval_prog(prog, px, pz):
+    insList = prog[0]
+    tnList = prog[1]
+    tensorList  = [eval(t) for t in tnList]
+    # a = prog2Cm(insList, tensorList)
+    # a.row_echelon()
+
+    tn = prog2TNN(insList, tnList)
+    n = tn.get_n()
+    k = tn.get_k()
+
+    tmp = tn.toCm()
+    tmp.row_echelon()
+    rw = tmp.rowWBound()
+    cw = tmp.colWBound()
+    # tn.setLogical(0,0)
+
+    d,error,K = eval_TN(tn)
+
+    print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error:.5e}")
+
+    code = checkM2Stabilizers(tmp.matrix)
+    print(code)
+    print(tmp.matrix)
+    # for op in tmp.LogicOp:
+    #     print(op.shape[1]//2)
+    #     print(op)
+
+    stab_group = stabilizer_group(code)
+
+    print("ABzx", ABzx(stab_group, px, 1 - px, pz, 1- pz, k, K))
+    # print(eval_tn(tn))
+    print(distance(code, k, stab_group))
+
+def EvalActiveCode(prog, px, pz):
+    insList = prog[0]
+    tnList = prog[1]
+    tensorList  = [eval(t) for t in tnList]
+    # a = prog2Cm(insList, tensorList)
+    # a.row_echelon()
+
+    tn = prog2TNN(insList, tnList)
+    n = tn.get_n()
+    k = tn.get_k()
+
+    CM = tn.toCm()
+    CM.row_echelon()
+    rw = CM.rowWBound()
+    cw = CM.colWBound()
+    # tn.setLogical(0,0)
+    d,error,K = eval_TN(tn)
+    print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error:.5e}")
+    return evalFromCeckKMatrix(CM, px, pz, k, K)
+
+def evalFromCeckKMatrix(CM, px, pz, k=1, K=1):
+    code = checkM2Stabilizers(CM.matrix)
+    rbsize = 7
+    colw = [a + rbsize for a in CM.colW()]
+    xe = mean([1-(1-px)**i for i in colw])
+    ze = mean([1-(1-pz)**i for i in colw])
+    stab_group = stabilizer_group(code)
+    print(f"xe: {xe:.4f}, ze: {ze:.4f}")
+    error_rate = ABzx(stab_group, xe, 1 - xe, ze, 1- ze, k, K)
+    print(f"Error rate: {error_rate: .5e}")
+    return error_rate
 
 prog15_14 = ([['trace', 0, 2, 1, 0], ['trace', 0, 4, 2, 0], ['trace', 0, 3, 3, 0], ['self', 2, 1, 3, 1], ['setLog',0,0]], ['code603', 'code604', 'code604', 'code604'])
 # insList = [['trace', 0, 0, 1, 0], ['self', 0, 1, 1, 1], ['self', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['self', 0, 4, 1, 4]]         
@@ -48,12 +112,13 @@ prog513 = (insList, tnList)
 
 progStean = ([['trace', 0, 0, 1,0], ['self', 0, 1, 1, 1], ['setLog', 0, 2]], ['code603', 'code603'])
 
-# 713 4 6 code
+# 713 4 4 code
 prog713_4_4 = ([['trace', 0, 5, 1, 0], ['trace', 0, 0, 2, 0], ['trace', 0, 1, 3, 0], ['trace', 1, 1, 4, 0], ['self', 2, 1, 3, 1], ['setLog', 0, 2]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
-
+# n: 7, k: 1, d: 3, Ks: 1, rW: 4, cW: 4, error: 1.08502e-4
 #713 5 6 code
 
 prog713_5_5 = ([['trace', 0, 0, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 5, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 1, 1, 1], ['setLog', 0, 4]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
+# n: 7, k: 1, d: 3, Ks: 1, rW: 5, cW: 5, error: 3.33403e-5
 
 prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3, 0], ['trace', 3, 1, 4, 0], ['self', 0, 1, 1, 2], ['setLog', 0, 2]], ['code603', 'code604', 'codeH', 'codeH', 'codeS'])
 
@@ -75,6 +140,13 @@ prog923_44 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 
 prog16_2_3 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 2],['self',0,4,2,1],['self',0,5,1,1], ['setLog', 2, 3], ['setLog', 3, 1]],['code603', 'codeH', 'code604', 'code604', 'code603'])
 
 prog623_trick = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['self', 0, 2, 2, 1], ['setLog', 0, 3], ['setLog', 1, 1]], ['code603', 'code604', 'codeS'])
+
+prog913_4_4 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 3, 1, 4, 0], ['self', 1, 1, 2, 1], ['setLog', 0, 3]], ['code804', 'codeH', 'codeH', 'code604', 'codeS'])
+# n: 9, k: 1, d: 3, Ks: 1, rW: 4, cW: 4, error: 9.62497e-5
+
+prog913_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 2, 1, 3, 0], ['self', 0, 2, 1, 1], ['setLog', 0, 3]], ['code804', 'codeH', 'code604', 'codeH'])
+
+prog913_8_7 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 3, 1, 4, 0], ['self', 1, 1, 2, 1], ['setLog', 0, 3]], ['code804', 'codeH', 'codeS', 'code604', 'codeS'])
 
 tnList = ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus'] + ['code603', 'codePlus'] + ['code603'] + ['code603', 'codePlus'] + ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus']
 tens6 =  [0, 3, 5, 8, 10, 11, 13, 16, 18]
@@ -113,45 +185,13 @@ tnList = ['code603', 'code0', 'codePlus']
 instList = [['trace', 0, 5, 1, 0], ['trace', 0, 2, 2, 0], ['setLog', 0, 0]] 
 debug = (instList, tnList)
 
-prog = debug
+if __name__ == "__main__":
+    
+    prog = prog913_4_4
+    px = 0.01
+    pz = 0.05
+    eval_prog(prog, px, pz)
 
-def eval_prog(prog):
-
-
-    insList = prog[0]
-    tnList = prog[1]
-    tensorList  = [eval(t) for t in tnList]
-
-
-    # a = prog2Cm(insList, tensorList)
-    # a.row_echelon()
-
-    tn = prog2TNN(insList, tnList)
-    n = tn.get_n()
-    k = tn.get_k()
-
-    tmp = tn.toCm()
-    tmp.row_echelon()
-    rw = tmp.rowWBound()
-    cw = tmp.colWBound()
-    # tn.setLogical(0,0)
-
-    d,error,K = eval_TN(tn)
-
-    print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error}")
-
-    code = checkM2Stabilizers(tmp.matrix)
-    print(code)
-    print(tmp.matrix)
-    # for op in tmp.LogicOp:
-    #     print(op.shape[1]//2)
-    #     print(op)
-
-    stab_group = stabilizer_group(code)
-
-    print("ABzx", ABzx(stab_group, px, 1 - px, pz, 1- pz, k, K))
-    # print(eval_tn(tn))
-    print(distance(code, k, stab_group))
 
 # a = prog2Cm(debug[0], [eval(t) for t in debug[1]])
 # a.row_echelon()
@@ -167,7 +207,7 @@ def eval_prog(prog):
 # b.row_echelon()
 # print(b.matrix)
 # print(a.matrix)
-eval_prog(prog)
+
 # eval_prog(prog823_43)
 # print(simp_poly(get_enum_tensor(code823, [])[0]))
 
@@ -189,25 +229,25 @@ eval_prog(prog)
 # print(A, B, B-A)
 # end = time.time()
 # print(f"time: {end-start}")
-exit(0)
 
 
-code = code11_1_5
-stab_group = stabilizer_group(code)
 
-d=distance(code, 2, stab_group)
-print(f"distance: {d}, n: {code[0].length}")
+# code = code11_1_5
+# stab_group = stabilizer_group(code)
 
-A = Azx(stab_group, px, 1 - px, pz, 1- pz)
-B = Bzx(2, stab_group, px, 1 - px, pz, 1- pz)
-print(A, B, B-A)
-exit(0)
+# d=distance(code, 2, stab_group)
+# print(f"distance: {d}, n: {code[0].length}")
+
+# A = Azx(stab_group, px, 1 - px, pz, 1- pz)
+# B = Bzx(2, stab_group, px, 1 - px, pz, 1- pz)
+# print(A, B, B-A)
+# exit(0)
  
 
-code = codelize(['xxxx', 'zzzz'])
-cm = check_matrix(code603, symmetry=[[0,1,2,3], [4,5]])
-print(cm.matrix)
-print(cm.symmetry)
+# code = codelize(['xxxx', 'zzzz'])
+# cm = check_matrix(code603, symmetry=[[0,1,2,3], [4,5]])
+# print(cm.matrix)
+# print(cm.symmetry)
 # a = cm.trace(cm, 0, 4)
 # b = a.trace(cm, 0, 4)
 # c = b.trace(cm, 0, 4)
@@ -232,7 +272,7 @@ print(cm.symmetry)
 # print(distance(code, 2))
 # exit(0)
 
-a = cm.trace(cm, 4,4)
+# a = cm.trace(cm, 4,4)
 # print(a.symmetry)
 
 # steane = a.selfTrace(4,9)
@@ -245,14 +285,14 @@ a = cm.trace(cm, 4,4)
 # print(distance(steane, 1))
 # exit(0)
 
-b = a.trace(cm, 9, 0)
-print("b")
-c = b.trace(cm, 11, 4)
-print("c")
-d = c.selfTrace(1, 12)
-print("d")
-e = d.selfTrace(0, 10)
-e = cm.trace(cm,0,0).trace(cm, 2, 0)
+# b = a.trace(cm, 9, 0)
+# print("b")
+# c = b.trace(cm, 11, 4)
+# print("c")
+# d = c.selfTrace(1, 12)
+# print("d")
+# e = d.selfTrace(0, 10)
+# e = cm.trace(cm,0,0).trace(cm, 2, 0)
 # value_range=[
 #     list(range(14)),
 #     [0,4],
@@ -276,25 +316,25 @@ e = cm.trace(cm,0,0).trace(cm, 2, 0)
 #         exit(0)
 
 
-e.setLogical(2)
-code = checkM2Stabilizers(e.matrix)
+# e.setLogical(2)
+# code = checkM2Stabilizers(e.matrix)
 # stb_group = stabilizer_group(code)
-print(e.matrix)
+# print(e.matrix)
 
 
 
 
-e = cm.trace(cm,0,0).trace(cm, 2, 0)
-e.setLogical(2)
-a = cm.trace(cm, 0, 4).selfTrace(0, 9)
-b = a.trace(cm, 4, 5).trace(cm, 4, 5).trace(cm, 4,4).trace(cm,1,4)
-c = b.selfTrace(6,13).selfTrace(6,16).selfTrace(1,18)
-c.setLogical(2)
-print("c", c.matrix.shape)
-print(c.matrix)
-code = checkM2Stabilizers(c.matrix)
+# e = cm.trace(cm,0,0).trace(cm, 2, 0)
+# e.setLogical(2)
+# a = cm.trace(cm, 0, 4).selfTrace(0, 9)
+# b = a.trace(cm, 4, 5).trace(cm, 4, 5).trace(cm, 4,4).trace(cm,1,4)
+# c = b.selfTrace(6,13).selfTrace(6,16).selfTrace(1,18)
+# c.setLogical(2)
+# print("c", c.matrix.shape)
+# print(c.matrix)
+# code = checkM2Stabilizers(c.matrix)
 
-code17_1_3 = codelize(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii","iiixxiiiiiixxixxi","iiiiixixiixxiiixx","iiiiiixixixxiiixx","iiiiiiiiixxxxiiii","iiiiiiiiiiiiixxxx","ziiiiizziiiiiiiii","iziiiiizziizziiii","iiziiiiiiiziziizz","iiiziiizziiiiizzi","iiiiziizziziziziz","iiiiizzzziiiiiiii","iiiiiiiiizzzziiii","iiiiiiiiiiiiizzzz"])
+# code17_1_3 = codelize(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii","iiixxiiiiiixxixxi","iiiiixixiixxiiixx","iiiiiixixixxiiixx","iiiiiiiiixxxxiiii","iiiiiiiiiiiiixxxx","ziiiiizziiiiiiiii","iziiiiizziizziiii","iiziiiiiiiziziizz","iiiziiizziiiiizzi","iiiiziizziziziziz","iiiiizzzziiiiiiii","iiiiiiiiizzzziiii","iiiiiiiiiiiiizzzz"])
 
 
 # print(distance(code13_1_4, 1))

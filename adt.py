@@ -69,6 +69,9 @@ def getAllPauli(n):
     size = 4**n
     return [intVec2M(numberToBase(i, 4), n) for i in range(size)]
 
+def getAllPauliInt(n):
+    size = 4**n
+    return [numberToBase(i, 4) for i in range(size)]
 
 def allsubset(s):
     return reduce(lambda a, b: a+b, [findsubsets(s, i) for i in range(len(s)+1)])
@@ -114,6 +117,12 @@ class pauli:
         self.sign *= result[0]*other.sign
         self.value = result[1]
 
+    def isTag(self, tag):
+        for t in tag:
+            if self.value == t.upper():
+                return True
+        return False
+
     def toInt(self):
         pauliMap = {'I':0, 'X':1, 'Y':2, 'Z':3}
         return pauliMap[self.value]
@@ -157,6 +166,9 @@ class stabilizer:
     
     def W(self, tag):
         return self.term().count(tag)
+    
+    def tagVec(self, tag):
+        return [p.isTag(tag) for p in self.value]
     
     def toInt(self):
         return [p.toInt() for p in self.value]
@@ -252,15 +264,19 @@ class check_matrix:
         return max(count)
     
     def colWBound(self):
+        count = self.colW()
+        if len(count)==0:
+            return 0
+        return max(count)
+    
+    def colW(self):
         stabs = [row[:self.n]+row[self.n:] for row in self.matrix]
         count = [0 for i in range(self.n)]
         for row in stabs:
             for i in range(self.n):
                 if row[i]!=0:
                     count[i]+=1
-        if len(count)==0:
-            return 0
-        return max(count)
+        return count
 
     def setOnlyOne1(self, column):
         target = -1
@@ -606,8 +622,31 @@ def ABzx(stab_group, x,y,z,w,k,K=1):
         wz = term.Wz()
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
-    print(Ax, 2**k*Bx)
+    # print(Ax, 2**k*Bx)
     return 2**k/K*Bx-Ax
+
+def ABzxVec(stab_group, x,xp,z,zp,k,K=1):
+    n = next(iter(stab_group)).length
+    Ax = 0
+    Bx = 0
+    def Nerror(x,xp,z,zp):
+        return product(x)*product(xp)*product(z)*product(zp)
+    def errorVec(errorVec, qubitmap):
+        error = []
+        for i in range(qubitmap):
+            if qubitmap[i]:
+                error.append(errorVec)
+        return error
+    for term in stab_group:
+        xmap = term.tagVec(('x', 'y'))
+        zmap = term.tagVec(('z', 'y'))
+        xe = errorVec(x, xmap)
+        ze = errorVec(z, zmap)
+        xpe = errorVec(xp, xmap)
+        zpe = errorVec(zp, zmap)
+        Ax += Nerror(xe, xpe, )
+
+
     
 def prog2Cm(insList, tnList):
     

@@ -46,7 +46,8 @@ if __name__ == "__main__":
 
     px = 0.01
     pz = 0.05
-    candidateProg = [prog913_4_4, prog913_6_6, prog913_8_7, prog713_4_4, prog713_5_5, prog713_6_6, prog623_trick, prog823_43]
-    for prog in candidateProg:
+
+    candidateProg = [prog13_1_4_99, prog913_4_4, prog913_6_6, prog913_8_7, prog713_4_4, prog713_5_5, prog713_6_6, prog623_trick, prog6_1_3_54, prog823_43]
+    for prog in candidateProg[:1]:
         EvalActiveCode(prog, px, pz)
         print("")

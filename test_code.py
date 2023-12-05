@@ -30,6 +30,7 @@ def aberror(code, k):
 
 def evalCodeFile(file, px, pz, k, K):
     code = getCode(file)
+    aberror(code, k)
     cm = check_matrix(code)
     evalFromCeckKMatrix(cm, px, pz, k, K)
 

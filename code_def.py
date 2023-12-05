@@ -179,6 +179,7 @@ code0 = codeTN(['z'])
 codePlus = codeTN(['x'])
 code922 = codeTN(['XXXIIIIII', 'IIIXXXIII', 'IIIIIIXXX', 'ZIZZIZZIZ', 'IZZZIZZIZ', 'IIIIZZZIZ', 'IIIIIIIZZ'])
 code913 = codeTN(['ZZIIIIIII', 'XXIXXIIII', 'IZZIZZIII', 'IIXIIXIII', 'IIIXIIXII', 'IIIZZIZZI', 'IIIIXXIXX', 'IIIIIIIZZ'])
+code613=codeTN(['YIZZIX', 'ZXZIZY', 'IZXZZY', 'ZZIYIX', 'IIIIYX'])
 # stab_list = []
 # length = int(len(code11_1_5.stabs) / 2 )
 # for i in range(length):
@@ -192,9 +193,9 @@ if __name__ == "__main__":
     
     px = 0.01
     pz = 0.05
-    code = code913
+    code = code613
     print(Az_poly(code))
-    print('d', distance(code, 2))
+    print('d', distance(code, 1))
     stab_group = stabilizer_group(code)
     print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 1))
     

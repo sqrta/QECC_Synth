@@ -158,6 +158,7 @@ def ABError(n, APoly, BPoly, px, pz):
     wz = 1 - pz
     Azx = wx**n*wz**n*APoly.subs([(x,px/wx), (z,pz/wz)])
     Bzx = wx**n*wz**n*BPoly.subs([(x,px/wx), (z,pz/wz)])
+    # print(f"Bzx: {Bzx}, Azx: {Azx}")
     return Bzx - Azx
 
 def eval_TN(tn, px=0.01, pz=0.05):
@@ -198,9 +199,10 @@ if __name__ == "__main__":
     px = 0.01
     pz = 0.05
     code = code513
+    code = code613
     #print(get_enum_tensor(code513, []))
     d,error = eval_code(code, 1)
-    cm = TNNetwork(Tensor('code823')).toCm()
+    cm = TNNetwork(Tensor('code513')).toCm()
     print(f"d: {d}, error: {error}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
 
 

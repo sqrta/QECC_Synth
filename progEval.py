@@ -1,7 +1,7 @@
 from adt import *
 import itertools
 from enumerator import *
-from statistics import mean
+from statistics import mean,geometric_mean
 
 def TNN2CM(TN):
     tn = copy.deepcopy(TN)
@@ -91,8 +91,8 @@ def evalFromCeckKMatrix(CM, px, pz, k=1, K=1):
     code = checkM2Stabilizers(CM.matrix)
     rbsize = 7
     colw = [a + rbsize for a in CM.colW()]
-    xe = mean([1-(1-px)**i for i in colw])
-    ze = mean([1-(1-pz)**i for i in colw])
+    xe = geometric_mean([1-(1-px)**i for i in colw])
+    ze = geometric_mean([1-(1-pz)**i for i in colw])
     stab_group = stabilizer_group(code)
     print(f"xe: {xe:.4f}, ze: {ze:.4f}")
     error_rate = ABzx(stab_group, xe, 1 - xe, ze, 1- ze, k, K)
@@ -125,6 +125,9 @@ prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3,
 prog422 = ([['setLog', 0, 0], ['setLog', 0, 1]],['code603'])
 prog422_trick = ([['trace', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['setLog', 1, 0], ['setLog', 0, 0],['setLog', 0, 1],['setLog', 1, 1]], ['code603', 'code603'])
 
+prog6_1_3_54=([['trace', 0, 0, 1, 0], ['trace', 1, 1, 2, 0], ['trace', 1, 2, 3, 0], ['self', 1, 3, 2, 1], ['self', 1, 5, 3, 1], ['setLog', 0, 1]],['code604', 'code603', 'codeH', 'codeGHZ'])
+
+prog6_1_3_55 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 2, 1, 3, 0], ['trace', 2, 2, 4, 0], ['trace', 0, 2, 5, 0], ['setLog', 0, 3]], ['code604', 'codeS', 'codeGHZ', 'codeH', 'codeH', 'codeS'])
 
 tmp = [['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 0, 5, 3, 1], ['setLog', 1, 1], ['setLog', 2, 1]]
 #  ['code604', 'code604', 'code604', 'codeS', 'codeH']
@@ -137,6 +140,9 @@ prog823_54 = ([['trace', 0, 0, 1, 0], ['trace', 1, 1, 2, 0], ['trace', 1, 2, 3, 
 prog823_43_2 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0],['self', 0, 5, 2, 1], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 3, 1],  ['setLog', 1, 1], ['setLog', 4, 1]],['code604', 'code604', 'codeH', 'codeH', 'code604'])
 prog923_44 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 0, 5, 3, 1], ['setLog', 1, 1], ['setLog', 2, 1]],['code604', 'code604', 'code604', 'codeGHZ', 'codeH'])
 
+prog513_44 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['setLog', 0, 2]],['code604', 'codeS', 'codeS'])
+prog513_43= ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['self', 0, 3, 3, 1], ['self', 0, 4, 2, 1], ['setLog', 0, 5]], ['code603', 'code604', 'codeH', 'codeS'])
+
 prog16_2_3 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 2],['self',0,4,2,1],['self',0,5,1,1], ['setLog', 2, 3], ['setLog', 3, 1]],['code603', 'codeH', 'code604', 'code604', 'code603'])
 
 prog623_trick = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['self', 0, 2, 2, 1], ['setLog', 0, 3], ['setLog', 1, 1]], ['code603', 'code604', 'codeS'])
@@ -147,6 +153,10 @@ prog913_4_4 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3,
 prog913_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 2, 1, 3, 0], ['self', 0, 2, 1, 1], ['setLog', 0, 3]], ['code804', 'codeH', 'code604', 'codeH'])
 
 prog913_8_7 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 3, 1, 4, 0], ['self', 1, 1, 2, 1], ['setLog', 0, 3]], ['code804', 'codeH', 'codeS', 'code604', 'codeS'])
+
+prog13_1_4_78 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 0, 3, 4, 0], ['self', 0, 4, 4, 1], ['self', 2, 1, 3, 1], ['setLog', 0, 5]],['code604', 'code603', 'codeH', 'code604', 'code604'])
+
+prog13_1_4_99 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 2, 1, 3, 0], ['self', 0, 2, 3, 1], ['self', 1, 1, 2, 2], ['setLog', 0, 3]], ['code604', 'code604', 'code604', 'code603'])
 
 tnList = ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus'] + ['code603', 'codePlus'] + ['code603'] + ['code603', 'codePlus'] + ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus']
 tens6 =  [0, 3, 5, 8, 10, 11, 13, 16, 18]
@@ -187,7 +197,7 @@ debug = (instList, tnList)
 
 if __name__ == "__main__":
     
-    prog = prog913_4_4
+    prog = prog13_1_4_99
     px = 0.01
     pz = 0.05
     eval_prog(prog, px, pz)

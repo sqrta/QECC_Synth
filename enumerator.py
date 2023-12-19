@@ -174,13 +174,12 @@ def Poly2Distance(APoly, BPoly):
             return d
         
 def ABError(n, APoly, BPoly, px, pz):
-    print(px, pz)
     wx = 1 - px
     wz = 1 - pz
     Azx = wx**n*wz**n*APoly.subs([(x,px/wx), (z,pz/wz)])
     Bzx = wx**n*wz**n*BPoly.subs([(x,px/wx), (z,pz/wz)])
     # print(f"Bzx: {Bzx}, Azx: {Azx}")
-    return Bzx - Azx
+    return 1 - Azx / Bzx
 
 def eval_TN(tn, px=0.01, pz=0.05):
     n = tn.get_n()

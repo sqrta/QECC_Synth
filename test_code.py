@@ -26,23 +26,33 @@ def aberror(code, k):
     d = distance(code, k, stab_group)
     error = ABzx(stab_group, px, 1 - px, pz, 1- pz, k)
     cm = check_matrix(code)
-    print(f"error: {error}, n:{code.length}, d: {d}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
+    print(error)
+    print(f"error: {error[1]:.5e}, n:{code.length}, d: {d}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
+
+
 
 def evalCodeFile(file, px, pz, k, K):
     code = getCode(file)
-    aberror(code, k)
+    stabs = [stab.toInt() for stab in code]
+    # return stabs
     cm = check_matrix(code)
-    evalFromCeckKMatrix(cm, px, pz, k, K)
+    xe, ze = ErrorFrCode(px, pz, cm)
+    stabs = [stab.toInt() for stab in code]
+    # aberror(code, k)
+    return stabs, xe, ze
+    # 
+    # evalFromCeckKMatrix(cm, px, pz, k, K)
 
 if __name__ == "__main__":
     dir_path = "exist_code/"
-    files = [dir_path + file for file in os.listdir(dir_path)]
-    px = 0.01
-    pz = 0.05
+    files = [file for file in os.listdir(dir_path)]
+    vars = ["code_"+file for file in os.listdir(dir_path)]
+    px = 0.001
+    pz = 0.005
     k = 1
     K = 1
+    print(f"[{','.join(vars)}]")
     for file in files:
-        print(file)
-        evalCodeFile(file, px, pz, k, K)
-        print("")
-    
+        path = dir_path + file
+        stabs, xe, ze = evalCodeFile(path, px, pz, k, K)
+        print(f"code_{file}=CodeWithError({stabs},{xe},{ze})")

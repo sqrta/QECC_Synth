@@ -43,6 +43,7 @@ def search(initial, candidate_code, candidate_bound):
     minError = {}
     count = 0
     f = open("found", 'w')
+    maxSize = 17
     while len(queue)>0:
         count+=1
         # print(count)
@@ -73,7 +74,7 @@ def search(initial, candidate_code, candidate_bound):
     
         if (d,error) not in exist_set:
             exist_set.add((d,error))
-            if top.get_n()<=18 and len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
+            if top.get_n()<=maxSize-2 and len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
                 dangleLegs = top.equiv_trace_leg()
                 exist = [a.index for a in top.tensorList] 
                 for i in range(len(candidate_code)):
@@ -87,7 +88,7 @@ def search(initial, candidate_code, candidate_bound):
                         for tractLeg in code.symmetry:
                             tmp = copy.deepcopy(top)
                             tmp.trace(leg[0],leg[1],Tensor(codeName,i), tractLeg)
-                            if tmp.get_n()<=20:
+                            if tmp.get_n()<=maxSize:
                                 queue.append(tmp)
             if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>6:
                 dangleLegs = top.equiv_trace_leg()

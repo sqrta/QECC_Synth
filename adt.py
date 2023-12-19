@@ -623,7 +623,8 @@ def ABzx(stab_group, x,y,z,w,k,K=1):
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
     print(Ax, 2**k*Bx)
-    return 2**k/K*Bx-Ax
+    res = 2**k/K*Bx-Ax
+    return 2**k/K*Bx-Ax, 1- Ax/(2**k/K*Bx)
 
 def ABzxVec(stab_group, x,xp,z,zp,k,K=1):
     n = next(iter(stab_group)).length

@@ -26,8 +26,28 @@ def get_enum_tensor(code, indices):
         # term = 1 if wx+wy+wz==0 else x**(wx )* x**wy * x**wz
         index = 0 if rank == 0 else tuple(index)
         enumerator[index] += term
-    
     return enumerator
+
+def enum_error(code, Xvec, ZVec):
+    indices = [0]
+    rank = len(indices)
+    stab_group = stabilizer_group(code)
+    max_degree = next(iter(stab_group)).length - rank
+    pauli_map = {'I':0, "X": 1, "Y":2, "Z":3}
+    # enumerator = np.full([4]*rank, fill_value=Polynomial([0]*(max_degree+1)))
+    enumerator = [0] if rank==0 else np.full([4]*rank, fill_value=0, dtype = object)
+    # print(f"stab length: {len(stab_group)}")
+    for stab in stab_group:
+        index = [pauli_map[stab.value[i].value] for i in indices]
+        weight = stab.weight() - rank + index.count(0)
+        wx = stab.W("X") - index.count(1)
+        wy = stab.W("Y") - index.count(2)
+        wz = stab.W("Z") - index.count(3)
+        term = 1 if wx+wy+wz==0 else x**(wx )* y**wy * z**wz
+        # term = 1 if wx+wy+wz==0 else x**(wx )* x**wy * x**wz
+        index = 0 if rank == 0 else tuple(index)
+        enumerator[index] += term
+    return enumerator  
 
 def get_BPoly(APoly, n, k):
     lx = symbols('lx')
@@ -154,6 +174,7 @@ def Poly2Distance(APoly, BPoly):
             return d
         
 def ABError(n, APoly, BPoly, px, pz):
+    print(px, pz)
     wx = 1 - px
     wz = 1 - pz
     Azx = wx**n*wz**n*APoly.subs([(x,px/wx), (z,pz/wz)])
@@ -200,10 +221,13 @@ if __name__ == "__main__":
     pz = 0.05
     code = code513
     code = code613
-    #print(get_enum_tensor(code513, []))
+    print(get_enum_tensor(code513v, []))
+    print(get_enum_tensor(code513, []))
+    exit(0)
     d,error = eval_code(code, 1)
     cm = TNNetwork(Tensor('code513')).toCm()
     print(f"d: {d}, error: {error}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
+    
 
 
 

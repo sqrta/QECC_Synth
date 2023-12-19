@@ -29,6 +29,7 @@ class codeTN:
         for i in range(length):
             stab_list.append(self.stabs[i] * self.stabs[i+length])
         self.stabs = stab_list
+
     def __getitem__(self, indices):
         return self.stabs[indices]
 
@@ -163,6 +164,7 @@ code13_1_4 = codeTN(['xiixixxiiixxi', 'ixixixixiiiii',
 'iiiiiiiiixxxx','ziiziizziiizz','izizizziiiiii', 'iizziziziiizz','iiiizzzziiiii', 'iiiiiiiiziziz', 'iiiiiiiiizzzz'], "code13_1_4")
 code17_1_3 = codeTN(["xiiiiiixxiixxixix","ixiiiiiiiixixixix","iixixiiiiiixxiiii","iiixxiiiiiixxixxi","iiiiixixiixxiiixx","iiiiiixixixxiiixx","iiiiiiiiixxxxiiii","iiiiiiiiiiiiixxxx","ziiiiizziiiiiiiii","iziiiiizziizziiii","iiziiiiiiiziziizz","iiiziiizziiiiizzi","iiiiziizziziziziz","iiiiizzzziiiiiiii","iiiiiiiiizzzziiii","iiiiiiiiiiiiizzzz"])
 code513 = codeTN(["xzzxi", 'ixzzx', 'xixzz', 'zxixz'], "code513")
+code513v = codeTN(['XZZIY', 'IYZZX', 'ZIXZY', 'ZZIXX'])
 code604 = codeTN(['ixzzxi', 'iixzzx', 'ixixzz', 'izxixz', 'xxxxxx', 'zzzzzz'], "code604", symmetry=[0])
 code603 = codeTN(['iixxxx', 'iizzzz', 'xixxii', 'ixixix', 'zizizi', 'iziizz'], "code603", symmetry=[0,2])
 code804 = codeTN(['iiiixxxx', 'iixxiixx', 'ixixixix', 'xxxxxxxx','iiiizzzz', 'iizziizz', 'iziziziz', 'zzzzzzzz'], "code803", symmetry=[0, 1])
@@ -193,9 +195,11 @@ if __name__ == "__main__":
     
     px = 0.01
     pz = 0.05
-    code = code613
+    code = code713
     print(Az_poly(code))
     print('d', distance(code, 1))
     stab_group = stabilizer_group(code)
+    
     print(ABzx(stab_group, px, 1 - px, pz, 1- pz, 1))
+    print([stab.toInt() for stab in code.stabs])
     

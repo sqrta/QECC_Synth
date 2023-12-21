@@ -235,6 +235,7 @@ if __name__ == "__main__":
     prog = prog513_44
 
     candidates = [prog513_44, prog6_1_3_54, prog7_3_66, prog813_66, prog913_6_6, prog1013_6_7, prog11_1_3_98,prog12_3_108, prog13_1_4_1010]
+    candidateProg = [prog513_44, prog6_1_3_54, prog7_3_66, prog813_66, prog913_6_6, prog1013_6_7, prog11_1_3_98,prog12_3_108, prog13_1_4_1010]
     for prog in candidates:
         px = 0.01
         pz = 0.05

@@ -21,38 +21,52 @@ def getCode(filename="tmp"):
         code.merge()
     return code
 
+def getGF4Code(filename):
+    with open(filename, "r") as f:
+        lines = f.readlines()
+        stabs = []
+        for line in lines:
+            stab = line.replace("w^2", "Y").replace("0", "I").replace("1", "X").replace("w", "Z")
+            stab = stab.translate(str.maketrans('', '', ' \n\t\r\[\]'))
+            stabs.append(stab)
+    return codeTN(stabs)
+
 def aberror(code, k):
     stab_group = stabilizer_group(code)
     d = distance(code, k, stab_group)
     error = ABzx(stab_group, px, 1 - px, pz, 1- pz, k)
     cm = check_matrix(code)
-    print(error)
-    print(f"error: {error[1]:.5e}, n:{code.length}, d: {d}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
+    print(f"pl: {error[0]:.5e},pnorm: {error[1]:.5e}, n:{code.length}, d: {d}, rowW: {cm.rowWBound()}, colW: {cm.colWBound()}")
 
 
 
-def evalCodeFile(file, px, pz, k, K):
-    code = getCode(file)
+def evalCodeFile(file, px, pz, k, form="G2"):
+    if form == "G2":
+        code = getCode(file)
+    elif form == "G4":
+        code = getGF4Code(file)
     stabs = [stab.toInt() for stab in code]
     # return stabs
     cm = check_matrix(code)
     xe, ze = ErrorFrCode(px, pz, cm)
     stabs = [stab.toInt() for stab in code]
-    # aberror(code, k)
+    aberror(code, k)
     return stabs, xe, ze
     # 
     # evalFromCeckKMatrix(cm, px, pz, k, K)
 
 if __name__ == "__main__":
     dir_path = "exist_code/"
+    dir_path = "magma_code/"
     files = [file for file in os.listdir(dir_path)]
     vars = ["code_"+file for file in os.listdir(dir_path)]
-    px = 0.001
-    pz = 0.005
+    px = 0.01
+    pz = 0.05
     k = 1
     K = 1
     print(f"[{','.join(vars)}]")
     for file in files:
         path = dir_path + file
-        stabs, xe, ze = evalCodeFile(path, px, pz, k, K)
+        print(file)
+        stabs, xe, ze = evalCodeFile(path, px, pz, k, "G4")
         print(f"code_{file}=CodeWithError({stabs},{xe},{ze})")

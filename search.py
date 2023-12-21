@@ -53,7 +53,7 @@ def search(initial, candidate_code, candidate_bound):
             end = time.time()
             f.write(f"queue length: {len(queue)}\nuse {end-start}s")
             f.close()
-            f= open(f"found{count}",'w')
+            f= open(f"gfound{count}",'w')
         top = queue.pop(0)
         # logLeg = None
         # for leg in top.equiv_trace_leg():

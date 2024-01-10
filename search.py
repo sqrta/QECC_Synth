@@ -43,13 +43,13 @@ def search(initial, candidate_code, candidate_bound):
     exist_set = set()
     minError = {}
     count = 0
-    prefix = "found"
+    prefix = "sfound"
     f = open(prefix, 'w')
     maxSize = 14
     while len(queue)>0:
         count+=1
         # print(count)
-        if count%1000==0:
+        if count%5000==0:
             f.write(str(minError))
             end = time.time()
             f.write(f"queue length: {len(queue)}\nuse {end-start}s")
@@ -63,12 +63,12 @@ def search(initial, candidate_code, candidate_bound):
         #         break
         legs = top.equiv_trace_leg()
         logLeg = legs[0]        
-        if True:
-            for secLeg in legs[1:]:
-                setlog = copy.deepcopy(top)
-                setlog.setLogical(logLeg[0], logLeg[1])
-                setlog.setLogical(secLeg[0], secLeg[1])
-                chooseProg(setlog, minError, f)
+        # if True:
+        #     for secLeg in legs[1:]:
+        #         setlog = copy.deepcopy(top)
+        #         setlog.setLogical(logLeg[0], logLeg[1])
+        #         setlog.setLogical(secLeg[0], secLeg[1])
+        #         chooseProg(setlog, minError, f)
 
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])

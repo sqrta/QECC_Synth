@@ -43,8 +43,9 @@ def search(initial, candidate_code, candidate_bound):
     exist_set = set()
     minError = {}
     count = 0
-    f = open("found", 'w')
-    maxSize = 16
+    prefix = "found"
+    f = open(prefix, 'w')
+    maxSize = 14
     while len(queue)>0:
         count+=1
         # print(count)
@@ -53,7 +54,7 @@ def search(initial, candidate_code, candidate_bound):
             end = time.time()
             f.write(f"queue length: {len(queue)}\nuse {end-start}s")
             f.close()
-            f= open(f"gfound{count}",'w')
+            f= open(f"{prefix}{count}",'w')
         top = queue.pop(0)
         # logLeg = None
         # for leg in top.equiv_trace_leg():
@@ -114,7 +115,7 @@ if __name__ == "__main__":
     import time
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
-    minE = search(Tensor('code604', 0), candidate_code, candidate_bound=[1,1, 2,2, 2,2])
+    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2])
     print(minE)
 
     # t604 = Tensor(code604)

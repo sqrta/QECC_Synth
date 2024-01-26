@@ -52,14 +52,14 @@ class bidict(dict):
 def findsubsets(s, n):
     return list(itertools.combinations(s, n))
 
-def numberToBase(n, b):
+def numberToBase(n, b, length):
     if n == 0:
-        return [0]
+        return [0 for i in range(length)]
     digits = []
     while n:
         digits.append(int(n % b))
         n //= b
-    return digits[::-1]
+    return [0 for i in range(length-len(digits))] + digits[::-1]
 
 def intVec2M(vec, n):
     v = [0]*(n-len(vec))+vec
@@ -67,11 +67,11 @@ def intVec2M(vec, n):
 
 def getAllPauli(n):
     size = 4**n
-    return [intVec2M(numberToBase(i, 4), n) for i in range(size)]
+    return [intVec2M(numberToBase(i, 4, n)) for i in range(size)]
 
 def getAllPauliInt(n):
     size = 4**n
-    return [numberToBase(i, 4) for i in range(size)]
+    return [numberToBase(i, 4, n) for i in range(size)]
 
 def allsubset(s):
     return reduce(lambda a, b: a+b, [findsubsets(s, i) for i in range(len(s)+1)])
@@ -118,6 +118,8 @@ class pauli:
         self.value = result[1]
 
     def isTag(self, tag):
+        if isinstance(tag, str):
+            return self.value == tag.upper()
         for t in tag:
             if self.value == t.upper():
                 return True
@@ -647,8 +649,6 @@ def ABzxVec(stab_group, x,xp,z,zp,k,K=1):
         zpe = errorVec(zp, zmap)
         Ax += Nerror(xe, xpe, )
 
-
-    
 def prog2Cm(insList, tnList):
     
     tracted = [[] for i in range(len(tnList))]
@@ -691,6 +691,8 @@ def prog2Cm(insList, tnList):
             raise NameError(f"no ops as {ins[0]}")
     cm.removeZeroRow()
     return cm
+
+
 
 
 if __name__ == "__main__":

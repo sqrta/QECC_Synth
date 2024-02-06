@@ -210,7 +210,8 @@ def eval_TN(tn, px=0.01, pz=0.05):
 def prog2TNN(insList, tensorList):
     progList = []
 
-    for ins in insList:
+    for state in insList:
+        ins = [state[0], state[1][0], state[1][1], state[1][0], state[1][1]]
         if ins[0]=="trace":
             index = ins[3]
             ins[3] = Tensor(tensorList[index])

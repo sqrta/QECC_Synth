@@ -10,7 +10,7 @@ def buildProg(insList, initial):
         elif ins[0] == "setLog":
             tn.setLogical(ins[1], ins[2])
         else:
-            raise NameError(f"no ops as {ins[0]}")
+            raise NameError(f"no ops as '{ins[0]}'")
     return tn
 
 class codeTN:
@@ -55,11 +55,14 @@ class TNNetwork:
         self.selfTraceCount = 0
 
     def trace(self, localIndex, leg1, tensor, leg2):
+        msg =['trace', localIndex, leg1, tensor, leg2] 
         if localIndex >= len(self.tensorList):
-            raise ValueError(localIndex, len(self.tensorList))
+            raise ValueError(msg, f"first index {localIndex} out of tnlist length {len(self.tensorList)}" )
         local = self.tensorList[localIndex]
-        if leg1 in local.tracted or leg1 >= local.size:
-            raise ValueError(leg1, local.tracted)
+        if leg1 in local.tracted:
+            raise ValueError(msg, f"leg {leg1} of TN {localIndex} is traced")
+        elif leg1 >= local.size:
+            raise ValueError(msg, f"leg {leg1} exceeds TN {localIndex}'s index (max {local.size-1})")
         local.tracted.append(leg1)
         tensor.tracted.append(leg2)
         self.insList.append(["trace", localIndex, leg1, len(self.tensorList), leg2])
@@ -69,9 +72,12 @@ class TNNetwork:
     def selfTrace(self, index1, leg1, index2, leg2):
         tn1 = self.tensorList[index1]
         tn2 = self.tensorList[index2]
-        if leg1 in tn1.tracted or leg2 in tn2.tracted:
-            print(index1, leg1, index2, leg2)
-            raise ValueError(leg1, leg2, tn1.tracted, tn2.tracted)
+        if leg1 in tn1.tracted:
+            print('self', index1, leg1, index2, leg2)
+            raise ValueError(f"leg {leg1} of TN {index1} is traced. TN {index1}'s traced set {tn1.tracted}")
+        if leg2 in tn2.tracted:
+            print('self', index1, leg1, index2, leg2)
+            raise ValueError(f"leg {leg2} of TN {index2} is traced. TN {index2}'s traced set {tn2.tracted}")
         tn1.tracted.append(leg1)
         tn2.tracted.append(leg2)
         self.insList.append(["self", index1, leg1, index2, leg2])

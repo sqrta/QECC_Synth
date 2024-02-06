@@ -2,6 +2,7 @@ from adt import *
 import copy
 import scipy.linalg
 import string
+from itertools import product
 digs = string.digits + string.ascii_letters
 
 class Ket:
@@ -92,12 +93,20 @@ def getLogicalState(stabs):
         init.add(tmp)
     return init
 
+def ErrorProb(error, px, py, pz):
+    errorMap = {0: 1-px-pz-py, 1: px, 2:py, 3:pz}
+    return reduce(lambda a,b:a*b, [errorMap[a] for a in error])
+
 def QECMatrix_Depolar(stabs):
     zero = getLogicalState(stabs)
     n = stabs[0].length
     
     paulis = getAllPauliInt(n)
-
+    ex=0.01
+    ez=0.05
+    px = ex*(1-ez)
+    pz = ez*(1-ex)
+    py = ex*ez
     N = len(paulis)
     M = np.zeros((N, N))
     for i in range(N):
@@ -108,7 +117,7 @@ def QECMatrix_Depolar(stabs):
             left.MulStabilier(error1)
             right = copy.deepcopy(zero)
             right.MulStabilier(error2)
-            M[i,j] = left.InnerProd(right)
+            M[i,j] = ErrorProb(error1, px,py,pz)*ErrorProb(error2, px,py,pz)*left.InnerProd(right)
     return M
 
 def NearOptFid(stabs):
@@ -140,6 +149,7 @@ def allSinglePauli(n):
     
 if __name__ == "__main__":
     stabs = ['xxziz', 'zxxzi', 'izxxz', 'zizxx']
+    stabs = ['iiixxxx', 'ixxiixx', 'xixixix', 'iiizzzz', 'izziizz', 'ziziziz']
     # stabs = ['xxx', 'zzi']
     stabs = [stabilizer(a) for a in stabs]
 

@@ -160,7 +160,7 @@ prog713_6_6 = ([['trace', 0, 0, 1, 0], ['trace', 0, 5, 2, 0], ['trace', 1, 1, 3,
 
 prog813_44 = ([['trace', 0, 0, 1, 0], ['trace', 1, 2, 2, 0], ['trace', 1, 5, 3, 0], ['trace', 0, 1, 4, 0], ['trace', 1, 3, 5, 0], ['self', 2, 1, 3, 1], ['setLog', 0, 2]], ['code604', 'code603', 'codeH', 'codeH', 'codeS', 'codeGHZ'])
 prog813_57 = ([['trace', 0, 0, 1, 0], ['trace', 1, 2, 2, 0], ['trace', 0, 1, 3, 0], ['trace', 1, 1, 4, 0], ['trace', 0, 2, 5, 0], ['self', 0, 3, 4, 1], ['setLog', 0, 4]],['code604', 'code603', 'codeH', 'codeS', 'codeS', 'codeGHZ'])
-prog813_66 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 2, 1, 4, 0], ['self', 2, 2, 4, 1], ['setLog', 0, 3]],['code604', 'codeS', 'code604', 'codeS', 'codeGHZ'])
+prog813_66 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 2, 1, 4, 0], ['self', 2, 2, 4, 1], ['setLog', 0, 3]], ['code604', 'codeS', 'code604', 'codeS', 'codeGHZ'])
 
 prog422 = ([['setLog', 0, 0], ['setLog', 0, 1]],['code603'])
 prog422_trick = ([['trace', 0, 2, 1, 2], ['self', 0, 3, 1, 3], ['setLog', 1, 0], ['setLog', 0, 0],['setLog', 0, 1],['setLog', 1, 1]], ['code603', 'code603'])

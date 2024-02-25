@@ -17,7 +17,6 @@ function error_prob(error, px, py, pz)
     return prob
 end
 
-
 function activeCodeEval(stabilizers, k, px,py, pz, Decoder)
     n = length(stabilizers[1])
     batch = 4

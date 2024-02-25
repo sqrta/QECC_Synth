@@ -21,6 +21,7 @@ import numpy as np
 import evaluator
 import programs_database
 
+from dialogues import DialogueTemplate, get_dialogue_template
 
 class LLM:
   """Language model that predicts continuation of provided source code."""
@@ -28,15 +29,29 @@ class LLM:
   def __init__(self, samples_per_prompt: int) -> None:
     self._samples_per_prompt = samples_per_prompt
 
-  def _draw_sample(self, prompt: str) -> str:
+  def _draw_sample(self, prompt: str, real_llm) -> str:
     """Returns a predicted continuation of `prompt`."""
     print("below is prompt")
     print(prompt)
-    raise NotImplementedError('Must provide a language model.')
+    # raise NotImplementedError('Must provide a language model.')
+    
+    tokenizer, model, dialogue_template, generation_config, device = real_llm
+    
+    # prompt formalization in real llm
+    prompt_with_role = {"role": "user", "content": prompt}
+    dialogue_template.messages = [prompt_with_role]
+    formatted_prompt = dialogue_template.get_inference_prompt()
 
-  def draw_samples(self, prompt: str) -> Collection[str]:
+    inputs = tokenizer.encode(formatted_prompt, return_tensors="pt").to(device)
+    outputs = model.generate(inputs, generation_config=generation_config)
+    generated_code = tokenizer.decode(outputs[0], clean_up_tokenization_spaces=False)
+    print(generated_code)
+
+    return generated_code 
+
+  def draw_samples(self, prompt: str, real_llm) -> Collection[str]:
     """Returns multiple predicted continuations of `prompt`."""
-    return [self._draw_sample(prompt) for _ in range(self._samples_per_prompt)]
+    return [self._draw_sample(prompt, real_llm) for _ in range(self._samples_per_prompt)]
 
 
 class Sampler:
@@ -52,11 +67,11 @@ class Sampler:
     self._evaluators = evaluators
     self._llm = LLM(samples_per_prompt)
 
-  def sample(self):
+  def sample(self, real_llm):
     """Continuously gets prompts, samples programs, sends them for analysis."""
     while True:
       prompt = self._database.get_prompt()
-      samples = self._llm.draw_samples(prompt.code)
+      samples = self._llm.draw_samples(prompt.code, real_llm)
       # This loop can be executed in parallel on remote evaluator machines.
       for sample in samples:
         chosen_evaluator = np.random.choice(self._evaluators)

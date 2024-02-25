@@ -22,6 +22,10 @@ import config as config_lib
 import evaluator
 import programs_database
 import sampler
+import torch
+from dialogues import DialogueTemplate, get_dialogue_template
+from transformers import (AutoModelForCausalLM, AutoTokenizer,
+                          GenerationConfig)
 
 
 def _extract_function_names(specification: str) -> tuple[str, str]:
@@ -37,13 +41,41 @@ def _extract_function_names(specification: str) -> tuple[str, str]:
   return evolve_functions[0], run_functions[0]
 
 
-def main(specification: str, inputs: Sequence[Any], config: config_lib.Config):
+def _initialize_real_llm(checkpoint: str, cache_dir: str) -> list:
+  device = "cuda" if torch.cuda.is_available() else "cpu"
+  tokenizer = AutoTokenizer.from_pretrained(checkpoint, revision=None, cache_dir=cache_dir)
+  model = AutoModelForCausalLM.from_pretrained(
+        checkpoint, revision=None, load_in_8bit=True, device_map="auto", torch_dtype=torch.float16, cache_dir=cache_dir
+  )
+  try:
+    dialogue_template = DialogueTemplate.from_pretrained(checkpoint, revision=None)
+  except Exception:
+    print("No dialogue template found in model repo. Defaulting to the `no_system` template.")
+    dialogue_template = get_dialogue_template("no_system")
+  generation_config = GenerationConfig(
+        temperature=0.2,
+        top_k=50,
+        top_p=0.95,
+        repetition_penalty=1.2,
+        do_sample=True,
+        pad_token_id=tokenizer.eos_token_id,
+        eos_token_id=tokenizer.convert_tokens_to_ids(dialogue_template.end_token),
+        min_new_tokens=32,
+        max_new_tokens=256,
+    )
+  return [tokenizer, model, dialogue_template, generation_config, device]
+
+
+def main(specification: str, inputs: Sequence[Any], config: config_lib.Config,
+         checkpoint: str, cache_dir: str,  
+  ):
   """Launches a FunSearch experiment."""
   function_to_evolve, function_to_run = _extract_function_names(specification)
 
   template = code_manipulation.text_to_program(specification)
   database = programs_database.ProgramsDatabase(
       config.programs_database, template, function_to_evolve)
+  real_llm = _initialize_real_llm(checkpoint, cache_dir)
 
   evaluators = []
   for _ in range(config.num_evaluators):
@@ -65,4 +97,4 @@ def main(specification: str, inputs: Sequence[Any], config: config_lib.Config):
   # sampler enters an infinite loop, without parallelization only the first
   # sampler will do any work.
   for s in samplers:
-    s.sample()
+    s.sample(real_llm)

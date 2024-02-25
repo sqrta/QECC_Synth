@@ -7,5 +7,7 @@ with open('capset.py', 'r') as f:
     conf = Config()
     inputs = [3]
     print(res)
-    main(content, inputs, conf)
+    checkpoint = 'bigcode/starcoder'
+    cache_dir = 'your path to save llm checkpoint'
+    main(content, inputs, conf, checkpoint, cache_dir)
     

@@ -107,6 +107,16 @@ def search(initial, candidate_code, candidate_bound):
     end = time.time()
     print(f"use {end-start}s")
     return minError
+
+def get_all_edge(tnList):
+    legs = []
+    tensor_list  = [eval(t) for t in tnList]
+    for i in range(len(tensor_list)):
+        for j in range(i+1, len(tensor_list)):
+            for leg1 in range(tensor_list[i].length):
+                for leg2 in range(tensor_list[j].length):
+                    legs.append([i, leg1, j, leg2])
+    return np.array(legs)
             
 
 if __name__ == "__main__":

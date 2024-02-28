@@ -45,6 +45,18 @@ class Tensor:
 
     def tensor(self):
         return eval(self.name)
+    
+def GenProg2TNN(insList, tnList):
+    tn = TNNetwork(None)
+    tn.tensorList = [Tensor(t) for t in tnList]
+    tn.insList = insList
+    for ins in insList:
+        if ins[0]=='setLog':
+            continue
+        fstTN, fstLeg, secTN, secLeg = ins[1], ins[2], ins[3], ins[4]
+        tn.tensorList[fstTN].tracted.append(fstLeg)
+        tn.tensorList[secTN].tracted.append(secLeg)
+    return tn
 
 class TNNetwork:
     def __init__(self, initTensor) -> None:
@@ -162,6 +174,41 @@ class TNNetwork:
                 raise NameError(f"no ops as {ins[0]}")
         cm.removeZeroRow()
         return cm
+    
+def normal_prog(insList, tnList):
+    tracted = set()
+    tracted.add(insList[0][1])
+    tracted.add(insList[0][3])
+    remap = {insList[0][1] : 0, insList[0][3]: 1}
+    result_ins = [insList[0]]
+    index = 2
+    while index < len(tnList):
+        for ins in insList:
+            if ins[0]!='trace':
+                print("error")
+                exit(0)
+            if ins[1] in remap.keys() and ins[3] in remap.keys():
+                continue
+
+            if ins[1] in remap.keys():
+                result_ins.append(ins)
+                remap[ins[3]]=index
+                index+=1
+                break
+            elif ins[3] in remap.keys():
+                result_ins.append(['trace', ins[3], ins[4], ins[1], ins[2]])
+                remap[ins[1]] = index
+                index+=1
+                break
+    print(remap, index)
+    result_ins += insList[len(tnList)-1:]
+    new_ins = []
+    for ins in result_ins:
+        new_ins.append([ins[0], remap[ins[1]], ins[2], remap[ins[3]], ins[4]])
+    new_tn=[None] * len(tnList)
+    for i in range(len(tnList)):
+        new_tn[remap[i]] = tnList[i]
+    return new_ins, new_tn
 
 code13_1_4 = codeTN(['xiixixxiiixxi', 'ixixixixiiiii',
 'iixxiixxiixxi',

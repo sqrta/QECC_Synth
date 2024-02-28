@@ -211,7 +211,8 @@ def prog2TNN(insList, tensorList):
     progList = []
 
     for state in insList:
-        ins = [state[0], state[1][0], state[1][1], state[1][0], state[1][1]]
+        # ins = [state[0], state[1][0], state[1][1], state[1][0], state[1][1]]
+        ins = state
         if ins[0]=="trace":
             index = ins[3]
             ins[3] = Tensor(tensorList[index])

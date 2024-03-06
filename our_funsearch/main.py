@@ -77,7 +77,8 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
             v1_head = "def priority_v1(edge: [int, int, int, int]) -> float:\n"
             program_v1 = program_v1.replace(v1_head, v1_head+'    """Improved version of `priority_v0`."""\n')
         # print(f"idx: {idx0} {idx1}")
-        log_f.write(f"idx: {idx0} {idx1}\n")
+        log_f.write(f"idx0: {save_filename0}\n")
+        log_f.write(f"idx1: {save_filename1}\n")
 
         # form the prompt with the sample programs
         prompt = description+program_body+'\n\n'+program_v0+'\n\n'+program_v1+'\n\n'+generation_head

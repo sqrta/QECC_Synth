@@ -13,9 +13,9 @@ class Sandbox:
   ) -> tuple[Any, bool]:
     """Returns `function_to_run(test_input)` and whether execution succeeded."""
     program = program.replace("@funsearch.run", "").replace("@funsearch.evolve", "")
-    print(program)
-    print(test_input)
-    print(timeout_seconds)
+    # print(program)
+    # print(test_input)
+    # print(timeout_seconds)
     
     try:
       sandbox_namespace = {}

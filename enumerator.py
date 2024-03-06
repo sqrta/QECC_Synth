@@ -200,11 +200,15 @@ def eval_TN(tn, px=0.01, pz=0.05):
     simpB = simp_poly(BPoly)
     A1 = simpA.all_coeffs()[-1]
     B1 = simpB.all_coeffs()[-1]
+
     APoly = APoly / A1
     BPoly = BPoly / B1
+    
     K = B1 / A1
     d = Poly2Distance(simpA, simpB)
     error = ABError(n, APoly.subs([(y,x*z)]), BPoly.subs([(y,x*z)]), px, pz)
+    if error == 0:
+        error = 1
     return d, error, K
 
 def prog2TNN(insList, tensorList):

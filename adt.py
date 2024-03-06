@@ -627,7 +627,7 @@ def ABzx(stab_group, x,y,z,w,k,K=1):
         wz = term.Wz()
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
-    print(Ax, 2**k*Bx)
+    print(Ax, 2**k*Bx/K)
     res = 2**k/K*Bx-Ax
     return 2**k/K*Bx-Ax, 1- Ax/(2**k/K*Bx)
 

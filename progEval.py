@@ -89,8 +89,11 @@ def eval_prog(prog, px, pz):
     # tn.setLogical(0,0)
 
     d,error,K = eval_TN(tn, px, pz)
-
-    print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error:.5e}")
+    print(error)
+    if error == 0:
+        print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error}")
+    else:
+        print(f"n: {n}, k: {k}, d: {d}, Ks: {K}, rW: {rw}, cW: {cw}, error: {error:.5e}")
 
     code = checkM2Stabilizers(tmp.matrix)
     print(code)
@@ -245,19 +248,22 @@ instList = [['setLog', 0, 0]]
 tnList = ['code603']
 prog512 = (instList, tnList)
 
-tnList = ['code603', 'code0', 'codePlus']
-instList = [['trace', 0, 5, 1, 0], ['trace', 0, 2, 2, 0], ['setLog', 0, 0]] 
+instList = [['trace', 0, 5, 1, 2], ['trace', 0, 4, 2, 1], ['trace', 2, 0, 3, 1], ['trace', 3, 0, 4, 5], ['trace', 4, 4, 5, 7], ['self', 0, 3, 1, 1], ['self', 0, 2, 1, 0], ['self', 5, 6, 4, 3], ['setLog', 0, 0]]
+tnList = ['code604', 'codeGHZ', 'codeS', 'codeH', 'code603', 'code804']
 debug = (instList, tnList)
 
 if __name__ == "__main__":
+    px = 0.01
+    pz = 0.05
+    eval_prog(debug, px, pz)
+    exit(0)
 
     prog = prog513_44
 
     candidates = [prog513_44, prog6_1_3_54, prog7_3_66, prog813_66, prog913_6_6, prog1013_6_7, prog11_1_3_98,prog12_3_108, prog13_1_4_1010]
     candidateProg = [prog513_44, prog6_1_3_54, prog7_3_66, prog813_66, prog913_6_6, prog1013_6_7, prog11_1_3_98,prog12_3_108, prog13_1_4_1010]
     for prog in candidates:
-        px = 0.01
-        pz = 0.05
+
         eval_prog(prog, px, pz)
         # stabs = [stab.toInt() for stab in prog2Stab(prog)]
         # print(stabs)

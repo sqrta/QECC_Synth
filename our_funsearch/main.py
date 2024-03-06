@@ -52,7 +52,7 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
     log_f = open(log_filename, 'a')
 
     for generation_count in range(sample_rounds):
-        # print(f"Generation #{generation_count}:\n")
+        print(f"Generation #{generation_count}:\n")
         log_f.write("--"*20+"\n")
         log_f.write(f"Generation #{generation_count}:\n\n")
 
@@ -140,7 +140,7 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
 
 if __name__ == '__main__':
     save_dir = "local_generated_codes/test"
-    sample_rounds = 10
+    sample_rounds = 3
     gen_per_sample = 1
     # assert os.path.exists(save_dir)==False, "Previous results exist!"
     main(save_dir, sample_rounds, gen_per_sample)

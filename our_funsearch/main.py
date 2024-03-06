@@ -47,11 +47,12 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
 
     log_filename = f'{save_dir}/generation.log'
     with open(log_filename, 'w') as f:
-        f.write(f"{save_dir}:\n\n")
+        f.write(f"Save dir: {save_dir}\n\n")
     log_f = open(log_filename, 'a')
 
     for generation_count in range(sample_rounds):
         # print(f"Generation #{generation_count}:\n")
+        log_f.write("--"*20+"\n")
         log_f.write(f"Generation #{generation_count}:\n\n")
 
         # sample two programs from the database
@@ -63,8 +64,9 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
             probabilities = _softmax(logits=logits, temperature=TEPERATURE)
             # print("logits:")
             # print(logits)
-            # print("probs:")
-            # print(probabilities)
+            print("probs:")
+            print(probabilities)
+            print(np.array(list(program_base.values())) )
             idx0, idx1 = np.random.choice(len(program_base.keys()), size=2, p=probabilities)
         save_filename0 = list(program_base.keys())[idx0]
         save_filename1 = list(program_base.keys())[idx1]
@@ -118,16 +120,20 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
             with open(save_error_filename, 'w') as f:
                 f.write(evaluated_program+"\n")
             
-            log_f.write(f"Round{generation_count} #{n}: {runnable}, {error}\n")
+            log_f.write(f"Round_{generation_count} Sample_{n}: Runnable {runnable}, Error {error}\n")
 
+        min_error_gen = list(program_base.keys())[np.argmax(list(program_base.values()))]
+        log_f.write(f"Best generated program: {min_error_gen} Error: {-program_base[min_error_gen]}\n")
+        log_f.write("--"*20+"\n")
         log_f.write(f"\n\n")
+
 
     end_time = time.time()
     # print(f"Time: {end_time-start_time}")
     # print(f"Correct count: {correct_count}")
     log_f.write(f"Time: {end_time-start_time}")
     log_f.write(f"Correct count: {correct_count}")
-
+    
 
 if __name__ == '__main__':
     save_dir = "local_generated_codes/test"

@@ -7,7 +7,8 @@ from sandbox import Sandbox
 
 sys.path.append(os.path.dirname(os.getcwd()))
 MAX_TIME=30
-TEPERATURE=1e-2
+TEPERATURE=1e-3
+DEBUG = False
 
 
 def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
@@ -64,9 +65,10 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
             probabilities = _softmax(logits=logits, temperature=TEPERATURE)
             # print("logits:")
             # print(logits)
-            print("probs:")
-            print(probabilities)
-            print(np.array(list(program_base.values())) )
+            if DEBUG:
+                print("probs:")
+                print(probabilities)
+                print(np.array(list(program_base.values())) )
             idx0, idx1 = np.random.choice(len(program_base.keys()), size=2, p=probabilities)
         save_filename0 = list(program_base.keys())[idx0]
         save_filename1 = list(program_base.keys())[idx1]
@@ -138,7 +140,7 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
 
 if __name__ == '__main__':
     save_dir = "local_generated_codes/test"
-    sample_rounds = 3
+    sample_rounds = 10
     gen_per_sample = 1
-    assert os.path.exists(save_dir)==False, "Previous results exist!"
+    # assert os.path.exists(save_dir)==False, "Previous results exist!"
     main(save_dir, sample_rounds, gen_per_sample)

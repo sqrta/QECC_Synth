@@ -200,7 +200,6 @@ def normal_prog(insList, tnList):
                 remap[ins[1]] = index
                 index+=1
                 break
-    print(remap, index)
     result_ins += insList[len(tnList)-1:]
     new_ins = []
     for ins in result_ins:

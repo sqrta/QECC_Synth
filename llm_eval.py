@@ -1,7 +1,7 @@
 from search import *
 import numpy as np
 
-def solve(tnList, max_legs):
+def evaluate(tnList, max_legs):
     edges = get_all_edge(tnList)
     scores = [priority(edge) for edge in edges]
     tmp = np.argsort(scores, kind='stable')[::-1]
@@ -14,9 +14,10 @@ import random
 
 def priority(edge: [int, int, int, int]) -> float:
     """Returns the priority with the new edge which we want to add to the tensor network."""
-    return -np.abs(edge[0] - edge[2])
+    # return -np.abs(edge[0] - edge[2])
+    return random.random()
 
 if __name__ == "__main__":
     tnList = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
-    result = solve(tnList, 8)
+    result = evaluate(tnList, 8)
     print(result)

@@ -150,8 +150,8 @@ def GetTensorNetworkFromEdges(edges, tnList, max_legs):
             break
         if (edge[0], edge[1]) not in tracted_leg and (edge[2], edge[3]) not in tracted_leg:
            insert_edge('self', edge)
-    # print(insList)
-    # print(tnList)
+    print(insList)
+    print(tnList)
     insList, tnList = normal_prog(insList, tnList)    
     tn = GenProg2TNN(insList, tnList)
     logicalLeg = tn.equiv_trace_leg()[0]

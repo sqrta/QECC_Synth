@@ -140,7 +140,7 @@ def main(save_dir: str, sample_rounds: int=5, gen_per_sample: int=3):
 
 if __name__ == '__main__':
     save_dir = "local_generated_codes/test"
-    sample_rounds = 3
+    sample_rounds = 5
     gen_per_sample = 1
     # assert os.path.exists(save_dir)==False, "Previous results exist!"
     main(save_dir, sample_rounds, gen_per_sample)

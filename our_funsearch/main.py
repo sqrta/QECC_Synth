@@ -1,6 +1,6 @@
 import os, sys, time
 import numpy as np
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 
 from statistics import median
 from sample import _softmax
@@ -13,14 +13,28 @@ MAX_TIME=30
 TEPERATURE=1e-1
 DEBUG = False
 
-def main(save_dir: str, init_dir: str, sample_rounds: int=5, gen_per_sample: int=3, resume=False, cal_init=True, cut=0):
+def main(save_dir: str, 
+         init_dir: str, 
+         sample_rounds: int = 5, 
+         gen_per_sample: int = 3, 
+         resume: bool = False, 
+         cal_init: bool = True, 
+         cut: int = 0,
+         use_api: bool = False
+):
     # create save_dir
     os.makedirs(save_dir, exist_ok=True)
     os.makedirs(f'{save_dir}/prompt', exist_ok=True)
     os.makedirs(f'{save_dir}/gen', exist_ok=True)
 
     # load LLM
-    client = OpenAI()
+    client = AzureOpenAI(
+      azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"), 
+      api_key=os.getenv("AZURE_OPENAI_KEY"),  
+      api_version="2023-05-15"
+      ) if use_api else OpenAI()
+    use_model = "gpt-4" if use_api else "gpt-3.5-turbo"
+    print(type(client))
 
     # initialize sandbox
     evaluator = Sandbox()
@@ -114,16 +128,22 @@ def main(save_dir: str, init_dir: str, sample_rounds: int=5, gen_per_sample: int
         with open(save_prompt_filename, 'w') as f:
             f.write(prompt+"\n")
 
-        # generate the new code by LLM  
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a python code assitant."},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=4096,
-            n=gen_per_sample,
-        )
+        # generate the new code by LLM
+        while True:
+            try:
+                response = client.chat.completions.create(
+                    model=use_model,
+                    messages=[
+                        {"role": "system", "content": "You are a python code assitant."},
+                        {"role": "user", "content": prompt},
+                    ],
+                    max_tokens=4096,
+                    n=gen_per_sample,
+                )
+                break
+            except BaseException:
+                  print("An exception on GPT was thrown! Wait a while for GPT")
+                  time.sleep(2)
         generated_codes = [response.choices[n].message.content.replace("@funsearch.evolve\n", "") for n in range(gen_per_sample)]
 
         for n in range(gen_per_sample):
@@ -179,4 +199,4 @@ if __name__ == '__main__':
     sample_rounds = 1600
     gen_per_sample = 2
     # assert os.path.exists(save_dir)==False, "Previous results exist!"
-    main(save_dir, init_dir, sample_rounds, gen_per_sample, resume=True, cal_init=False, cut=0.5)
+    main(save_dir, init_dir, sample_rounds, gen_per_sample, resume=True, cal_init=False, cut=0.5, use_api=True)

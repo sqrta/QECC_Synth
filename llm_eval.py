@@ -8,14 +8,34 @@ def evaluate(tnList, max_legs):
     edges = list(edges[tmp])
     tn = GetTensorNetworkFromEdges(edges, tnList, max_legs)
     d,error,K = eval_TN(tn, 0.01, 0.05)
+    print(d, error)
     return error
 
 import random
 
-def priority(edge: [int, int, int, int]) -> float:
-    """Returns the priority with the new edge which we want to add to the tensor network."""
-    # return -np.abs(edge[0] - edge[2])
-    return random.random()
+# gen_round1521_n2
+def priority(edge) -> float:
+    if edge[1] == 0 and edge[3] == 0:
+        score = 1.0
+    elif edge[0] == 0 and edge[1] == 0 and edge[2] == 1:
+        score = 0.9
+    elif edge[0] == 1 and edge[1] == 0 and edge[2] == 0:
+        score = 0.9
+    elif edge[0] % 2 == 0 and edge[2] % 2 == 1:
+        if edge[1] * edge[3] == 0:
+            score = 1.0
+        else:
+            score = 0.9
+    elif edge[0] % 2 == 0 and edge[2] % 2 == 0:
+        if edge[1] * edge[3] == 0:
+            score = 0.9
+        else:
+            score = 0.6
+    else:
+        score = 0.98 * edge[0] + 1.25 * edge[1] - (edge[2] + edge[3]) / 2 - edge[3] ** 0.5
+
+    return score
+
 
 if __name__ == "__main__":
     tnList = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']

@@ -2,8 +2,6 @@
 import itertools
 import numpy as np
 
-
-@funsearch.run
 def evaluate(n: int) -> int:
   """Returns the size of an `n`-dimensional cap set."""
   capset = solve(n)
@@ -35,8 +33,6 @@ def solve(n: int) -> np.ndarray:
 
   return capset
 
-
-@funsearch.evolve
 def priority(el: tuple[int, ...], n: int) -> float:
   """Returns the priority with which we want to add `element` to the cap set."""
   return 0.0

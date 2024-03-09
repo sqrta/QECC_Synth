@@ -1,2 +1,5 @@
-In the following code block, both of two python functions, 'priority_v0' and 'priority_v1', can be used as the python function 'priority' called in the python function 'evaluate'. However, using them cannot minimize the output of python function 'evaluate'. Try to improve the python function 'priority' in the given code block based on 'priority_v0' and 'priority_v1' to minimize the returned value of python function 'evaluate'. The answer should be only a new python function whose name is 'priority'.
+In the following code block, there are two python functions 'priority_v0' and 'priority_v1'. However, using them cannot minimize the output of python function 'evaluate'. Try to improve the python function 'priority' in the given code block based on 'priority_v0' and 'priority_v1' to minimize the returned value of python function 'evaluate'.
+
+The answer should be only a new python function whose name is 'priority'.
+
 The code block is given as following:

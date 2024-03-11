@@ -16,7 +16,11 @@ class Sandbox:
     # print(program)
     # print(test_input)
     # print(timeout_seconds)
-    
+    # sandbox_namespace = {}
+    # fun = compile(program,'<string>','exec')
+    # exec(fun, sandbox_namespace)
+    # error = sandbox_namespace['main']()
+    # return [error, True]    
     try:
       sandbox_namespace = {}
       fun = compile(program,'<string>','exec')

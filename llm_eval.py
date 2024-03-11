@@ -14,7 +14,7 @@ def evaluate(tnList, max_legs):
 import random
 
 # gen_round1521_n2
-def priority(edge) -> float:
+def priority1521_n2(edge) -> float:
     if edge[1] == 0 and edge[3] == 0:
         score = 1.0
     elif edge[0] == 0 and edge[1] == 0 and edge[2] == 1:
@@ -35,6 +35,35 @@ def priority(edge) -> float:
         score = 0.98 * edge[0] + 1.25 * edge[1] - (edge[2] + edge[3]) / 2 - edge[3] ** 0.5
 
     return score
+
+def priority(edge) -> float:
+    score = 0.0
+
+    if edge[0] % 2 == 0 and edge[2] % 2 == 1:
+        if edge[1] * edge[3] == 0:
+            score = min(score, 1.0)
+        elif edge[1] * edge[3] % 2 == 0:
+            score = min(score, 0.9)
+        else:
+            score = min(score, 0.6)
+    elif edge[0] % 2 == 1 and edge[2] % 2 == 0:
+        if edge[1] * edge[3] == 0:
+            score = min(score, 0.4)
+        elif edge[1] * edge[3] % 2 == 0:
+            score = min(score, 0.1)
+        else:
+            score = min(score, 0.2)
+    elif edge[0] % 2 == 0 and edge[2] % 2 == 0:
+        if (edge[1] * edge[3]) == 0:
+            score += 0.5
+        else:
+            score += 0.3
+    else:
+        even_sum = sum([edge[i] for i in range(4) if edge[i] % 2 == 0])
+        score += even_sum * 0.001
+
+    return score
+
 
 
 if __name__ == "__main__":

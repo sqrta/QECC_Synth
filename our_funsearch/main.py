@@ -34,6 +34,7 @@ def main(save_dir: str,
       api_version="2023-05-15"
       ) if use_api else OpenAI()
     use_model = "gpt-4" if use_api else "gpt-3.5-turbo"
+    # use_model = "gpt-35-turbo" if use_api else "gpt-3.5-turbo"
     print(type(client))
 
     # initialize sandbox
@@ -65,6 +66,7 @@ def main(save_dir: str,
     if cal_init:
         for initFile in initFiles:
             save_filename = f'{init_dir}/{initFile}'
+            print(save_filename)
             with open(save_filename, 'r') as f:
                 init_head = f.read()
             evaluated_program = program_body.replace("@funsearch.run", "")+'\n'+init_head.replace("@funsearch.evolve", "")+'\n'+main_body
@@ -141,15 +143,16 @@ def main(save_dir: str,
                     n=gen_per_sample,
                 )
                 break
-            except BaseException:
+            except BaseException as e:
                   print("An exception on GPT was thrown! Wait a while for GPT")
+                  print(e)
                   time.sleep(2)
         generated_codes = [response.choices[n].message.content.replace("@funsearch.evolve\n", "") for n in range(gen_per_sample)]
 
         for n in range(gen_per_sample):
             # save the generated program
             code = generated_codes[n].replace("```python", "").replace("```", "")
-            codeFound = re.findall(r"def priority\(edge: \[int, int, int, int\]\) -> float:.*\n    return score", code, re.DOTALL)
+            codeFound = re.findall(r"def priority\(edge: \[int, int, int, int\]\) -> float:.*\n    return .*\n", code, re.DOTALL)
             if len(codeFound)>0:
                 code = codeFound[0]
             save_gen_filename = f'{save_dir}/gen/gen_round{generation_count}_n{n}.txt'
@@ -196,7 +199,7 @@ def main(save_dir: str,
 if __name__ == '__main__':
     save_dir = "local_generated_codes/test"
     init_dir = "init_template"
-    sample_rounds = 1600
+    sample_rounds = 600
     gen_per_sample = 2
     # assert os.path.exists(save_dir)==False, "Previous results exist!"
-    main(save_dir, init_dir, sample_rounds, gen_per_sample, resume=True, cal_init=False, cut=0.5, use_api=True)
+    main(save_dir, init_dir, sample_rounds, gen_per_sample, resume=True, cal_init=True, cut=0, use_api=True)

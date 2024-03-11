@@ -2,6 +2,8 @@ from adt import *
 import itertools
 from enumerator import *
 import traceback
+import sys
+import pickle 
 
 def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn = buildProg(prog, initial)
@@ -33,8 +35,16 @@ def chooseProg(setlog, minError, f, write=True):
                 f.write(content+"\n\n")
     return d, error, KS
 
+def dump(variable, fileName):
+    with open(fileName+'.pkl', 'wb') as f:
+        pickle.dump(variable, f)
 
-def search(initial, candidate_code, candidate_bound):
+def load(fileName):
+    with open(fileName+'.pkl', 'rb') as f:
+        tmp = pickle.load(tmp)
+    return tmp
+
+def search(initial, candidate_code, candidate_bound, resume = False):
     import time
     start = time.time()
     queue = [TNNetwork(initial)]
@@ -46,16 +56,30 @@ def search(initial, candidate_code, candidate_bound):
     prefix = "sfound"
     f = open(prefix, 'w')
     maxSize = 14
+    MAX_QUEUE = 7e6
+
+    if resume:
+        queue = load('queue')
+        exist_set = load('exist_set')
+        minError = load('minError')
+        count = load('count')
     while len(queue)>0:
         count+=1
-        # print(count)
+        # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
         if count%5000==0:
             f.write(str(minError))
             end = time.time()
             f.write(f"queue length: {len(queue)}\nuse {end-start}s")
+            f.write(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
             f.close()
-            f= open(f"{prefix}{count}",'w')
+            f = open(f"{prefix}{count}",'w')
         top = queue.pop(0)
+
+        if count % 20000 == 0:
+            dump(queue, 'queue')
+            dump(exist_set, 'exist_set')
+            dump(minError, 'minError')
+            dump(count, 'count')
         # logLeg = None
         # for leg in top.equiv_trace_leg():
         #     if leg[0]==0 and leg[1]>1:
@@ -76,6 +100,8 @@ def search(initial, candidate_code, candidate_bound):
     
         if (d,error) not in exist_set:
             exist_set.add((d,error))
+        
+        if len(queue) < MAX_QUEUE:
             if top.get_n()<=maxSize-2 and len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
                 dangleLegs = top.equiv_trace_leg()
                 exist = [a.index for a in top.tensorList] 
@@ -91,6 +117,7 @@ def search(initial, candidate_code, candidate_bound):
                             tmp = copy.deepcopy(top)
                             tmp.trace(leg[0],leg[1],Tensor(codeName,i), tractLeg)
                             if tmp.get_n()<=maxSize:
+
                                 queue.append(tmp)
             if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>6:
                 dangleLegs = top.equiv_trace_leg()

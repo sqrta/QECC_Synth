@@ -33,8 +33,8 @@ def main(save_dir: str,
       api_key=os.getenv("AZURE_OPENAI_KEY"),  
       api_version="2023-05-15"
       ) if use_api else OpenAI()
-    use_model = "gpt-4" if use_api else "gpt-35-turbo"
-    # use_model = "gpt-35-turbo" if use_api else "gpt-3.5-turbo"
+    # use_model = "gpt-4" if use_api else "gpt-35-turbo"
+    use_model = "gpt-35-turbo" if use_api else "gpt-3.5-turbo"
     print(type(client))
 
     # initialize sandbox

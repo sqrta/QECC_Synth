@@ -6,6 +6,28 @@ import copy
 import itertools
 from sympy import Matrix
 
+import psutil
+import os
+
+pid = os.getpid()
+process = psutil.Process(pid)
+
+debug = False
+
+def get_mem_use(mode='MB'):
+    mem_info = process.memory_info()
+    if mode == 'KB':
+        mem_usage =  mem_info.rss / 1024.0
+    elif mode == 'MB':
+        mem_usage = mem_info.rss / 1024.0 / 1024.0  # 单位转换为MB
+    else:
+        mem_usage =  mem_info.rss
+    return mem_usage
+
+def show_mem_use(mode='MB', msg=''):
+    mem_usage = get_mem_use(mode)
+    print(f"{msg}, memory usage {mem_usage:.2f} {mode}") 
+
 debug = False
 
 

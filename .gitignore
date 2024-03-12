@@ -13,3 +13,5 @@ local*/
 our_funsearch/__pycache__/
 
 try/__pycache__/
+save/
+*.pkl

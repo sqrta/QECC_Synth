@@ -5,6 +5,8 @@ import traceback
 import sys
 import pickle 
 
+save_dir = 'save/'
+
 def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn = buildProg(prog, initial)
     tn.show()
@@ -36,11 +38,11 @@ def chooseProg(setlog, minError, f, write=True):
     return d, error, KS
 
 def dump(variable, fileName):
-    with open(fileName+'.pkl', 'wb') as f:
+    with open(save_dir+fileName+'.pkl', 'wb') as f:
         pickle.dump(variable, f)
 
 def load(fileName):
-    with open(fileName+'.pkl', 'rb') as f:
+    with open(save_dir+fileName+'.pkl', 'rb') as f:
         tmp = pickle.load(f)
     return tmp
 
@@ -53,33 +55,34 @@ def search(initial, candidate_code, candidate_bound, resume = False):
     exist_set = set()
     minError = {}
     count = 0
-    prefix = "sfound"
-    f = open(prefix, 'w')
     maxSize = 14
-    MAX_QUEUE = 7e6
-
+    MAX_QUEUE = 6e6
+    MAX_ITER = 1e5
     if resume:
         queue = load('queue')
         exist_set = load('exist_set')
         minError = load('minError')
         count = load('count')
-    while len(queue)>0:
+    prefix = f"sfound"
+    f = open(prefix+str(count), 'w')    
+    while len(queue)>0 and MAX_ITER>0:
         count+=1
+        MAX_ITER-=1
+        # print(minError)
         # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
         if count%5000==0:
             f.write(str(minError))
             end = time.time()
-            f.write(f"queue length: {len(queue)}\nuse {end-start}s")
-            f.write(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
+            f.write(f"\nqueue length: {len(queue)}\nuse {end-start}s\n")
+            f.write(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}\n")
             f.close()
             f = open(f"{prefix}{count}",'w')
-        top = queue.pop(0)
-
-        if count % 20000 == 0:
             dump(queue, 'queue')
             dump(exist_set, 'exist_set')
             dump(minError, 'minError')
-            dump(count, 'count')
+            dump(count, 'count')            
+        top = queue.pop(0)
+
         # logLeg = None
         # for leg in top.equiv_trace_leg():
         #     if leg[0]==0 and leg[1]>1:
@@ -96,12 +99,10 @@ def search(initial, candidate_code, candidate_bound, resume = False):
 
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error, Ks = chooseProg(hash, minError, f, write=False)
-    
-        if (d,error) not in exist_set:
-            exist_set.add((d,error))
+        d, error, Ks = chooseProg(hash, minError, f, write=True)
         
-        if len(queue) < MAX_QUEUE:
+        if len(queue) < MAX_QUEUE and (d,error) not in exist_set:
+            exist_set.add((d,error))
             if top.get_n()<=maxSize-2 and len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
                 dangleLegs = top.equiv_trace_leg()
                 exist = [a.index for a in top.tensorList] 
@@ -192,7 +193,7 @@ if __name__ == "__main__":
     import time
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
-    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = True)
+    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = False)
     print(minE)
 
     # t604 = Tensor(code604)

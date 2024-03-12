@@ -1,5 +1,5 @@
 In the following code block, there are two python functions 'priority_v0' and 'priority_v1'. However, using them cannot minimize the output of python function 'evaluate'. Try to improve the python function 'priority' in the given code block based on 'priority_v0' and 'priority_v1' to minimize the returned value of python function 'evaluate'.
 
-The answer should be only a new python function whose name is 'priority'.
+The answer should only be a new python function whose name is 'priority'. Do not add explanation of the code in the answer. Do not call 'priority_v0' and 'priority_v1' in your implementation.
 
 The code block is given as following:

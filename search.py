@@ -41,7 +41,7 @@ def dump(variable, fileName):
 
 def load(fileName):
     with open(fileName+'.pkl', 'rb') as f:
-        tmp = pickle.load(tmp)
+        tmp = pickle.load(f)
     return tmp
 
 def search(initial, candidate_code, candidate_bound, resume = False):

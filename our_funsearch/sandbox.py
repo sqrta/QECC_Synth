@@ -1,5 +1,6 @@
 from typing import Any
 import numpy as np
+import traceback
 
 
 class Sandbox:
@@ -27,8 +28,9 @@ class Sandbox:
       exec(fun, sandbox_namespace)
       error = sandbox_namespace['main']()
       return [error, True]
-    except:
+    except Exception as e:
       print("Run Fail!")
+      traceback.print_exc()
       return [np.inf, False]
     # raise NotImplementedError(
     #     'Must provide a sandbox for executing untrusted code.')

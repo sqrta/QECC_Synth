@@ -64,6 +64,28 @@ def priority(edge) -> float:
 
     return score
 
+def priority_8760_n1(edge) -> float:
+    if (edge[0] in [0, 1] and edge[2] in [0, 1]) or \
+            ((edge[0] == 2 and edge[2] == 3) or (edge[0] == 3 and edge[2] == 2)) or \
+            ((edge[0] == 4 and edge[2] == 5) or (edge[0] == 5 and edge[2] == 4)):
+        score = -1.5 if edge[1] * edge[3] == 0 else -1.3
+    else:
+        score = edge[0] * 0.01 + edge[1] * 0.02 - edge[2] * 0.002 - edge[3] ** 0.5
+    
+    if edge[1] - edge[3] == 0:
+        score += 1.2
+    elif edge[1] * edge[3] == 0:
+        score += 0.6
+    elif edge[0] in [0, 1]:
+        score += 0.2
+    elif edge[0] in [2, 3]:
+        score += 0.4
+    else:
+        score += 0.6
+    
+    return score
+
+
 
 
 if __name__ == "__main__":

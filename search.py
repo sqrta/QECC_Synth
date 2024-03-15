@@ -57,7 +57,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
     count = 0
     maxSize = 14
     MAX_QUEUE = 6e6
-    MAX_ITER = 1e6
+    MAX_ITER = 7e5
     if resume:
         queue = load('queue')
         exist_set = load('exist_set')

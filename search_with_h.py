@@ -83,7 +83,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
     count = 0
     maxSize = 14
     MAX_QUEUE = 6e6
-    MAX_ITER = 1e6
+    MAX_ITER = 7e5
     if resume:
         queue = load('queue')
         exist_set = load('exist_set')
@@ -226,7 +226,7 @@ if __name__ == "__main__":
     import time
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
-    minE = search(Tensor('code603', 1), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = True)
+    minE = search(Tensor('code603', 1), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = False)
     print(minE)
 
     # t604 = Tensor(code604)

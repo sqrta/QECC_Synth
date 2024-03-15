@@ -65,6 +65,7 @@ def priority(edge) -> float:
     return score
 
 def priority_8760_n1(edge) -> float:
+    score = 0
     if (edge[0] in [0, 1] and edge[2] in [0, 1]) or \
             ((edge[0] == 2 and edge[2] == 3) or (edge[0] == 3 and edge[2] == 2)) or \
             ((edge[0] == 4 and edge[2] == 5) or (edge[0] == 5 and edge[2] == 4)):

@@ -4,6 +4,7 @@ from enumerator import *
 import traceback
 import sys
 import pickle 
+import random
 
 save_dir = 'save/'
 
@@ -25,11 +26,12 @@ def chooseProg(setlog, minError, f, write=True):
     # if not d or d>=3 or KS!=1:
     if write:
         if d and d>=3:
+            print(f"write, d: {d}")
             cm = setlog.toCm()
             rowW = cm.rowWBound()
             colW = cm.colWBound()
             content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, KS:{KS}, rowW: {rowW}, colW: {colW}"
-            # print(content)
+            print(content)
             key = (n,d,rowW,colW)
             if key not in minError.keys() or error < minError[key]:
                 minError[key] = error
@@ -125,9 +127,9 @@ def search(initial, candidate_code, candidate_bound, resume = False):
 
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error, Ks = chooseProg(hash, minError, f, write=True)
-        
+        d, error, Ks = chooseProg(hash, minError, f, write=True)      
         if len(queue) < MAX_QUEUE and (d,error) not in exist_set:
+            # print(f"count: {count}, d: {d}")
             exist_set.add((d,error))
             exist = [a.index for a in top.tensorList] 
             if top.get_n()<=maxSize-2 and len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
@@ -146,7 +148,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
                 candidate_legs = sort_with_h(candidate_legs, exist)
                 for leg in candidate_legs:
                     new_tnn = copy.deepcopy(top)
-                    new_tnn.trace(leg[0],leg[1],Tensor(codeName,leg[2]), leg[3])
+                    new_tnn.trace(leg[0],leg[1],Tensor(candidate_code[leg[2]],leg[2]), leg[3])
                     if new_tnn.get_n()<=maxSize:
                         queue.append(new_tnn)
             if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>6:
@@ -166,7 +168,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
                     new_tnn.selfTrace(leg[0],leg[1],leg[2],leg[3])
                     queue.append(new_tnn)
     end = time.time()
-    print(f"use {end-start}s")
+    print(f"use {end-start}s, count: {count}, iter_remain: {MAX_ITER}, queue length: {len(queue)}")
     return minError
 
 def get_all_edge(tnList):
@@ -226,8 +228,12 @@ if __name__ == "__main__":
     import time
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
-    minE = search(Tensor('code603', 1), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = False)
+    resumation = False
+    if len(sys.argv)>=2 and sys.argv[1]==1:
+        resumation = True
+    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = resumation)
     print(minE)
+
 
     # t604 = Tensor(code604)
     # tn = TNNetwork(Tensor(code603))

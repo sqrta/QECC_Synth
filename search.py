@@ -33,7 +33,7 @@ def chooseProg(setlog, minError, f, write=True):
             key = (n,d,rowW,colW)
             if key not in minError.keys() or error < minError[key]:
                 minError[key] = error
-                # print(content)
+                print(content)
                 f.write(content+"\n\n")
     return d, error, KS
 

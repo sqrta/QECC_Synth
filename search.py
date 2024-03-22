@@ -69,6 +69,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
     while len(queue)>0 and MAX_ITER>0:
         count+=1
         MAX_ITER-=1
+        print(count)
         # print(minError)
         # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
         if count%5000==0:
@@ -195,8 +196,9 @@ if __name__ == "__main__":
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
     resumation = False
-    if len(sys.argv)>=2 and sys.argv[1]==1:
+    if len(sys.argv)>=2 and sys.argv[1]=='1':
         resumation = True
+    print(resumation, sys.argv)
     minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = resumation)
     print(minE)
 

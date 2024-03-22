@@ -31,7 +31,6 @@ def chooseProg(setlog, minError, f, write=True):
             rowW = cm.rowWBound()
             colW = cm.colWBound()
             content = str(setlog) + f"error: {error}, n: {n}, k: {k}, d: {d}, KS:{KS}, rowW: {rowW}, colW: {colW}"
-            print(content)
             key = (n,d,rowW,colW)
             if key not in minError.keys() or error < minError[key]:
                 minError[key] = error
@@ -229,7 +228,7 @@ if __name__ == "__main__":
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
     resumation = False
-    if len(sys.argv)>=2 and sys.argv[1]==1:
+    if len(sys.argv)>=2 and sys.argv[1]=='1':
         resumation = True
     minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = resumation)
     print(minE)

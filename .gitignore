@@ -17,3 +17,9 @@ save/
 *.pkl
 
 sfound*
+our_funsearch/matrix/__pycache__/
+our_funsearch/matrix/66Hx.mtx
+our_funsearch/matrix/66Hz.mtx
+our_funsearch/matrix/QX80.mtx
+our_funsearch/matrix/QZ80.mtx
+our_funsearch/matrix/result

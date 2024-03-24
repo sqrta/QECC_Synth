@@ -69,7 +69,6 @@ def search(initial, candidate_code, candidate_bound, resume = False):
     while len(queue)>0 and MAX_ITER>0:
         count+=1
         MAX_ITER-=1
-        print(count)
         # print(minError)
         # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
         if count%5000==0:

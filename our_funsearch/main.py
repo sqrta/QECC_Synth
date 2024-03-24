@@ -52,7 +52,7 @@ def main(save_dir: str,
         generation_head = f.read()
     with open('template_source/main_body.py', 'r') as f:
         main_body = f.read()
-
+    
     # initilize the program database
     program_base = {}
     init_gen = 0
@@ -61,7 +61,11 @@ def main(save_dir: str,
             program_base = pickle.load(f)
         with open(f"{save_dir}/gen_count.pkl", 'rb') as f:
             init_gen = pickle.load(f) + 1
-
+    def save():
+        with open(f"{save_dir}/error_dict.pkl", 'wb') as f:
+            pickle.dump(program_base, f)
+        with open(f"{save_dir}/gen_count.pkl", 'wb') as f:
+            pickle.dump(generation_count, f)
     initFiles = os.listdir(init_dir)
     if cal_init:
         for initFile in initFiles:
@@ -96,7 +100,8 @@ def main(save_dir: str,
         print(f"Generation #{generation_count}:\n")
         log_f.write("--"*20+"\n")
         log_f.write(f"Generation #{generation_count}:\n\n")
-
+        if generation_count%2000==0:
+            save()
         # sample two programs from the database
         if len(program_base.keys())==1:
             idx0 = 0
@@ -146,6 +151,7 @@ def main(save_dir: str,
             except BaseException as e:
                   print("An exception on GPT was thrown! Wait a while for GPT")
                   print(e)
+                  save()
                   time.sleep(2)
         generated_codes = [response.choices[n].message.content.replace("@funsearch.evolve\n", "") for n in range(gen_per_sample)]
 
@@ -184,10 +190,7 @@ def main(save_dir: str,
         log_f.write("--"*20+"\n")
         log_f.write(f"\n\n")
 
-    with open(f"{save_dir}/error_dict.pkl", 'wb') as f:
-        pickle.dump(program_base, f)
-    with open(f"{save_dir}/gen_count.pkl", 'wb') as f:
-        pickle.dump(generation_count, f)
+    save()
     end_time = time.time()
     # print(f"Time: {end_time-start_time}")
     # print(f"Correct count: {correct_count}")

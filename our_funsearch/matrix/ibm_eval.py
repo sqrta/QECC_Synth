@@ -107,18 +107,22 @@ def Get_kd_BBCode(proc, A, B):
     d = int(read(proc))
     return k,d
 
+def PowStr(p):
+    matrix = 'x' if p[0]==0 else 'y'
+    return f'{matrix}{p[1]}'
 
 def search_BBcode(l, m):
     gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
     power = get_candidate_state(1)
-    power = [str(i) for i in range(13)]
-    terms = [(0, i) for i in power] + [(1, i) for i in power]
+    power = [str(i) for i in range(6)]
+    terms = [(0, str(i)) for i in range(l)] + [(1, str(i)) for i in range(m)]
     n = 2 * l * m
     x = get_x(l, m)
     y = get_y(l, m)
     result = []
     # r1,r2,r3,s1,s2,s3 = 0, 2, 3, 1, 19, 3
-    r1,r2,r3,s1,s2,s3 = 0, 1, 15, 2, 23, 25
+    r1,r2,r3,s1,s2,s3 = 0, 2, 14, 3, 12, 13
+    found = set()
     def same(p1, p2):
         if p1[0]==p2[0] and eval(p1[1]) == eval(p2[1]):
             return True
@@ -151,6 +155,10 @@ def search_BBcode(l, m):
                     continue
                 if same(a1, a3) or same(a2, a3):
                     continue
+                A = mat(a1) + mat(a2) + mat(a3)
+                if rank(A)==l*m:
+                    print(PowStr(a1), PowStr(a2), PowStr(a3))
+                    continue
                 s1 = 0 if i3>r3 else s1
                 for j1 in range(s1, term_len-2):
                     b1 = terms[j1]
@@ -172,7 +180,6 @@ def search_BBcode(l, m):
                                 continue
                             print(f"{i1}, {i2}, {i3}, {j1}, {j2}, {j3}")
                             print((a1,a2,a3,b1,b2,b3))
-                            A = mat(a1) + mat(a2) + mat(a3)
                             B = mat(b1) + mat(b2) + mat(b3)
                             k, d = Get_kd_BBCode(gap, A, B)
                             if k!=0:
@@ -180,27 +187,36 @@ def search_BBcode(l, m):
                             if count>120:
                                 terminate(gap)
                                 gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])      
-                                count=0                          
-                            print(f"good with n: {n}, k: {k}, d: {d}")
-                            r_frac = k/(2.0*n) 
-                            if (d>3 and r_frac>1/12.0) or (d>2 and r_frac>1/4.0):
-                                result.append((a1,a2,a3,b1,b2,b3))
+                                count=0          
+                            r_frac = k*1.0/(2.0*n)                    
+                            print(f"good with n: {n}, k: {k}, d: {d}, r: {r_frac}")
+                             
+                            if True and ((d>(n/16.0) and r_frac>=3.0/n) or (d>(n/24.0) and r_frac>4.0/n) or d>8):
                                 print(f"good with n: {n}, k: {k}, d: {d}")
                                 print((a1,a2,a3,b1,b2,b3))
-                                with open('good_log', 'w+') as f:
-                                    f.write((f"good with n: {n}, k: {k}, d: {d}"))
-                                    f.write(str((a1,a2,a3,b1,b2,b3)))
-                                result.append((a1,a2,a3,b1,b2,b3))
+                                found.add((n,k,d))
+                                with open(f'good_log_{l}_{m}', 'a') as f:
+                                    f.write((f"good with n: {n}, k: {k}, d: {d}, r: {r_frac} "))
+                                    f.write(f"{PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}\n")
+                                result.append((n,k,d,a1,a2,a3,b1,b2,b3))
     terminate(gap)
     return result
 
 if __name__ == '__main__':
 
     
-    l = 6
-    m = 6
+    l = 9
+    m = 11
     n = 2*l*m
-    
+    res = search_BBcode(l, m)
+    res.sort(key=lambda a: a[1], reverse=True)
+    print(res)
+    with open(f'good_log_{l}_{m}', 'w') as f:
+        for i in res:
+            n,k,d,a1,a2,a3,b1,b2,b3 = i
+            r_frac = k*1.0/(2.0*n)
+            f.write((f"good with n: {n}, k: {k}, d: {d}, r: {r_frac} "))
+            f.write(f"{PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}\n")
     # gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
     # (a1,a2,a3,b1,b2,b3) = ((0, '(l+l)'), (0, '(l+1)'), (0, '(l+2)'), (0, '(l+1)'), (0, '(m-1)'), (1, '2**2'))
     # x = get_x(l, m)
@@ -219,8 +235,7 @@ if __name__ == '__main__':
     #     k, d = Get_kd_BBCode(gap, A, B)
     # print(f"good with n: {n}, k: {k}, d: {d}")
     
-    res = search_BBcode(l, m)
-    print(res)
+    
 
     # result = get_candidate_state(1)
     # print(result)
@@ -239,3 +254,5 @@ if __name__ == '__main__':
     # print("B Space")
     # for vec in B_null:
     #     print(vec.T)
+
+# good with n: 72, k: 16, d: 4((0, '1'), (0, '0'), (0, '2'), (0, '3'), (1, '2'), (1, '4'))

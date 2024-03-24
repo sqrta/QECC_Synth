@@ -4,6 +4,7 @@ from enumerator import *
 import traceback
 import sys
 import pickle 
+import os
 
 save_dir = 'save/'
 
@@ -81,7 +82,9 @@ def search(initial, candidate_code, candidate_bound, resume = False):
             dump(queue, 'queue')
             dump(exist_set, 'exist_set')
             dump(minError, 'minError')
-            dump(count, 'count')            
+            dump(count, 'count')      
+        if count %2e4 ==0:
+            os.system('cp -r save save_back')      
         top = queue.pop(0)
 
         # logLeg = None

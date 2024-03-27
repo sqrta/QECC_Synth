@@ -201,7 +201,7 @@ if __name__ == "__main__":
     if len(sys.argv)>=2 and sys.argv[1]=='1':
         resumation = True
     print(resumation, sys.argv)
-    minE = search(Tensor('code603', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = resumation)
+    minE = search(Tensor('code604', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = resumation)
     print(minE)
 
     # t604 = Tensor(code604)

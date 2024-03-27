@@ -134,6 +134,8 @@ def search_BBcode(l, m):
     result = []
     # r1,r2,r3,s1,s2,s3 = 0, 2, 3, 1, 19, 3
     r1,r2,r3,s1,s2,s3 = 0,0,0,0,0,0
+    # 9-8 0, 3, 6, 7, 11, 14
+    #9-10 3, 12, 14, 6, 10, 11
     found = set()
     def same(p1, p2):
         if p1[0]==p2[0] and eval(p1[1]) == eval(p2[1]):
@@ -212,6 +214,7 @@ def search_BBcode(l, m):
                                     f.write(f"{PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}\n")
                                 result.append((n,k,d,a1,a2,a3,b1,b2,b3))
     terminate(gap)
+    sortFile(f'good_log_{l}_{m}')
     return result
 
 def good(n,k,d):
@@ -223,16 +226,15 @@ def good(n,k,d):
 
 if __name__ == '__main__':
 
+    sortFile(f'good_log_{9}_{10}')
+    exit(0)
+    toSearch = [(9,11)]    
+    for item in toSearch:
+        l,m = item
+        n = 2*l*m
+        res = search_BBcode(l, m)
+        print(f"{l},{m} finish")
     
-    l = 9
-    m = 8
-    n = 2*l*m
-    
-    res = search_BBcode(l, m)
-    res.sort(key=lambda a: a[1], reverse=True)
-    print(res)
-    print(l,m)
-    sortFile(f'good_log_{l}_{m}')
 
     # with open(f'good_log_{l}_{m}', 'w') as f:
     #     for i in res:

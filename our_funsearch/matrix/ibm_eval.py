@@ -91,7 +91,6 @@ def writeMatrix(path, M):
                 if M[i, j]==1:
                     f.write(f"{i+1} {j+1} 1\n")
 
-
 def Get_kd_BBCode(proc, A, B):
     n = A.shape[0] * 2
     Hz = np.concatenate((B.T, A.T),axis=1)
@@ -111,17 +110,30 @@ def PowStr(p):
     matrix = 'x' if p[0]==0 else 'y'
     return f'{matrix}{p[1]}'
 
+def sortFile(filename, key='k'):
+    with open(filename, 'r') as f:
+        content = f.readlines()
+        result = []
+        for item in content:
+            kstring = re.findall(rf"{key}: [0-9]+,", item)[0]
+            k = int(re.findall(r"[0-9]+", kstring)[0])
+            result.append((k, item))
+        result.sort(key=lambda a : a[0], reverse=True)
+    with open(filename, 'w') as f:
+        for item in result:
+            f.write(item[1])
+
 def search_BBcode(l, m):
     gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
     power = get_candidate_state(1)
     power = [str(i) for i in range(6)]
-    terms = [(0, str(i)) for i in range(l)] + [(1, str(i)) for i in range(m)]
+    terms = [(0, str(i)) for i in range(l)] + [(1, str(i)) for i in range(1, m)]
     n = 2 * l * m
     x = get_x(l, m)
     y = get_y(l, m)
     result = []
     # r1,r2,r3,s1,s2,s3 = 0, 2, 3, 1, 19, 3
-    r1,r2,r3,s1,s2,s3 = 0, 2, 14, 3, 12, 13
+    r1,r2,r3,s1,s2,s3 = 0,0,0,0,0,0
     found = set()
     def same(p1, p2):
         if p1[0]==p2[0] and eval(p1[1]) == eval(p2[1]):
@@ -159,7 +171,7 @@ def search_BBcode(l, m):
                 if rank(A)==l*m:
                     print(PowStr(a1), PowStr(a2), PowStr(a3))
                     continue
-                s1 = 0 if i3>r3 else s1
+                s1 = i1 if i3>r3 else s1
                 for j1 in range(s1, term_len-2):
                     b1 = terms[j1]
                     if valid(b1[1]):
@@ -191,7 +203,7 @@ def search_BBcode(l, m):
                             r_frac = k*1.0/(2.0*n)                    
                             print(f"good with n: {n}, k: {k}, d: {d}, r: {r_frac}")
                              
-                            if True and ((d>(n/16.0) and r_frac>=3.0/n) or (d>(n/24.0) and r_frac>4.0/n) or d>8):
+                            if True and good(n,k,d):
                                 print(f"good with n: {n}, k: {k}, d: {d}")
                                 print((a1,a2,a3,b1,b2,b3))
                                 found.add((n,k,d))
@@ -202,38 +214,42 @@ def search_BBcode(l, m):
     terminate(gap)
     return result
 
+def good(n,k,d):
+    r_frac = k*1.0/(2.0*n)
+    if ((d>(n/16.0) and r_frac>=3.0/n) or (d>(n/28.0) and r_frac>4.0/n) or d>8 or (d>3 and k>20)):
+        return True
+    else:
+        return False
+
 if __name__ == '__main__':
 
     
     l = 9
-    m = 11
+    m = 8
     n = 2*l*m
+    
     res = search_BBcode(l, m)
     res.sort(key=lambda a: a[1], reverse=True)
     print(res)
-    with open(f'good_log_{l}_{m}', 'w') as f:
-        for i in res:
-            n,k,d,a1,a2,a3,b1,b2,b3 = i
-            r_frac = k*1.0/(2.0*n)
-            f.write((f"good with n: {n}, k: {k}, d: {d}, r: {r_frac} "))
-            f.write(f"{PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}\n")
+    print(l,m)
+    sortFile(f'good_log_{l}_{m}')
+
+    # with open(f'good_log_{l}_{m}', 'w') as f:
+    #     for i in res:
+    #         n,k,d,a1,a2,a3,b1,b2,b3 = i
+    #         r_frac = k*1.0/(2.0*n)
+    #         f.write((f"good with n: {n}, k: {k}, d: {d}, r: {r_frac} "))
+    #         f.write(f"{PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}\n")
+
     # gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
-    # (a1,a2,a3,b1,b2,b3) = ((0, '(l+l)'), (0, '(l+1)'), (0, '(l+2)'), (0, '(l+1)'), (0, '(m-1)'), (1, '2**2'))
+    # l = 15
+    # m = 3
     # x = get_x(l, m)
     # y = get_y(l, m)
-    # def mat(p):
-    #     M = x if p[0]==0 else y
-    #     return mp(M, eval(p[1])) 
-    # A = mat(a1) + mat(a2) + mat(a3)
-    # B = mat(b1) + mat(b2) + mat(b3)
-    # for i in range(200):
-    #     print(i)
-    #     if i==124:
-
-    #         terminate(gap)
-    #         gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
-    #     k, d = Get_kd_BBCode(gap, A, B)
-    # print(f"good with n: {n}, k: {k}, d: {d}")
+    # A = mp(x, 9) + mp(y, 1) + mp(y, 2)
+    # B = mp(y, 0) + mp(x, 2) + mp(x, 7)
+    # k, d = Get_kd_BBCode(gap, A, B)
+    # print(k,d)
     
     
 

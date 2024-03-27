@@ -205,4 +205,4 @@ if __name__ == '__main__':
     sample_rounds = 10000
     gen_per_sample = 2
     # assert os.path.exists(save_dir)==False, "Previous results exist!"
-    main(save_dir, init_dir, sample_rounds, gen_per_sample, resume=True, cal_init=False, cut=0.5, use_api=True)
+    main(save_dir, init_dir, sample_rounds, gen_per_sample, resume=True, cal_init=False, cut=0, use_api=True)

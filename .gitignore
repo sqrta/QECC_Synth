@@ -27,3 +27,5 @@ our_funsearch/matrix/good_log*
 our_funsearch/matrix/logs
 our_funsearch/matrix/result
 our_funsearch/matrix/good_log
+our_funsearch/matrix/*.mtx
+our_funsearch/matrix/out*

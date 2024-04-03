@@ -215,6 +215,7 @@ prog13_1_4_1010 = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 1, 1
 
 prog7_3_66 = ([['trace', 0, 0, 1, 0], ['trace', 1, 2, 2, 0], ['trace', 0, 1, 3, 0], ['trace', 0, 2, 4, 0], ['trace', 0, 3, 5, 0], ['self', 1, 5, 2, 1], ['setLog', 0, 4]], ['code604', 'code603', 'codeH', 'codeS', 'codeS', 'codeH'])
 
+
 tnList = ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus'] + ['code603', 'codePlus'] + ['code603'] + ['code603', 'codePlus'] + ['code603', 'code0', 'codePlus'] + ['code603', 'code0'] + ['code603', 'code0', 'codePlus']
 tens6 =  [0, 3, 5, 8, 10, 11, 13, 16, 18]
 instList = [['trace', 0, 5, 1, 0], ['trace', 0, 2, 2, 0], ['trace', 0, 4, 3, 4]] 
@@ -252,10 +253,12 @@ instList = [['trace', 0, 5, 1, 2], ['trace', 0, 4, 2, 1], ['trace', 2, 0, 3, 1],
 tnList = ['code604', 'codeGHZ', 'codeS', 'codeH', 'code603', 'code804']
 debug = (instList, tnList)
 
+tmp = ([['trace', 0, 0, 1, 0], ['trace', 0, 1, 2, 0], ['trace', 0, 2, 3, 0], ['trace', 1, 2, 4, 0], ['self', 0, 3, 1, 3], ['self', 1, 5, 4, 1], ['setLog', 0, 4]], ['code604', 'code603', 'codeH', 'code604', 'code604'])
+
 if __name__ == "__main__":
     px = 0.01
     pz = 0.05
-    eval_prog(debug, px, pz)
+    eval_prog(tmp, px, pz)
     exit(0)
 
     prog = prog513_44

@@ -327,7 +327,7 @@ def search_2GBAcode(l, m, countA, countB):
                 # found.add((n,k,d))
                 with open(filename, 'a') as f:
                     f.write((f"good with n: {n}, k: {k}, d: {d}, r: {r} "))
-                    f.write(f"{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}\n")
+                    f.write(f"{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}, {l}, {m}\n")
             if k!=0:
                 count+=1
             if count>120:

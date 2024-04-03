@@ -7,6 +7,7 @@ import sys
 from interactive import *
 from itertools import combinations
 from functools import reduce
+from gap_path import gap_path
 
 import re
 
@@ -149,7 +150,7 @@ def search_BBcode(l, m):
     else:
         with open(f'good_log_{l}_{m}', 'a') as f:
             pass
-    gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
+    gap = start([gap_path, '-L', 'workplace','-q', '-b'])
     power = get_candidate_state(1)
     power = [str(i) for i in range(6)]
     terms = [(0, str(i)) for i in range(l)] + [(1, str(i)) for i in range(1, m)]
@@ -234,7 +235,7 @@ def search_BBcode(l, m):
                                 count+=1
                             if count>120:
                                 terminate(gap)
-                                gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])      
+                                gap = start([gap_path, '-L', 'workplace','-q', '-b'])      
                                 count=0          
                             r_frac = k*1.0/(2.0*n) 
                                                
@@ -274,7 +275,7 @@ def search_2GBAcode(l, m, countA, countB):
     else:
         with open(filename, 'a') as f:
             pass
-    gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
+    gap = start([gap_path, '-L', 'workplace','-q', '-b'])
     power = get_candidate_state(1)
     power = [str(i) for i in range(6)]
     terms = [(0, str(i)) for i in range(l)] + [(1, str(i)) for i in range(1, m)]
@@ -333,7 +334,7 @@ def search_2GBAcode(l, m, countA, countB):
             if count>120:
                 count = 1
                 terminate(gap)
-                gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])      
+                gap = start([gap_path, '-L', 'workplace','-q', '-b'])      
 
             
     print(f"itercount: {iter_count}")
@@ -349,7 +350,7 @@ if __name__ == '__main__':
     #     M = r if p[0]==0 else s
     #     res = mp(M, eval(p[1])) 
     #     return res
-    # gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
+    # gap = start([gap_path, '-L', 'workplace','-q', '-b'])
     # l = 3
     # m = 5
     # r = get_x(l, m)
@@ -398,7 +399,7 @@ if __name__ == '__main__':
     #         f.write((f"good with n: {n}, k: {k}, d: {d}, r: {r_frac} "))
     #         f.write(f"{PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}\n")
 
-    # gap = start(['/mnt/e/github/tmp/gap-4.13.0/gap', '-L', 'workplace','-q', '-b'])
+    # gap = start([gap_path, '-L', 'workplace','-q', '-b'])
     # l = 15
     # m = 3
     # x = get_x(l, m)

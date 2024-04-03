@@ -1,0 +1,1 @@
+gap_path = '/mnt/e/github/tmp/gap-4.13.0/gap'

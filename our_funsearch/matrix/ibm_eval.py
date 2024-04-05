@@ -124,7 +124,7 @@ def PowStr(p):
     matrix = 'x' if p[0]==0 else 'y'
     return f'{matrix}{p[1]}'
 
-def sortFile(filename, key=('k','d'), func=lambda k,d:k*d):
+def sortFile(filename, key=('k','d'), func=lambda k,d:k*d+d/100.0):
     with open(filename, 'r') as f:
         content = f.readlines()
         result = []
@@ -304,7 +304,7 @@ def search_2GBAcode(l, m, countA, countB):
     for i in range(ri, len(Aterms)):
         aterm = Aterms[i]
         A = sumMat([mat(t) for t in aterm])
-        if rank(A)>=l*m-2:
+        if rank(A)>=l*m-4:
             print([PowStr(a1) for a1 in aterm])
             continue
         if countA == countB:
@@ -377,6 +377,8 @@ if __name__ == '__main__':
         lmstring = sys.argv[i].split(',')
         l, m = int(lmstring[0]), int(lmstring[1])
         toSearch.append((l,m))
+    with open('isWorking.txt', 'a') as f:
+        f.write(f"{toSearch}\n")
     if flag == 'bb':
         for item in toSearch:
             l,m = item

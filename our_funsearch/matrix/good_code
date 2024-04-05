@@ -1,0 +1,56 @@
+3 10
+good with n: 60, k: 12, d: 7, r: 1.4 x0+x1+y1+y9, x0+x2+y3+y7
+good with n: 60, k: 12, d: 7, r: 1.4 x0+x1+y3+y7, x0+x2+y1+y9
+good with n: 60, k: 10, d: 8, r: 1.3333333333333333 x0+x1+y1+y4, x2+y2+y3+y5
+good with n: 60, k: 10, d: 8, r: 1.3333333333333333 x0+x1+y1+y4, x2+y3+y5+y7
+good with n: 60, k: 10, d: 8, r: 1.3333333333333333 x0+x1+y2+y3, x2+y1+y5+y9
+good with n: 60, k: 10, d: 8, r: 1.3333333333333333 x0+x1+y2+y3, x2+y5+y6+y9
+
+6 5
+good with n: 60, k: 12, d: 7, r: 1.4 x1+x3+y1+y4, x3+x5+y2+y3, 6, 5
+good with n: 60, k: 12, d: 7, r: 1.4 x1+x3+y2+y3, x3+x5+y1+y4, 6, 5
+good with n: 60, k: 10, d: 8, r: 1.3333333333333333 x0+x1+y1+y4, x2+x3+y2+y3, 6, 5
+good with n: 60, k: 10, d: 8, r: 1.3333333333333333 x0+x1+y2+y3, x2+x3+y1+y4, 6, 5
+
+6 7
+good with n: 84, k: 16, d: 8, r: 1.5238095238095237 x1+x5+y1+y3, x2+x4+y4+y5, 6, 7
+good with n: 84, k: 16, d: 8, r: 1.5238095238095237 x1+x5+y1+y5, x2+x4+y4+y6, 6, 7
+good with n: 84, k: 16, d: 8, r: 1.5238095238095237 x1+x5+y2+y3, x2+x4+y1+y5, 6, 7
+good with n: 84, k: 16, d: 8, r: 1.5238095238095237 x1+x5+y2+y6, x2+x4+y1+y3, 6, 7
+good with n: 84, k: 16, d: 8, r: 1.5238095238095237 x1+x5+y4+y5, x2+x4+y2+y6, 6, 7
+good with n: 84, k: 16, d: 8, r: 1.5238095238095237 x1+x5+y4+y6, x2+x4+y2+y3, 6, 7
+
+4 8 
+good with n: 64, k: 14, d: 8, r: 1.75 x1+x2+y1+y3, x1+y4+y5+y7
+good with n: 64, k: 14, d: 8, r: 1.75 x1+x2+y1+y7, x1+y3+y4+y5
+good with n: 64, k: 14, d: 8, r: 1.75 x1+x2+y3+y5, x1+y1+y4+y7
+good with n: 64, k: 14, d: 8, r: 1.75 x1+x2+y5+y7, x1+y1+y3+y4
+good with n: 64, k: 14, d: 8, r: 1.75 x2+x3+y1+y3, x3+y4+y5+y7
+good with n: 64, k: 14, d: 8, r: 1.75 x2+x3+y1+y7, x3+y3+y4+y5
+good with n: 64, k: 14, d: 8, r: 1.75 x2+x3+y3+y5, x3+y1+y4+y7
+good with n: 64, k: 14, d: 8, r: 1.75 x2+x3+y5+y7, x3+y1+y3+y4
+
+3 9 
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y2, x1+x2+y2+y7
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y2, x1+x2+y4+y5
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y2, x1+x2+y4+y8
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y2, x1+x2+y5+y7
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y5, x1+x2+y1+y8
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y5, x1+x2+y2+y4
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y5, x1+x2+y2+y7
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y5, x1+x2+y7+y8
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y8, x1+x2+y2+y4
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y8, x1+x2+y4+y8
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y1+y8, x1+x2+y5+y7
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y2+y4, x1+x2+y4+y5
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y2+y4, x1+x2+y7+y8
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y2+y7, x1+x2+y4+y8
+good with n: 54, k: 10, d: 6, r: 1.1111111111111112 x1+x2+y2+y7, x1+x2+y7+y8
+
+3 7
+good with n: 42, k: 14, d: 4, r: 1.3333333333333333 x1+x2+y1+y3, x1+x2+y2+y6
+good with n: 42, k: 14, d: 4, r: 1.3333333333333333 x1+x2+y1+y3, x1+x2+y4+y5
+good with n: 42, k: 14, d: 4, r: 1.3333333333333333 x1+x2+y1+y5, x1+x2+y2+y3
+good with n: 42, k: 14, d: 4, r: 1.3333333333333333 x1+x2+y1+y5, x1+x2+y4+y6
+good with n: 42, k: 14, d: 4, r: 1.3333333333333333 x1+x2+y2+y3, x1+x2+y4+y6
+good with n: 42, k: 14, d: 4, r: 1.3333333333333333 x1+x2+y2+y6, x1+x2+y4+y5

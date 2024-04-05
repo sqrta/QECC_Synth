@@ -390,6 +390,7 @@ if __name__ == '__main__':
             res = search_2GBAcode(l, m, countA, countB)
             print(f"{l},{m},{countA}, {countB} finish")
     endT = time.time()
+    print(toSearch)
     print(f"use {endT-startT}s")
 
     # with open(f'good_log_{l}_{m}', 'w') as f:

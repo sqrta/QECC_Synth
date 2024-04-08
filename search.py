@@ -13,11 +13,11 @@ def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn.show()
     return eval_tn(tn)
  
-def chooseProg(setlog, minError, f, write=True):
+def chooseProg(setlog, minError, f, px, pz, write=True):
     n = setlog.get_n()
     k = setlog.get_k()
     try:
-        d, error, KS = eval_TN(setlog)
+        d, error, KS = eval_TN(setlog, px, pz)
     except Exception: 
         print(str(setlog))
         traceback.print_exc()             
@@ -47,7 +47,7 @@ def load(fileName):
         tmp = pickle.load(f)
     return tmp
 
-def search(initial, candidate_code, candidate_bound, resume = False):
+def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
     import time
     start = time.time()
     queue = [TNNetwork(initial)]
@@ -57,7 +57,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
     minError = {}
     count = 0
     maxSize = 14
-    MAX_QUEUE = 6e6
+    MAX_QUEUE = 5e6
     MAX_ITER = 7e5
     if resume:
         queue = load('queue')
@@ -103,7 +103,7 @@ def search(initial, candidate_code, candidate_bound, resume = False):
 
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error, Ks = chooseProg(hash, minError, f, write=True)
+        d, error, Ks = chooseProg(hash, minError, f, px, pz, write=True)
         
         if len(queue) < MAX_QUEUE and (d,error) not in exist_set:
             exist_set.add((d,error))
@@ -192,8 +192,8 @@ def GetTensorNetworkFromEdges(edges, tnList, max_legs):
             
 
 if __name__ == "__main__":
-    px = 0.01
-    pz = 0.05
+    px = 0.05
+    pz = 0.01
     import time
     start = time.time()
     candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     if len(sys.argv)>=2 and sys.argv[1]=='1':
         resumation = True
     print(resumation, sys.argv)
-    minE = search(Tensor('code604', 0), candidate_code, candidate_bound=[1,2, 2,2, 1,2],resume = resumation)
+    minE = search(Tensor('code604', 0), candidate_code, [1,2, 2,2, 1,2], px, pz, resume = resumation)
     print(minE)
 
     # t604 = Tensor(code604)

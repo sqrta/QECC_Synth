@@ -56,7 +56,7 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
     exist_set = set()
     minError = {}
     count = 0
-    maxSize = 14
+    maxSize = 16
     MAX_QUEUE = 5e6
     MAX_ITER = 7e5
     if resume:
@@ -94,16 +94,16 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
         #         break
         legs = top.equiv_trace_leg()
         logLeg = legs[0]        
-        # if True:
-        #     for secLeg in legs[1:]:
-        #         setlog = copy.deepcopy(top)
-        #         setlog.setLogical(logLeg[0], logLeg[1])
-        #         setlog.setLogical(secLeg[0], secLeg[1])
-        #         chooseProg(setlog, minError, f)
+        if True:
+            for secLeg in legs[1:]:
+                setlog = copy.deepcopy(top)
+                setlog.setLogical(logLeg[0], logLeg[1])
+                setlog.setLogical(secLeg[0], secLeg[1])
+                chooseProg(setlog, minError, f, px, pz, write=True)
 
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error, Ks = chooseProg(hash, minError, f, px, pz, write=True)
+        d, error, Ks = chooseProg(hash, minError, f, px, pz, write=False)
         
         if len(queue) < MAX_QUEUE and (d,error) not in exist_set:
             exist_set.add((d,error))

@@ -5,6 +5,7 @@ import traceback
 import sys
 import pickle 
 import os
+from collections import deque as Queue
 
 save_dir = 'save/'
 
@@ -47,32 +48,51 @@ def load(fileName):
         tmp = pickle.load(f)
     return tmp
 
+
 def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
     import time
     start = time.time()
-    queue = [TNNetwork(initial)]
+    queue = Queue()
+    queue.append(TNNetwork(initial))
+    nextQueue = Queue()
     maxTensor = sum(candidate_bound)
     selfTraceDepth = 4
     exist_set = set()
     minError = {}
     count = 0
     maxSize = 16
-    MAX_QUEUE = 5e6
+    MAX_QUEUE = 1e6
     MAX_ITER = 7e5
+    queueCount = 0
+    saveCount=0
+    firstFill = False
     if resume:
         queue = load('queue')
         exist_set = load('exist_set')
         minError = load('minError')
         count = load('count')
+        saveCount = load('saveCount')
+        queueCount = load('queueCount')
     prefix = f"sfound"
     f = open(prefix+str(count), 'w')    
     print("Search Start")
-    while len(queue)>0 and MAX_ITER>0:
+    
+    while MAX_ITER>0:
         count+=1
         MAX_ITER-=1
+        if len(queue)>MAX_QUEUE:
+            firstFill = True
+        if len(nextQueue)>MAX_QUEUE:
+            dump(nextQueue, f"Queue{saveCount}")
+            saveCount+=1
+            nextQueue.clear()
+        if len(queue) == 0:
+            queue = load(f'Queue{queueCount}')
+            queueCount += 1
+        
         # print(minError)
         # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
-        if count%5000==0:
+        if count%20000==0:
             f.write(str(minError))
             end = time.time()
             f.write(f"\nqueue length: {len(queue)}\nuse {end-start}s\n")
@@ -82,10 +102,12 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
             dump(queue, 'queue')
             dump(exist_set, 'exist_set')
             dump(minError, 'minError')
-            dump(count, 'count')      
-        if count %2e4 ==0:
+            dump(count, 'count')   
+            dump(saveCount, 'saveCount')
+            dump(queueCount, 'queueCount')   
+        if count %5e4 ==0:
             os.system('cp -r save save_back')      
-        top = queue.pop(0)
+        top = queue.popleft()
 
         # logLeg = None
         # for leg in top.equiv_trace_leg():
@@ -94,18 +116,18 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
         #         break
         legs = top.equiv_trace_leg()
         logLeg = legs[0]        
-        if True:
-            for secLeg in legs[1:]:
-                setlog = copy.deepcopy(top)
-                setlog.setLogical(logLeg[0], logLeg[1])
-                setlog.setLogical(secLeg[0], secLeg[1])
-                chooseProg(setlog, minError, f, px, pz, write=True)
+        # if True:
+        #     for secLeg in legs[1:]:
+        #         setlog = copy.deepcopy(top)
+        #         setlog.setLogical(logLeg[0], logLeg[1])
+        #         setlog.setLogical(secLeg[0], secLeg[1])
+        #         chooseProg(setlog, minError, f, px, pz, write=True)
 
         hash = copy.deepcopy(top)
         hash.setLogical(logLeg[0], logLeg[1])
-        d, error, Ks = chooseProg(hash, minError, f, px, pz, write=False)
+        d, error, Ks = chooseProg(hash, minError, f, px, pz, write=True)
         
-        if len(queue) < MAX_QUEUE and (d,error) not in exist_set:
+        if (d,error) not in exist_set:
             exist_set.add((d,error))
             if top.get_n()<=maxSize-2 and len(top.tensorList)<maxTensor and (len(top.insList)<1 or top.insList[-1][0]!="self"):
                 dangleLegs = top.equiv_trace_leg()
@@ -122,8 +144,10 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
                             tmp = copy.deepcopy(top)
                             tmp.trace(leg[0],leg[1],Tensor(codeName,i), tractLeg)
                             if tmp.get_n()<=maxSize:
-
-                                queue.append(tmp)
+                                if not firstFill:
+                                    queue.append(tmp)
+                                else:
+                                    nextQueue.append(tmp)
             if len(top.tensorList)>=2 and top.selfTraceCount<=selfTraceDepth and top.get_n()>6:
                 dangleLegs = top.equiv_trace_leg()
                 for i in range(len(dangleLegs)-1):
@@ -135,7 +159,10 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
                             continue
                         tmp = copy.deepcopy(top)
                         tmp.selfTrace(first[0],first[1],second[0],second[1])
-                        queue.append(tmp)
+                        if not firstFill:
+                            queue.append(tmp)
+                        else:
+                            nextQueue.append(tmp)
     end = time.time()
     print(f"use {end-start}s")
     return minError
@@ -196,12 +223,12 @@ if __name__ == "__main__":
     pz = 0.01
     import time
     start = time.time()
-    candidate_code = ['code804','code603', 'codeH', 'codeS', 'code604', 'codeGHZ']
+    candidate_code = ['code604', 'codeGHZ', 'code804','code603', 'codeH', 'codeS']
     resumation = False
     if len(sys.argv)>=2 and sys.argv[1]=='1':
         resumation = True
     print(resumation, sys.argv)
-    minE = search(Tensor('code604', 0), candidate_code, [1,2, 2,2, 1,2], px, pz, resume = resumation)
+    minE = search(Tensor('code604', 0), candidate_code, [2,2, 1,2, 2,2], px, pz, resume = resumation)
     print(minE)
 
     # t604 = Tensor(code604)

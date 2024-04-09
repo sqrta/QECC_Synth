@@ -48,6 +48,14 @@ def load(fileName):
         tmp = pickle.load(f)
     return tmp
 
+def save_back(filename):
+    path = 'save_back/'
+    source = 'save/'
+    if isinstance(filename, list):
+        for name in filename:          
+            os.system(f'cp {source}{name}.pkl {path}')
+    else:
+        os.system(f'cp {source}{filename}.pkl {path}')
 
 def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
     import time
@@ -92,7 +100,7 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
         
         # print(minError)
         # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
-        if count%20000==0:
+        if count%5e4==0:
             f.write(str(minError))
             end = time.time()
             f.write(f"\nqueue length: {len(queue)}\nuse {end-start}s\n")
@@ -105,8 +113,8 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
             dump(count, 'count')   
             dump(saveCount, 'saveCount')
             dump(queueCount, 'queueCount')   
-        if count %5e4 ==0:
-            os.system('cp -r save save_back')      
+        if count %1e5 ==0:
+            save_back(['queue', 'minError', 'count', 'saveCount', 'queueCount', 'exist_set'])
         top = queue.popleft()
 
         # logLeg = None

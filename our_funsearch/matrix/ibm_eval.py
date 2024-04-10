@@ -200,9 +200,9 @@ def search_BBcode(l, m):
                 if same(a1, a3) or same(a2, a3):
                     continue
                 A = mat(a1) + mat(a2) + mat(a3)
-                print(rank(A))
+                # print(rank(A))
                 if rank(A)>=l*m-2:
-                    print(PowStr(a1), PowStr(a2), PowStr(a3))
+                    # print(PowStr(a1), PowStr(a2), PowStr(a3))
                     continue
                 s1 = i1 if flag else s1
                 for j1 in range(s1, term_len-2):
@@ -240,7 +240,7 @@ def search_BBcode(l, m):
                             r_frac = k*1.0/(2.0*n) 
                                                
                             # print(f"good with n: {n}, k: {k}, d: {d}, r: {r_frac}")
-                            print(f"{iter_count}, {PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}")
+                            # print(f"{iter_count}, {PowStr(a1)}+{PowStr(a2)}+{PowStr(a3)}, {PowStr(b1)}+{PowStr(b2)}+{PowStr(b3)}")
                             if True and good(n,k,d):
                                 r = 2.0*n / k
                                 found.add((n,k,d))
@@ -265,6 +265,17 @@ def good(n,k,d):
 
 def sumMat(mList):
     return reduce(lambda a,b : a+b, mList)
+
+def pruneTerm(Terms):
+    result = []
+    for term in Terms:
+        sumT = sum([a[0] for a in term])
+        if sumT % len(term) == 0:
+            if term[0][1]==0:
+                result.append(term)
+        else:
+            result.append(term)
+    return result
     
 def search_2GBAcode(l, m, countA, countB):
     filename = f'good_log_{l}_{m}_count{countA}{countB}'
@@ -300,19 +311,17 @@ def search_2GBAcode(l, m, countA, countB):
     term_len = len(terms)
     count = 0
     Aterms = combin(terms, countA)
+    Aterms = pruneTerm(Aterms)
     iter_count = 0
     for i in range(ri, len(Aterms)):
         aterm = Aterms[i]
+        print(f"i: {i}, iter: {iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}")
         A = sumMat([mat(t) for t in aterm])
         if rank(A)>=l*m-4:
             print([PowStr(a1) for a1 in aterm])
             continue
         if countA == countB:
-            index = terms.index(aterm[0])
-            Bterms = combin(terms[index:], countA)
-            if aterm in Bterms:
-                index2 = Bterms.index(aterm)
-                Bterms = Bterms[index2:]
+            Bterms = Aterms[i:]
         else:
             Bterms = combin(terms, countA)
         jstart = rj if i==ri else 0
@@ -322,8 +331,8 @@ def search_2GBAcode(l, m, countA, countB):
             B = sumMat([mat(t) for t in bterm])
             k, d = Get_kd_BBCode(gap, A, B, l, m)
             r = d*k*1.0/n   
-            print(f"i: {i}, j: {j} with n: {n}, k: {k}, d: {d}, r: {r}") 
-            print(f"{iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}")
+            # print(f"i: {i}, j: {j} with n: {n}, k: {k}, d: {d}, r: {r}") 
+            # print(f"{iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}")
             if True and goodC(n,k,d):
                 # found.add((n,k,d))
                 with open(filename, 'a') as f:

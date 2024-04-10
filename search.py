@@ -8,6 +8,7 @@ import os
 from collections import deque as Queue
 
 save_dir = 'save/'
+prefix = f"xfound"
 
 def eval_prog(prog, initial, px=0.01, pz = 0.05):
     tn = buildProg(prog, initial)
@@ -40,11 +41,11 @@ def chooseProg(setlog, minError, f, px, pz, write=True):
     return d, error, KS
 
 def dump(variable, fileName):
-    with open(save_dir+fileName+'.pkl', 'wb') as f:
+    with open(save_dir+prefix+fileName+'.pkl', 'wb') as f:
         pickle.dump(variable, f)
 
 def load(fileName):
-    with open(save_dir+fileName+'.pkl', 'rb') as f:
+    with open(save_dir+prefix+fileName+'.pkl', 'rb') as f:
         tmp = pickle.load(f)
     return tmp
 
@@ -53,9 +54,9 @@ def save_back(filename):
     source = 'save/'
     if isinstance(filename, list):
         for name in filename:          
-            os.system(f'cp {source}{name}.pkl {path}')
+            os.system(f'cp {source}{prefix}{name}.pkl {path}')
     else:
-        os.system(f'cp {source}{filename}.pkl {path}')
+        os.system(f'cp {source}{prefix}{filename}.pkl {path}')
 
 def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
     import time
@@ -70,7 +71,7 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
     count = 0
     maxSize = 16
     MAX_QUEUE = 1e6
-    MAX_ITER = 7e5
+    MAX_ITER = 8e5
     queueCount = 0
     saveCount=0
     firstFill = False
@@ -81,7 +82,7 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
         count = load('count')
         saveCount = load('saveCount')
         queueCount = load('queueCount')
-    prefix = f"sfound"
+    
     f = open(prefix+str(count), 'w')    
     print("Search Start")
     
@@ -227,8 +228,8 @@ def GetTensorNetworkFromEdges(edges, tnList, max_legs):
             
 
 if __name__ == "__main__":
-    px = 0.05
-    pz = 0.01
+    px = 0.01
+    pz = 0.05
     import time
     start = time.time()
     candidate_code = ['code604', 'codeGHZ', 'code804','code603', 'codeH', 'codeS']

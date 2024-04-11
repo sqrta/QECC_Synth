@@ -317,7 +317,7 @@ def search_2GBAcode(l, m, countA, countB):
         aterm = Aterms[i]
         print(f"i: {i}, iter: {iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}")
         A = sumMat([mat(t) for t in aterm])
-        if rank(A)>=l*m-4:
+        if rank(A)>=l*m-3:
             print([PowStr(a1) for a1 in aterm])
             continue
         if countA == countB:
@@ -380,6 +380,7 @@ if __name__ == '__main__':
     countA = 4
     countB = 4
     flag = sys.argv[1]
+
     import time
     startT = time.time()
     for i in range(2, len(sys.argv)):
@@ -394,7 +395,9 @@ if __name__ == '__main__':
             n = 2*l*m
             res = search_BBcode(l, m)
             print(f"{l},{m} finish")
-    if flag == '2g':
+    if flag[:2] == '2g':
+        counts = flag.split('_')
+        countA, countB = int(counts[1]), int(counts[2])
         for item in toSearch:
             l,m = item
             n = 2*l*m

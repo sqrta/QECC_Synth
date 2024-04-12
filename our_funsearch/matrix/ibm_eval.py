@@ -271,7 +271,7 @@ def pruneTerm(Terms):
     for term in Terms:
         sumT = sum([a[0] for a in term])
         if sumT % len(term) == 0:
-            if term[0][1]==0:
+            if term[0][1]=='0':
                 result.append(term)
         else:
             result.append(term)
@@ -317,7 +317,7 @@ def search_2GBAcode(l, m, countA, countB):
         aterm = Aterms[i]
         print(f"i: {i}, iter: {iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}")
         A = sumMat([mat(t) for t in aterm])
-        if rank(A)>=l*m-3:
+        if rank(A)>=l*m-4:
             print([PowStr(a1) for a1 in aterm])
             continue
         if countA == countB:

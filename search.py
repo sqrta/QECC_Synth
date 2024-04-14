@@ -105,7 +105,7 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
             f.write(str(minError))
             end = time.time()
             f.write(f"\nqueue length: {len(queue)}\nuse {end-start}s\n")
-            f.write(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}\n")
+            f.write(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}, px: {px}, pz: {pz}\n")
             f.close()
             f = open(f"{prefix}{count}",'w')
             dump(queue, 'queue')
@@ -236,9 +236,11 @@ if __name__ == "__main__":
     resumation = False
     if len(sys.argv)>=2 and sys.argv[1]=='1':
         resumation = True
+    px = float(sys.argv[2])
+    pz = float(sys.argv[3])
     print(resumation, sys.argv)
     minE = search(Tensor('code604', 0), candidate_code, [2,2, 1,2, 2,2], px, pz, resume = resumation)
-    print(minE)
+    print(px, pz)
 
     # t604 = Tensor(code604)
     # tn = TNNetwork(Tensor(code603))

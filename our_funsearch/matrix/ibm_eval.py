@@ -318,7 +318,7 @@ def search_2GBAcode(l, m, countA, countB):
         print(f"i: {i}, iter: {iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}")
         A = sumMat([mat(t) for t in aterm])
         rankA = rank(A)
-        if rankA>=l*m-4:
+        if rankA>=l*m-3:
             print([PowStr(a1) for a1 in aterm], f"lm-rankA: {l*m-rankA}")
 
             continue

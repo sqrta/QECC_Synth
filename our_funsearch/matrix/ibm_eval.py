@@ -277,7 +277,7 @@ def pruneTerm(Terms):
             result.append(term)
     return result
     
-def search_2GBAcode(l, m, countA, countB):
+def search_2GBAcode(l, m, countA, countB, kthres = 4):
     filename = f'good_log_{l}_{m}_count{countA}{countB}'
     ri, rj = 222,0
     if ri==0 and rj==0:
@@ -318,7 +318,7 @@ def search_2GBAcode(l, m, countA, countB):
         print(f"i: {i}, iter: {iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}")
         A = sumMat([mat(t) for t in aterm])
         rankA = rank(A)
-        if rankA>=l*m-3:
+        if rankA>=l*m-kthres:
             print([PowStr(a1) for a1 in aterm], f"lm-rankA: {l*m-rankA}")
 
             continue
@@ -399,11 +399,11 @@ if __name__ == '__main__':
             print(f"{l},{m} finish")
     if flag[:2] == '2g':
         counts = flag.split('_')
-        countA, countB = int(counts[1]), int(counts[2])
+        countA, countB, kthres = int(counts[1]), int(counts[2]), int(counts[3])
         for item in toSearch:
             l,m = item
             n = 2*l*m
-            res = search_2GBAcode(l, m, countA, countB)
+            res = search_2GBAcode(l, m, countA, countB, kthres)
             print(f"{l},{m},{countA}, {countB} finish")
     endT = time.time()
     print(toSearch)

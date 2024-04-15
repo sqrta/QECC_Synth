@@ -279,7 +279,7 @@ def pruneTerm(Terms):
     
 def search_2GBAcode(l, m, countA, countB, kthres = 4):
     filename = f'good_log_{l}_{m}_count{countA}{countB}'
-    ri, rj = 222,0
+    ri, rj = 0,0
     if ri==0 and rj==0:
         with open(filename, 'w') as f:
             pass    

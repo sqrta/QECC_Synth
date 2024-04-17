@@ -366,10 +366,11 @@ bpdZ=bposd_decoder(
 
 good_trials=0
 bad_trials=0
+error_cnt_collect = []
 for trial in range(num_trials):
 
 	circ, error_count = generate_noisy_circuit(error_rate)
-	error_cnt_collect = []
+	
 	# error correction result
 	# True = success
 	# False = fail
@@ -426,7 +427,7 @@ for trial in range(num_trials):
 
 	if ec_resultZ and ec_resultX:
 		good_trials+=1
-		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
+		# print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
 	else:
 		bad_trials+=1
 		error_cnt_collect.append(error_count)

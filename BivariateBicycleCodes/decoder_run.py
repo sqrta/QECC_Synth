@@ -10,7 +10,7 @@ import sys
 num_trials = 100000
 
 error_rate = 0.003
-
+test_dis = False
 
 
 # code parameters and number of syndrome cycles
@@ -26,12 +26,16 @@ if len(sys.argv)>2:
 	num_cycles = int(sys.argv[4])
 	error_rate = float(sys.argv[5])
 	num_trials = int(sys.argv[6])
-
+dis_bound = d
 tag = None
 if len(sys.argv)>7:
 	tag = int(sys.argv[7])
 
-head = f'./TMP/mydata{tag}_' if tag else './TMP/mydata_'
+if len(sys.argv)>8:
+	test_dis = True 
+	dis_bound = int(sys.argv[8])
+
+head = f'./TMP/mydata{tag}_' if tag and tag>0 else './TMP/mydata_'
 # load decoder data from file (must be created with decoder_setup.py)
 title = head + str(n) + '_' + str(k) + '_p_' + str(error_rate) + '_cycles_' + str(num_cycles)
 print('reading data from file')
@@ -103,7 +107,11 @@ def generate_noisy_circuit(p):
 	error_rate_cnot = p
 	circ = []
 	err_cnt=0
-	for gate in cycle_repeated:
+	for i in range(len(cycle_repeated)):
+		gate = cycle_repeated[i]
+		if test_dis and err_cnt>dis_bound:
+			circ += cycle_repeated[i:]
+			break
 		assert(gate[0] in ['CNOT','IDLE','PrepX','PrepZ','MeasX','MeasZ'])
 		if gate[0]=='MeasX':
 			if np.random.uniform()<=error_rate_meas:
@@ -366,7 +374,7 @@ bpdZ=bposd_decoder(
 
 good_trials=0
 bad_trials=0
-error_cnt_collect = []
+error_cnt_collect = [9999]
 for trial in range(num_trials):
 
 	circ, error_count = generate_noisy_circuit(error_rate)
@@ -427,7 +435,7 @@ for trial in range(num_trials):
 
 	if ec_resultZ and ec_resultX:
 		good_trials+=1
-		# print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
+		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
 	else:
 		bad_trials+=1
 		error_cnt_collect.append(error_count)
@@ -438,5 +446,5 @@ for trial in range(num_trials):
 	
 
 assert(num_trials==(good_trials+bad_trials))
-
+print(error_cnt_collect)
 print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(num_trials) + '\t' + str(bad_trials) + f'\ttag: {tag}' + f'\t{min(error_cnt_collect)}',file=open(fname,'a'))

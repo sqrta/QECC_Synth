@@ -351,6 +351,8 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     print(f"itercount: {iter_count}")
     terminate(gap)
     sortFile(filename)
+    with open('finished.txt', 'a') as f:
+        f.write(f"{(l,m)}\n")
     if count>0:
         os.system(f'rm {l}{m}Hx.mtx')
         os.system(f'rm {l}{m}Hz.mtx')

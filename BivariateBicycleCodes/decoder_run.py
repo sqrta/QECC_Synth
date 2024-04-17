@@ -27,8 +27,13 @@ if len(sys.argv)>2:
 	error_rate = float(sys.argv[5])
 	num_trials = int(sys.argv[6])
 
+tag = None
+if len(sys.argv)>7:
+	tag = int(sys.argv[7])
+
+head = f'./TMP/mydata{tag}_' if tag else './TMP/mydata_'
 # load decoder data from file (must be created with decoder_setup.py)
-title = './TMP/mydata_' + str(n) + '_' + str(k) + '_p_' + str(error_rate) + '_cycles_' + str(num_cycles)
+title = head + str(n) + '_' + str(k) + '_p_' + str(error_rate) + '_cycles_' + str(num_cycles)
 print('reading data from file')
 print(title)
 with open(title, 'rb') as fp:
@@ -200,7 +205,7 @@ def generate_noisy_circuit(p):
 			circ.append(gate)
 			continue
 
-	return circ
+	return circ, err_cnt
 
 
 
@@ -363,8 +368,8 @@ good_trials=0
 bad_trials=0
 for trial in range(num_trials):
 
-	circ = generate_noisy_circuit(error_rate)
-
+	circ, error_count = generate_noisy_circuit(error_rate)
+	error_cnt_collect = []
 	# error correction result
 	# True = success
 	# False = fail
@@ -421,14 +426,16 @@ for trial in range(num_trials):
 
 	if ec_resultZ and ec_resultX:
 		good_trials+=1
+		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
 	else:
 		bad_trials+=1
-		
+		error_cnt_collect.append(error_count)
+		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}' + f'\t{error_count}')
 	assert((trial+1)==(good_trials+bad_trials))
 
-	print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials))
+	
 	
 
 assert(num_trials==(good_trials+bad_trials))
 
-print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(num_trials) + '\t' + str(bad_trials),file=open(fname,'a'))
+print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(num_trials) + '\t' + str(bad_trials) + f'\ttag: {tag}' + f'\t{min(error_cnt_collect)}',file=open(fname,'a'))

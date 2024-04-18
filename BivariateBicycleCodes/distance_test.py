@@ -1,109 +1,450 @@
 import numpy as np
-from mip import Model, xsum, minimize, BINARY
+import itertools
+from ldpc import bposd_decoder
 from bposd.css import css_code
+import pickle
+from scipy.sparse import coo_matrix
+import sys
+import random
 
-# computes the minimum Hamming weight of a binary vector x such that 
-# stab @ x = 0 mod 2
-# logicOp @ x = 1 mod 2
-# here stab is a binary matrix and logicOp is a binary vector
-def distance_test(stab,logicOp):
-	# number of qubits
-	n = stab.shape[1]
-	# number of stabilizers
-	m = stab.shape[0]
+# number of Monte Carlo trials
+num_trials = 100000
 
-	# maximum stabilizer weight
-	wstab = np.max([np.sum(stab[i,:]) for i in range(m)])
-	# weight of the logical operator
-	wlog = np.count_nonzero(logicOp)
-	# how many slack variables are needed to express orthogonality constraints modulo two
-	num_anc_stab = int(np.ceil(np.log2(wstab)))
-	num_anc_logical = int(np.ceil(np.log2(wlog)))
-	# total number of variables
-	num_var = n + m*num_anc_stab + num_anc_logical
-
-	model = Model()
-	model.verbose = 0
-	x = [model.add_var(var_type=BINARY) for i in range(num_var)]
-	model.objective = minimize(xsum(x[i] for i in range(n)))
-
-	# orthogonality to rows of stab constraints
-	for row in range(m):
-		weight = [0]*num_var
-		supp = np.nonzero(stab[row,:])[0]
-		for q in supp:
-			weight[q] = 1
-		cnt = 1
-		for q in range(num_anc_stab):
-			weight[n + row*num_anc_stab +q] = -(1<<cnt)
-			cnt+=1
-		model+= xsum(weight[i] * x[i] for i in range(num_var)) == 0
-
-	# odd overlap with logicOp constraint
-	supp = np.nonzero(logicOp)[0]
-	weight = [0]*num_var
-	for q in supp:
-		weight[q] = 1
-	cnt = 1
-	for q in range(num_anc_logical):
-			weight[n + m*num_anc_stab +q] = -(1<<cnt)
-			cnt+=1
-	model+= xsum(weight[i] * x[i] for i in range(num_var)) == 1
-
-	model.optimize()
-
-	opt_val = sum([x[i].x for i in range(n)])
-	return int(opt_val)
+error_rate = 0.003
+test_dis = False
 
 
+# code parameters and number of syndrome cycles
+n = 170
+k = 16
+d = 10
+num_cycles = 12
 
-# [[144,12,12]]
-ell,m = 12,6
-a1,a2,a3 = 3,1,2
-b1,b2,b3 = 3,1,2
+if len(sys.argv)>2:
+	n = int(sys.argv[1])
+	k = int(sys.argv[2])
+	d = int(sys.argv[3])
+	num_cycles = int(sys.argv[4])
+	error_rate = float(sys.argv[5])
+	num_trials = int(sys.argv[6])
+dis_bound = d
+tag = None
+if len(sys.argv)>7:
+	tag = int(sys.argv[7])
+
+if len(sys.argv)>8:
+	test_dis = True 
+	dis_bound = int(sys.argv[8])
+
+head = f'./TMP/mydata{tag}_' if tag and tag>0 else './TMP/mydata_'
+# load decoder data from file (must be created with decoder_setup.py)
+title = head + str(n) + '_' + str(k) + '_p_' + str(error_rate) + '_cycles_' + str(num_cycles)
+print('reading data from file')
+print(title)
+with open(title, 'rb') as fp:
+	mydata = pickle.load(fp)
 
 
-n = 2*ell*m
-n2 = ell*m
+# file to save simulation results
+fname = './CODE_' + str(n) + '_' + str(k) + '_' + str(d) + '/result'
+
+# format of the result file
+# column 1: error rate
+# column 2: number of syndrome cycles
+# column 3: number of Monte Carlo trials 
+# column 4: number of Monte Carlo trials that resulted in a logical error
 
 
-# define cyclic shift matrices 
-I_ell = np.identity(ell,dtype=int)
-I_m = np.identity(m,dtype=int)
-I = np.identity(ell*m,dtype=int)
-x = {}
-y = {}
-for i in range(ell):
-	x[i] = np.kron(np.roll(I_ell,i,axis=1),I_m)
-for i in range(m):
-	y[i] = np.kron(I_ell,np.roll(I_m,i,axis=1))
+HdecX = mydata['HdecX']
+HdecZ = mydata['HdecZ']
+channel_probsX = mydata['probX']
+channel_probsZ = mydata['probZ']
+lin_order = mydata['lin_order']
+assert(mydata['num_cycles']==num_cycles)
+data_qubits = mydata['data_qubits']
+Xchecks=mydata['Xchecks']
+Zchecks=mydata['Zchecks']
+cycle = mydata['cycle']
+HX = mydata['HX']
+HZ = mydata['HZ']
+lx = mydata['lx']
+lz = mydata['lz']
+first_logical_rowZ=mydata['first_logical_rowZ']
+first_logical_rowX=mydata['first_logical_rowX']
+ell=mydata['ell']
+m=mydata['m']
+a1=mydata['a1']
+a2=mydata['a2']
+a3=mydata['a3']
+b1=mydata['b1']
+b2=mydata['b2']
+b3=mydata['b3']
+sX=mydata['sX']
+sZ=mydata['sZ']
+assert(error_rate==mydata['error_rate'])
+cycle_repeated = num_cycles*cycle
 
-# define check matrices
-A = (x[a1] + y[a2] + y[a3]) % 2
-B = (y[b1] + x[b2] + x[b3]) % 2
-AT = np.transpose(A)
-BT = np.transpose(B)
-hx = np.hstack((A,B))
-hz = np.hstack((BT,AT))
+# setup BP-OSD decoder parameters
+my_bp_method = "ms"
+my_max_iter = 10000
+my_osd_method = "osd_cs"
+my_osd_order = 7
+my_ms_scaling_factor = 0
 
-qcode=css_code(hx,hz)
-print('Testing CSS code...')
-qcode.test()
-print('Done')
 
-lz = qcode.lz
-lx = qcode.lx
-k = lz.shape[0]
 
-print('Computing code distance...')
-# We compute the distance only for Z-type logical operators (the distance for X-type logical operators is the same)
-# by solving an integer linear program (ILP). The ILP looks for a minimum weight Pauli Z-type operator which has an even overlap with each X-check 
-# and an odd overlap with logical-X operator on the i-th logical qubit. Let w_i be the optimal value of this ILP. 
-# Then the code distance for Z-type logical operators is dZ = min(w_1,…,w_k).
-d = n
-for i in range(k):
-	w = distance_test(hx,lx[i,:])
-	print('Logical qubit=',i,'Distance=',w)
-	d = min(d,w)
+# code length
+n = 2*m*ell
 
-print('Code parameters: n,k,d=',n,k,d)
+n2 = m*ell
+
+
+
+
+def generate_noisy_circuit(p):
+	error_rate_meas = p
+	error_rate_idle = p
+	error_rate_init = p
+	error_rate_cnot = p
+	circ = []
+	err_cnt=0
+	sample = random.sample(range(0, len(cycle_repeated)), d)
+	for i in range(len(cycle_repeated)):
+		gate = cycle_repeated[i]
+		assert(gate[0] in ['CNOT','IDLE','PrepX','PrepZ','MeasX','MeasZ'])
+		if i not in sample:
+			circ.append(gate)
+			continue
+		if gate[0]=='MeasX':
+			if np.random.uniform()<=error_rate_meas:
+				circ.append(('Z',gate[1]))
+				err_cnt+=1
+			circ.append(gate)
+			continue
+		if gate[0]=='IDLE':
+			if np.random.uniform()<=error_rate_idle:
+				ptype = np.random.randint(3)
+				if ptype==0:
+					circ.append(('X',gate[1]))
+				if ptype==1:
+					circ.append(('Y',gate[1]))
+				if ptype==2:
+					circ.append(('Z',gate[1]))
+				err_cnt+=1
+			continue
+		if gate[0]=='PrepX':
+			circ.append(gate)
+			if np.random.uniform()<=error_rate_init:
+				circ.append(('Z',gate[1]))
+				err_cnt+=1
+			continue
+		if gate[0]=='CNOT':
+			circ.append(gate)
+			if np.random.uniform()<=error_rate_cnot:
+				error_type = np.random.randint(15)
+				if error_type==0:
+					circ.append(('X',gate[1]))
+					err_cnt+=1
+					continue
+				if error_type==1:
+					circ.append(('Y',gate[1]))
+					err_cnt+=1
+					continue
+				if error_type==2:
+					circ.append(('Z',gate[1]))
+					err_cnt+=1
+					continue
+				if error_type==3:
+					circ.append(('X',gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==4:
+					circ.append(('Y',gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==5:
+					circ.append(('Z',gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==6:
+					circ.append(('XX',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==7:
+					circ.append(('YY',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==8:
+					circ.append(('ZZ',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==9:
+					circ.append(('XY',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==10:
+					circ.append(('YX',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==11:
+					circ.append(('YZ',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==12:
+					circ.append(('ZY',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==13:
+					circ.append(('XZ',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+				if error_type==14:
+					circ.append(('ZX',gate[1],gate[2]))
+					err_cnt+=1
+					continue
+		if gate[0]=='PrepZ':
+			circ.append(gate)
+			if np.random.uniform()<=error_rate_init:
+				circ.append(('X',gate[1]))
+				err_cnt+=1
+			continue
+		if gate[0]=='MeasZ':
+			if np.random.uniform()<=error_rate_meas:
+				circ.append(('X',gate[1]))
+				err_cnt+=1
+			circ.append(gate)
+			continue
+	return circ, err_cnt
+
+
+
+
+# we only look at the action of the circuit on Z errors; 0 means no error, 1 means error
+def simulate_circuitZ(C):
+	syndrome_history = []
+	# keys = Xchecks, vals = list of positions in the syndrome history array
+	syndrome_map = {}
+	state = np.zeros(2*n,dtype=int)
+	# need this for debugging
+	err_cnt = 0
+	syn_cnt = 0
+	for gate in C:
+		if gate[0]=='CNOT':
+			assert(len(gate)==3)
+			control = lin_order[gate[1]]
+			target = lin_order[gate[2]]
+			state[control] = (state[target] + state[control]) % 2
+			continue
+		if gate[0]=='PrepX':
+			assert(len(gate)==2)
+			q = lin_order[gate[1]]
+			state[q]=0
+			continue
+		if gate[0]=='MeasX':
+			assert(len(gate)==2)
+			assert(gate[1][0]=='Xcheck')
+			q = lin_order[gate[1]]
+			syndrome_history.append(state[q])
+			if gate[1] in syndrome_map:
+				syndrome_map[gate[1]].append(syn_cnt)
+			else:
+				syndrome_map[gate[1]] = [syn_cnt]
+			syn_cnt+=1
+			continue
+		if gate[0] in ['Z','Y']:
+			err_cnt+=1
+			assert(len(gate)==2)
+			q = lin_order[gate[1]]
+			state[q] = (state[q] + 1) % 2
+			continue
+
+		if gate[0] in ['ZX', 'YX']:
+			err_cnt+=1
+			assert(len(gate)==3)
+			q = lin_order[gate[1]]
+			state[q] = (state[q] + 1) % 2
+			continue
+
+		if gate[0] in ['XZ','XY']:
+			err_cnt+=1
+			assert(len(gate)==3)
+			q = lin_order[gate[2]]
+			state[q] = (state[q] + 1) % 2
+			continue
+
+		if gate[0] in ['ZZ','YY','YZ','ZY']:
+			err_cnt+=1
+			assert(len(gate)==3)
+			q1 = lin_order[gate[1]]
+			q2 = lin_order[gate[2]]
+			state[q1] = (state[q1] + 1) % 2
+			state[q2] = (state[q2] + 1) % 2
+			continue
+	return np.array(syndrome_history,dtype=int),state,syndrome_map,err_cnt
+
+
+# we only look at the action of the circuit on X errors; 0 means no error, 1 means error
+def simulate_circuitX(C):
+	syndrome_history = []
+	# keys = Zchecks, vals = list of positions in the syndrome history array
+	syndrome_map = {}
+	state = np.zeros(2*n,dtype=int)
+	# need this for debugging
+	err_cnt = 0
+	syn_cnt = 0
+	for gate in C:
+		if gate[0]=='CNOT':
+			assert(len(gate)==3)
+			control = lin_order[gate[1]]
+			target = lin_order[gate[2]]
+			state[target] = (state[target] + state[control]) % 2
+			continue
+		if gate[0]=='PrepZ':
+			assert(len(gate)==2)
+			q = lin_order[gate[1]]
+			state[q]=0
+			continue
+		if gate[0]=='MeasZ':
+			assert(len(gate)==2)
+			assert(gate[1][0]=='Zcheck')
+			q = lin_order[gate[1]]
+			syndrome_history.append(state[q])
+			if gate[1] in syndrome_map:
+				syndrome_map[gate[1]].append(syn_cnt)
+			else:
+				syndrome_map[gate[1]] = [syn_cnt]
+			syn_cnt+=1
+			continue
+		if gate[0] in ['X','Y']:
+			err_cnt+=1
+			assert(len(gate)==2)
+			q = lin_order[gate[1]]
+			state[q] = (state[q] + 1) % 2
+			continue
+
+		if gate[0] in ['XZ', 'YZ']:
+			err_cnt+=1
+			assert(len(gate)==3)
+			q = lin_order[gate[1]]
+			state[q] = (state[q] + 1) % 2
+			continue
+
+		if gate[0] in ['ZX','ZY']:
+			err_cnt+=1
+			assert(len(gate)==3)
+			q = lin_order[gate[2]]
+			state[q] = (state[q] + 1) % 2
+			continue
+
+		if gate[0] in ['XX','YY','XY','YX']:
+			err_cnt+=1
+			assert(len(gate)==3)
+			q1 = lin_order[gate[1]]
+			q2 = lin_order[gate[2]]
+			state[q1] = (state[q1] + 1) % 2
+			state[q2] = (state[q2] + 1) % 2
+			continue
+	return np.array(syndrome_history,dtype=int),state,syndrome_map,err_cnt
+
+
+
+
+
+# begin decoding
+bpdX=bposd_decoder(
+    HdecX,#the parity check matrix
+    channel_probs=channel_probsX, #assign error_rate to each qubit. This will override "error_rate" input variable
+    max_iter=my_max_iter, #the maximum number of iterations for BP)
+    bp_method=my_bp_method,
+    ms_scaling_factor=my_ms_scaling_factor, #min sum scaling factor. If set to zero the variable scaling factor method is used
+    osd_method=my_osd_method, #the OSD method. Choose from:  1) "osd_e", "osd_cs", "osd0"
+    osd_order=my_osd_order #the osd search depth
+    )
+
+
+bpdZ=bposd_decoder(
+    HdecZ,#the parity check matrix
+    channel_probs=channel_probsZ, #assign error_rate to each qubit. This will override "error_rate" input variable
+    max_iter=my_max_iter, #the maximum number of iterations for BP)
+    bp_method=my_bp_method,
+    ms_scaling_factor=my_ms_scaling_factor, #min sum scaling factor. If set to zero the variable scaling factor method is used
+    osd_method="osd_cs", #the OSD method. Choose from:  1) "osd_e", "osd_cs", "osd0"
+    osd_order=my_osd_order #the osd search depth
+    )
+
+
+good_trials=0
+bad_trials=0
+error_cnt_collect = [9999]
+error_rate = 1
+for trial in range(num_trials):
+
+	circ, error_count = generate_noisy_circuit(error_rate)
+	
+	# error correction result
+	# True = success
+	# False = fail
+	ec_resultZ = False
+	ec_resultX = False
+	
+	# correct Z errors 
+	syndrome_history,state,syndrome_map,err_cntZ = simulate_circuitZ(circ+cycle+cycle)
+	assert(len(syndrome_history)==n2*(num_cycles+2))
+	state_data_qubits = [state[lin_order[q]] for q in data_qubits]
+	syndrome_final_logical = (lx @ state_data_qubits) % 2
+	# apply syndrome sparsification map
+	syndrome_history_copy = syndrome_history.copy()
+	for c in Xchecks:
+		pos = syndrome_map[c]
+		assert(len(pos)==(num_cycles+2))
+		for row in range(1,num_cycles+2):
+			syndrome_history[pos[row]]+= syndrome_history_copy[pos[row-1]]
+	syndrome_history%= 2
+	assert(HdecZ.shape[0]==len(syndrome_history))
+	bpdZ.decode(syndrome_history)
+	low_weight_error = bpdZ.osdw_decoding
+
+	assert(len(low_weight_error)==HZ.shape[1])
+	syndrome_history_augmented_guessed = (HZ @ low_weight_error) % 2
+	syndrome_final_logical_guessed = syndrome_history_augmented_guessed[first_logical_rowZ:(first_logical_rowZ+k)]
+	ec_resultZ = np.array_equal(syndrome_final_logical_guessed,syndrome_final_logical)
+	
+	
+	if ec_resultZ:
+		# correct X errors 
+		syndrome_history,state,syndrome_map,err_cntX = simulate_circuitX(circ+cycle+cycle)
+		assert(len(syndrome_history)==n2*(num_cycles+2))
+		state_data_qubits = [state[lin_order[q]] for q in data_qubits]
+		syndrome_final_logical = (lz @ state_data_qubits) % 2
+		# apply syndrome sparsification map
+		syndrome_history_copy = syndrome_history.copy()
+		for c in Zchecks:
+			pos = syndrome_map[c]
+			assert(len(pos)==(num_cycles+2))
+			for row in range(1,num_cycles+2):
+				syndrome_history[pos[row]]+= syndrome_history_copy[pos[row-1]]
+		syndrome_history%= 2
+		assert(HdecX.shape[0]==len(syndrome_history))
+		bpdX.decode(syndrome_history)
+		low_weight_error = bpdX.osdw_decoding
+
+		assert(len(low_weight_error)==HX.shape[1])
+		syndrome_history_augmented_guessed = (HX @ low_weight_error) % 2
+		syndrome_final_logical_guessed = syndrome_history_augmented_guessed[first_logical_rowX:(first_logical_rowX+k)]
+		ec_resultX = np.array_equal(syndrome_final_logical_guessed,syndrome_final_logical)
+		
+	
+
+	if ec_resultZ and ec_resultX:
+		good_trials+=1
+		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
+	else:
+		bad_trials+=1
+		error_cnt_collect.append(error_count)
+		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}' + f'\t{error_count}')
+		print('has such error')
+		exit(0)
+	assert((trial+1)==(good_trials+bad_trials))
+
+	
+print('no such error')	

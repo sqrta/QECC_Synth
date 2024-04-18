@@ -438,14 +438,14 @@ for trial in range(num_trials):
 	if ec_resultZ and ec_resultX:
 		good_trials+=1
 		if good_trials%500 == 0:
-			print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}')
+			print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}\t d:{d}\t n:{n}')
 	else:
 		bad_trials+=1
 		error_cnt_collect.append(error_count)
 		print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(trial+1) + '\t' + str(bad_trials) + f'\ttag: {tag}' + f'\t{error_count}')
-		print(f'has such error with distance{d}')
+		print(f'has such error with distance{d} and n:{n}')
 		exit(0)
 	assert((trial+1)==(good_trials+bad_trials))
 
 	
-print(f'no such error with distance {d}')	
+print(f'no such error with distance {d} and n:{n}')	

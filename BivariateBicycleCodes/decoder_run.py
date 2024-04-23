@@ -5,6 +5,7 @@ from bposd.css import css_code
 import pickle
 from scipy.sparse import coo_matrix
 import sys
+import os
 
 # number of Monte Carlo trials
 num_trials = 100000
@@ -45,7 +46,8 @@ with open(title, 'rb') as fp:
 
 
 # file to save simulation results
-fname = './CODE_' + str(n) + '_' + str(k) + '_' + str(d) + '/result'
+Path = './CODE_' + str(n) + '_' + str(k) + '_' + str(d)
+fname = Path + '/result'
 
 # format of the result file
 # column 1: error rate
@@ -447,4 +449,6 @@ for trial in range(num_trials):
 
 assert(num_trials==(good_trials+bad_trials))
 print(error_cnt_collect)
+if not os.path.exists(Path):
+	os.makedirs(Path)
 print(str(error_rate) + '\t' + str(num_cycles) + '\t' + str(num_trials) + '\t' + str(bad_trials) + f'\ttag: {tag}' + f'\t{min(error_cnt_collect)}',file=open(fname,'a'))

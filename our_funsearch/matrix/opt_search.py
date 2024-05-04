@@ -103,7 +103,7 @@ def writeMatrix(path, M):
                 if M[i, j]==1:
                     f.write(f"{i+1} {j+1} 1\n")
 
-def Get_kd_BBCode(proc, A, B, l, m):
+def Get_kd_BBCode(proc, A, B, l, m, kthres=0):
     n = A.shape[0] * 2
     Hz = np.concatenate((B.T, A.T),axis=1)
     Hx = np.concatenate((A, B),axis=1)
@@ -111,7 +111,7 @@ def Get_kd_BBCode(proc, A, B, l, m):
     writeMatrix(f'{l}{m}Hz.mtx', Hz)
     rankz = rank(Hz)
     k = n - 2*rankz
-    if k==0:
+    if k<=2*kthres:
         return 0, 0
     write(proc, f'lisX:=ReadMTXE("{l}{m}Hx.mtx",0);;')
     write(proc, f'lisZ:=ReadMTXE("{l}{m}Hz.mtx",0);;')
@@ -273,6 +273,7 @@ def good(n,k,d):
 def sumMat(mList):
     return reduce(lambda a,b : a+b, mList)
 
+
 def goodTerm(term, l, m):
     if term[0][0]==0 and term[1][0]==1 and term[2][0]==1 and int(term[1][1])+int(term[2][1])==m:
         return True
@@ -282,7 +283,7 @@ def goodTerm(term, l, m):
         return True
     return False
 
-def pruneTerm(Terms, l, m):
+def optTerm(Terms, l, m):
     result = []
     for term in Terms:
 
@@ -291,12 +292,25 @@ def pruneTerm(Terms, l, m):
             result.append(term)
     return result
 
+def pruneTerm(Terms):
+    result = []
+    for term in Terms:
+        sumT = sum([a[0] for a in term])
+        if sumT % len(term) == 0:
+            if term[0][1]=='0':
+                result.append(term)
+        else:
+            result.append(term)
+    return result
+
 def TermStr(aterm):
     return '+'.join([PowStr(a1) for a1 in aterm])
     
 def search_2GBAcode(l, m, countA, countB, kthres = 4):
     filename = f'good_log_{l}_{m}_count{countA}{countB}'
-    ri, rj = 0,0
+    # i: 34, iter: 32650,x1+x5+y18 python3 opt_search.py 2g_3_3_5 6,32
+    # i: 45, iter: 26792,x2+x8+y14 10 15
+    ri, rj = 34,100
     if ri==0 and rj==0:
         with open(filename, 'w') as f:
             pass    
@@ -328,7 +342,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     term_len = len(terms)
     count = 0
     Aterms = combin(terms, countA)
-    Aterms = pruneTerm(Aterms, l, m)
+    Aterms = optTerm(Aterms, l, m)
     for t in Aterms:
         print(TermStr(t))
     # exit(0)
@@ -343,12 +357,13 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
 
             continue
         Bterms = combin(terms, countB)
+        Bterms = pruneTerm(Bterms)
         jstart = rj if i==ri else 0
         for j in range(jstart, len(Bterms)):
             iter_count += 1
             bterm = Bterms[j]
             B = sumMat([mat(t) for t in bterm])
-            k, d = Get_kd_BBCode(gap, A, B, l, m)
+            k, d = Get_kd_BBCode(gap, A, B, l, m, kthres)
             r = d*k*1.0/n   
             # print(f"i: {i}, j: {j} with n: {n}, k: {k}, d: {d}, r: {r}") 
             # print(f"{iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}")

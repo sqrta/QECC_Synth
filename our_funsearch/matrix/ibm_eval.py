@@ -359,27 +359,27 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     return result
 
 if __name__ == '__main__':
-    def mat(p):
-        M = r if p[0]==0 else s
-        res = mp(M, eval(p[1])) 
-        return res
-    gap = start([gap_path, '-L', 'workplace','-q', '-b'])
-    l = 15
-    m = 9
-    r = get_x(l, m)
-    print(r)
-    s = get_y(l, m)
-    # x^9 + y^3 + y^6$ & $1+x^2 +x^7
-    aterm = ((0, '9'), (1, '3'), (1, '6'))
-    bterm = ((0, '0'), (0, '2'), (0, '7'))
-    # A = mp(r, 0) + mp(r, 1) @ mp(s, 4)
-    # B = mp(r, 0) + mp(r, 1) + mp(r, 2) + mp(s, 1) + mp(s, 3) @ mp(r, 1) + mp(s, 2) @ mp(r, 6) 
-    A = sumMat([mat(t) for t in aterm])
-    B = sumMat([mat(t) for t in bterm])
-    print('after')
-    k,d = Get_kd_BBCode(gap, A, B, l, m)
-    print(k,d)
-    exit(0)
+    # def mat(p):
+    #     M = r if p[0]==0 else s
+    #     res = mp(M, eval(p[1])) 
+    #     return res
+    # gap = start([gap_path, '-L', 'workplace','-q', '-b'])
+    # l = 15
+    # m = 9
+    # r = get_x(l, m)
+    # print(r)
+    # s = get_y(l, m)
+    # # x^9 + y^3 + y^6$ & $1+x^2 +x^7
+    # aterm = ((0, '9'), (1, '3'), (1, '6'))
+    # bterm = ((0, '0'), (0, '2'), (0, '7'))
+    # # A = mp(r, 0) + mp(r, 1) @ mp(s, 4)
+    # # B = mp(r, 0) + mp(r, 1) + mp(r, 2) + mp(s, 1) + mp(s, 3) @ mp(r, 1) + mp(s, 2) @ mp(r, 6) 
+    # A = sumMat([mat(t) for t in aterm])
+    # B = sumMat([mat(t) for t in bterm])
+    # print('after')
+    # k,d = Get_kd_BBCode(gap, A, B, l, m)
+    # print(k,d)
+    # exit(0)
 
     toSearch = [] 
     countA = 4

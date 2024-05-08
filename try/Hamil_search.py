@@ -57,17 +57,28 @@ class PauliTerm:
 
     def __repr__(self):
         return str(self)
+    
+def ket2Vec(n, kets):
+    vec = np.zeros((2**n, 1))
+    for ket in kets:
+        index = int(ket, base=2)
+        vec[index, 0]=1
+    return vec
 
 if __name__ =='__main__':
     n = 4
-    Xeff = [1, -1, 1, -1]
-    Zeff = [1, 0, 1, 0]
+    Xeff = [1, 1, -1, -1]
+    Zeff = [1, 2, 1, 2]
     terms = [PauliTerm(n, f'X{i}*X{(i+1)%n}', Xeff[i]) for i in range(n)] 
     terms += [PauliTerm(n, f'Z{i}*Z{(i+1)%n}', Zeff[i]) for i in range(n)]
     print(terms)
     H = sum([t.value() for t in terms])
     eigenvalues, eigenvectors = LA.eig(H)
-    
+    print(H.shape)
+
+    # tmp_vec = ket2Vec(n, ['0010', '1101'])
+    # print(H @ tmp_vec) 
+    # exit(0)
     # print(eigenvectors)
     # index = np.argsort(np.absolute(eigenvalues))
     

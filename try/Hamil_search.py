@@ -1,7 +1,9 @@
 import numpy as np
 from numpy import kron
 import functools
-from numpy import linalg as LA
+from scipy import linalg as LA
+import time
+import random
 
 PAULI_MATRICES = np.array((
     ((0, 1), (1, 0)),
@@ -67,14 +69,15 @@ def ket2Vec(n, kets):
 
 if __name__ =='__main__':
     n = 4
-    Xeff = [1, 1, -1, -1]
-    Zeff = [1, 2, 1, 2]
+    Xeff = [1,1.5,1,1.5]
+    Zeff = [1,0.5,1,0.5]
     terms = [PauliTerm(n, f'X{i}*X{(i+1)%n}', Xeff[i]) for i in range(n)] 
     terms += [PauliTerm(n, f'Z{i}*Z{(i+1)%n}', Zeff[i]) for i in range(n)]
     print(terms)
+    start = time.time()
     H = sum([t.value() for t in terms])
-    eigenvalues, eigenvectors = LA.eig(H)
-    print(H.shape)
+    eigenvalues, eigenvectors = LA.eigh(H)
+    # print(H.shape)
 
     # tmp_vec = ket2Vec(n, ['0010', '1101'])
     # print(H @ tmp_vec) 
@@ -82,15 +85,18 @@ if __name__ =='__main__':
     # print(eigenvectors)
     # index = np.argsort(np.absolute(eigenvalues))
     
-    print(eigenvalues)
+    # print(eigenvalues)
     index = np.absolute(eigenvalues)<1e-6
     eigenvectors = eigenvectors[:, index].T
-    print(index)
-    print(eigenvalues[index])
+    # print(index)
+    # print(eigenvalues[index])
     # print(eigenvectors)    
     # exit(0)
+    # print(eigenvectors[0] @ eigenvectors[2].T)
     for vec in eigenvectors:
+        print('-----------')
         print('-----------')
         # print(H @ vec.T)
         print(ket2Str(n, vec2Ket(vec)))
-        print('-----------')
+    end = time.time()
+    print(f'use {end-start}s')

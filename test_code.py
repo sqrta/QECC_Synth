@@ -57,16 +57,17 @@ def evalCodeFile(file, px, pz, k, form="G2"):
 
 if __name__ == "__main__":
     dir_path = "exist_code/"
-    dir_path = "magma_code/"
+    # dir_path = "magma_code/"
     files = [file for file in os.listdir(dir_path)]
     vars = ["code_"+file for file in os.listdir(dir_path)]
-    px = 0.01
-    pz = 0.05
+    px = 0.05
+    pz = 0.01
     k = 1
     K = 1
     print(f"[{','.join(vars)}]")
     for file in files:
         path = dir_path + file
         print(file)
-        stabs, xe, ze = evalCodeFile(path, px, pz, k, "G4")
-        print(f"code_{file}=CodeWithError({stabs},{xe},{ze})")
+        k = int(file.split('_')[1])
+        stabs, xe, ze = evalCodeFile(path, px, pz, k, "G2")
+        # print(f"code_{file}=CodeWithError({stabs},{xe},{ze})")

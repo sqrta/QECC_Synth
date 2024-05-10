@@ -620,7 +620,7 @@ def distance(generator, k ,stab_group = None):
         stab_group = stabilizer_group(generator)
     Az_coeff = Az_poly(generator, stab_group)
     Bz_coeff = Bz_poly(generator, k, stab_group)
-    print(Az_coeff, Bz_coeff)
+    # print(Az_coeff, Bz_coeff)
     for d in range(len(Az_coeff)):
         if Az_coeff[d] != Bz_coeff[d]:
             return d
@@ -649,7 +649,7 @@ def ABzx(stab_group, x,y,z,w,k,K=1):
         wz = term.Wz()
         Ax += Nerror(x,y,z,w,wx,wz)
         Bx += Nerror(w-z, z+w, (y-x)/2, (x+y)/2,wx,wz)
-    print(Ax, 2**k*Bx/K)
+    # print(Ax, 2**k*Bx/K)
     res = 2**k/K*Bx-Ax
     return 2**k/K*Bx-Ax, 1- Ax/(2**k/K*Bx)
 

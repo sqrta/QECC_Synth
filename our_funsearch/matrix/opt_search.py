@@ -285,6 +285,12 @@ def sumMat(mList):
 
 # sopt_2
 def goodTerm(term, l, m):
+    if term[0][0]==0 and term[1][0]==1 and term[2][0]==1 and int(term[1][1])+int(term[2][1])==m:
+        return False
+    if term[0][0]==0 and term[0][1]=='0' and term[1][0]==0 and term[2][0]==0 and int(term[1][1])+int(term[2][1])==l:
+        return False
+    if term[0][0]==0 and term[1][0]==0 and term[2][0]==1 and int(term[0][1])+int(term[1][1])==l:
+        return False
     if term[0][0]==0 and term[1][0]==1 and term[2][0]==1 and int(term[0][1])+int(term[1][1])+int(term[2][1])==m:
         return True
     if term[0][0]==0 and term[1][0]==0 and term[2][0]==1 and int(term[0][1])+int(term[1][1])+int(term[2][1])==l:
@@ -353,7 +359,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     Aterms = optTerm(Aterms, l, m)
     for t in Aterms:
         print(TermStr(t))
-    # exit(0)
+
     iter_count = 0
     for i in range(ri, len(Aterms)):
         aterm = Aterms[i]

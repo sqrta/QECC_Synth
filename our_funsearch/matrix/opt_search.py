@@ -274,24 +274,24 @@ def sumMat(mList):
     return reduce(lambda a,b : a+b, mList)
 
 # sopt_1
-def goodTerm(term, l, m):
-    if term[0][0]==0 and term[1][0]==1 and term[2][0]==1 and int(term[1][1])+int(term[2][1])==m:
-        return True
-    if term[0][0]==0 and term[0][1]=='0' and term[1][0]==0 and term[2][0]==0 and int(term[1][1])+int(term[2][1])==l:
-        return True
-    if term[0][0]==0 and term[1][0]==0 and term[2][0]==1 and int(term[0][1])+int(term[1][1])==l:
-        return True
-    return False
-
-# sopt_1_default
 # def goodTerm(term, l, m):
 #     if term[0][0]==0 and term[1][0]==1 and term[2][0]==1 and int(term[1][1])+int(term[2][1])==m:
-#         return False
+#         return True
 #     if term[0][0]==0 and term[0][1]=='0' and term[1][0]==0 and term[2][0]==0 and int(term[1][1])+int(term[2][1])==l:
-#         return False
+#         return True
 #     if term[0][0]==0 and term[1][0]==0 and term[2][0]==1 and int(term[0][1])+int(term[1][1])==l:
-#         return False
-#     return True
+#         return True
+#     return False
+
+# sopt_1_default
+def goodTerm(term, l, m):
+    if term[0][0]==0 and term[1][0]==1 and term[2][0]==1 and int(term[1][1])+int(term[2][1])==m:
+        return False
+    if term[0][0]==0 and term[0][1]=='0' and term[1][0]==0 and term[2][0]==0 and int(term[1][1])+int(term[2][1])==l:
+        return False
+    if term[0][0]==0 and term[1][0]==0 and term[2][0]==1 and int(term[0][1])+int(term[1][1])==l:
+        return False
+    return True
 
 # sopt_2
 # def goodTerm(term, l, m):

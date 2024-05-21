@@ -415,10 +415,10 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     return result
 
 if __name__ == '__main__':
-    # def mat(p):
-    #     M = r if p[0]==0 else s
-    #     res = mp(M, eval(p[1])) 
-    #     return res
+    def mat(p,r,s):
+        M = r if p[0]=='x' else s
+        res = mp(M, int(p[1:])) 
+        return res
     # gap = start([gap_path, '-L', 'workplace','-q', '-b'])
     # l = 3
     # m = 5
@@ -449,6 +449,35 @@ if __name__ == '__main__':
         toSearch.append((l,m))
     with open('isWorking.txt', 'a') as f:
         f.write(f"{toSearch}\n")
+
+    if flag == 'test':
+        gap = start([gap_path, '-L', 'workplace','-q', '-b'])
+        l = 4
+        m = 30
+        # # x^9 + y^3 + y^6$ & $1+x^2 +x^7
+        # aterm = ((0, '1'), (0, '2'), (1, '3'))
+        # bterm = ((0, '3'), (1, '5'), (1, '10'))
+        with open('toRun.txt', 'r') as f:
+            toRuns = f.readlines()
+        for t in toRuns:
+            terms = t.split(', ')
+            l = int(terms[5])
+            m = int(terms[6])
+            aterm = terms[3].split(' ')[2].split('+')
+            bterm = terms[4].split('+')
+            print(l,m,aterm,bterm)
+            r = get_x(l, m)
+            # print(r)
+            s = get_y(l, m)
+            # A = mp(r, 0) + mp(r, 1) @ mp(s, 4)
+            # B = mp(r, 0) + mp(r, 1) + mp(r, 2) + mp(s, 1) + mp(s, 3) @ mp(r, 1) + mp(s, 2) @ mp(r, 6) 
+            A = sumMat([mat(t,r,s) for t in aterm])
+            B = sumMat([mat(t,r,s) for t in bterm])
+
+            k,d = Get_kd_BBCode(gap, A, B, l, m)
+            print(k,d)
+        os.system(f'rm *.mtx')
+        exit(0)
     if flag == 'bb':
         for item in toSearch:
             l,m = item

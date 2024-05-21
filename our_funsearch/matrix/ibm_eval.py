@@ -163,9 +163,9 @@ def pruneTerm(Terms):
             result.append(term)
     return result
     
-def search_2GBAcode(l, m, countA, countB, kthres = 4):
+def search_2GBAcode(l, m, countA, countB, kthres = 4, init=0):
     filename = f'good_log_{l}_{m}_count{countA}{countB}'
-    ri, rj = 502,0
+    ri, rj = init,0
     if ri==0 and rj==0:
         with open(filename, 'w') as f:
             pass    
@@ -197,7 +197,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     term_len = len(terms)
     count = 0
     Aterms = combin(terms, countA)
-    # Aterms = pruneTerm(Aterms)
+    Aterms = pruneTerm(Aterms)
     # print(Aterms)
     # for i in range(len(Aterms)):
     #     aterm = Aterms[i]
@@ -267,7 +267,10 @@ if __name__ == '__main__':
     for i in range(2, len(sys.argv)):
         lmstring = sys.argv[i].split(',')
         l, m = int(lmstring[0]), int(lmstring[1])
-        toSearch.append((l,m))
+        init = 0
+        if len(lmstring)>2:
+            init = int(lmstring[2])
+        toSearch.append((l,m,init))
     with open('isWorking.txt', 'a') as f:
         f.write(f"{toSearch}\n")
     if flag == 'sort':
@@ -314,9 +317,9 @@ if __name__ == '__main__':
         counts = flag.split('_')
         countA, countB, kthres = int(counts[1]), int(counts[2]), int(counts[3])
         for item in toSearch:
-            l,m = item
+            l,m,init = item
             n = 2*l*m
-            res = search_2GBAcode(l, m, countA, countB, kthres)
+            res = search_2GBAcode(l, m, countA, countB, kthres,init)
             print(f"{l},{m},{countA}, {countB} finish")
     endT = time.time()
     print(toSearch)

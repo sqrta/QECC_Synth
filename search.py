@@ -101,7 +101,7 @@ def search(initial, candidate_code, candidate_bound, px, pz, resume = False):
         
         # print(minError)
         # print(f"count: {count}, queue size: {sys.getsizeof(queue)}, dict size: {sys.getsizeof(exist_set)}")
-        if count%5e4==0:
+        if count%1e4==0:
             f.write(str(minError))
             end = time.time()
             f.write(f"\nqueue length: {len(queue)}\nuse {end-start}s\n")

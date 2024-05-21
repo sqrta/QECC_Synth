@@ -359,6 +359,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4):
     return result
 
 if __name__ == '__main__':
+
     # def mat(p):
     #     M = r if p[0]==0 else s
     #     res = mp(M, eval(p[1])) 

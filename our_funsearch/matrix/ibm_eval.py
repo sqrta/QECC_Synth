@@ -364,26 +364,7 @@ if __name__ == '__main__':
         M = r if p[0]=='x' else s
         res = mp(M, int(p[1:])) 
         return res
-    gap = start([gap_path, '-L', 'workplace','-q', '-b'])
-    l = 4
-    m = 30
-    r = get_x(l, m)
-    # print(r)
-    s = get_y(l, m)
-    # # x^9 + y^3 + y^6$ & $1+x^2 +x^7
-    # aterm = ((0, '1'), (0, '2'), (1, '3'))
-    # bterm = ((0, '3'), (1, '5'), (1, '10'))
-    terms = 'x1+y2+y23, x1+y18+y29'.split(', ')
-    aterm = terms[0].split('+')
-    bterm = terms[1].split('+')
-    # A = mp(r, 0) + mp(r, 1) @ mp(s, 4)
-    # B = mp(r, 0) + mp(r, 1) + mp(r, 2) + mp(s, 1) + mp(s, 3) @ mp(r, 1) + mp(s, 2) @ mp(r, 6) 
-    A = sumMat([mat(t) for t in aterm])
-    B = sumMat([mat(t) for t in bterm])
-    print('after')
-    k,d = Get_kd_BBCode(gap, A, B, l, m)
-    print(k,d)
-    exit(0)
+
 
     toSearch = [] 
     countA = 4
@@ -398,6 +379,27 @@ if __name__ == '__main__':
         toSearch.append((l,m))
     with open('isWorking.txt', 'a') as f:
         f.write(f"{toSearch}\n")
+    if flag == 'test':
+        gap = start([gap_path, '-L', 'workplace','-q', '-b'])
+        l = 4
+        m = 30
+        r = get_x(l, m)
+        # print(r)
+        s = get_y(l, m)
+        # # x^9 + y^3 + y^6$ & $1+x^2 +x^7
+        # aterm = ((0, '1'), (0, '2'), (1, '3'))
+        # bterm = ((0, '3'), (1, '5'), (1, '10'))
+        terms = 'x1+y2+y23, x1+y18+y29'.split(', ')
+        aterm = terms[0].split('+')
+        bterm = terms[1].split('+')
+        # A = mp(r, 0) + mp(r, 1) @ mp(s, 4)
+        # B = mp(r, 0) + mp(r, 1) + mp(r, 2) + mp(s, 1) + mp(s, 3) @ mp(r, 1) + mp(s, 2) @ mp(r, 6) 
+        A = sumMat([mat(t) for t in aterm])
+        B = sumMat([mat(t) for t in bterm])
+        print('after')
+        k,d = Get_kd_BBCode(gap, A, B, l, m)
+        print(k,d)
+        exit(0)
     if flag == 'bb':
         for item in toSearch:
             l,m = item

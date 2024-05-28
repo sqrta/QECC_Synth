@@ -23,7 +23,7 @@ def write(process, message):
 def terminate(process):
     process.stdin.close()
     process.terminate()
-    process.wait(timeout=1)
+    process.wait(timeout=10)
 
 
 # process = start("./dummy.py")

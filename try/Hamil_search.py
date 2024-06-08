@@ -30,10 +30,20 @@ def pauliStr2mat(num_qubits, pstrings):
     paulis = []
     pmap = {'X':X, 'Y':Y, 'Z':Z}
     pauli = pstrings.split('*')
+    eff = 1
+    if pauli[0].isdigit():
+        eff = int(pauli[0])
+        pauli.pop(0)
     for p in pauli:
         paulis.append(pmap[p[0].upper()])
         indexes.append(int(p[1:]))
-    return pauli2Mat(num_qubits, indexes, paulis)
+    return eff*pauli2Mat(num_qubits, indexes, paulis)
+
+def pauliExpr2Mat(n, expr):
+    exp = expr.split('+')
+    terms = [PauliTerm(n, e) for e in exp] 
+    H = sum([t.value() for t in terms])    
+    return H
 
 def vec2Ket(vec):
     args = np.where(np.absolute(vec)>1e-4)[0]
@@ -120,6 +130,7 @@ def printVecs(n, Xeff, Zeff):
         print('-----------')
         # print(H @ vec.T)
         print(ket2Str(n, vec2Ket(vec)))
+
 def getHamil(n, Xeff, Zeff):
     terms = [PauliTerm(n, f'X{i}*X{(i+1)%n}', Xeff[i]) for i in range(n)] 
     terms += [PauliTerm(n, f'Z{i}*Z{(i+1)%n}', Zeff[i]) for i in range(n)]
@@ -127,10 +138,14 @@ def getHamil(n, Xeff, Zeff):
     H = sum([t.value() for t in terms])
     return H
 
-def testH(n, H):
+def getSpace(n, H):
     eigenvalues, eigenvectors = LA.eigh(H)
     index = np.absolute(eigenvalues)<1e-6
     eigenvectors = eigenvectors[:, index]
+    return eigenvectors
+
+def testH(n, H):
+    eigenvectors = getSpace(n, H)
     PList = []
     # print(f"space size: {eigenvectors.shape[1]}")
     if eigenvectors.shape[1]<4:
@@ -145,6 +160,32 @@ def testH(n, H):
     # if result:
     #     print(eigenvectors.shape[1])
     return result, eigenvectors.shape[1]
+
+def getProjector(n, H):
+    eigenvectors = getSpace(n, H)
+    PList = []
+    # print(f"space size: {eigenvectors.shape[1]}")
+    if eigenvectors.shape[1]<4:
+        return False, eigenvectors.shape[1]
+    for i in range(eigenvectors.shape[1]):
+        vec = eigenvectors[:, i]
+        vec = vec.reshape(len(vec), 1)
+        PList.append(vec)
+    # PList = [ket2Vec(n, ['1000', '0111']), ket2Vec(n, ['0100', '1011']), ket2Vec(n, ['0010', '1101']), ket2Vec(n, ['0001', '1110'])]
+    P = getP(PList)
+    return P
+
+def testLogicalOp(n, pauliStr, H, Pc):
+    op = pauliExpr2Mat(n, pauliStr)
+    P = getProjector(n, H)
+    O = P @ op @ P
+    return commuteOrNot(O, Pc)
+
+def commuteOrNot(P1, P2):
+    M = P1 @ P2 - P2 @ P1
+    if LA.norm(M) < 1e-4:
+        return True
+    return False
 
 def testEff(n, Xeff, Zeff):
     terms = [PauliTerm(n, f'X{i}*X{(i+1)%n}', Xeff[i]) for i in range(n)] 
@@ -172,16 +213,19 @@ def searchHpen(n, k, path = 'result'):
                     f.write((f"succeed: {Xeff}, {Zeff}, size: {size}\n"))
                     # print((f"succeed: {Xeff}, {Zeff}, size: {size}"))
 
+
+
+
 if __name__ =='__main__':
 
     n = 4
 
-    # c1 = ket2Vec(n, ['1000', '0111'])
+    # c1 = ket2Vec(n, ['1000', '0111']) 
     # P = c1 @ c1.conj().T
     # print(P)
     # PList = [ket2Vec(n, ['1000', '0111']), ket2Vec(n, ['0100', '1011']), ket2Vec(n, ['0010', '1101']), ket2Vec(n, ['0001', '1110'])]
     # P = getP(PList)
-    # E = pauliStr2mat(n, f'X{0}')
+    # E = pauliStr2mat(n, f'X{0}*X1+Z0*Z2')
     # res = P @ E @ P
     # print(checkLinear(res, P))
     # exit(0)

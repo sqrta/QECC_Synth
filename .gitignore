@@ -42,3 +42,4 @@ our_funsearch/matrix/back/
 our_funsearch/matrix/BB_sopt1/*
 our_funsearch/matrix/BB_sopt2/*
 try/back.py
+try/*.txt

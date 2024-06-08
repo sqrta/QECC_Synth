@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # dir_path = "magma_code/"
     files = [file for file in os.listdir(dir_path)]
     vars = ["code_"+file for file in os.listdir(dir_path)]
-    px = 0.05
+    px = 0.01
     pz = 0.01
     k = 1
     K = 1

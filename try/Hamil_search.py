@@ -250,7 +250,7 @@ if __name__ =='__main__':
     if len(sys.argv)>2:
         depth = int(sys.argv[2])
     if len(sys.argv)>3:
-        thres = int(sys.argv)
+        thres = int(sys.argv[3])
     # c1 = ket2Vec(n, ['1000', '0111']) 
     # P = c1 @ c1.conj().T
     # print(P)

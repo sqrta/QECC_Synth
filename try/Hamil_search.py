@@ -115,6 +115,29 @@ def testProjector(P, n):
 def getP(vecs):
     return sum([vec @ vec.conj().T for vec in vecs])
 
+def bindTerm(n, eff, name):
+    X = []
+    for i in range(n):
+        if eff[i]!=0:
+            tmp = f'{name}{i}*{name}{(i+1)%n}'
+            if eff[i]==-1:
+                tmp = '-'+tmp
+            elif eff[i]!=1:
+                tmp = f'{eff[i]}*'+tmp
+            if eff[i]>0 and i >0:
+                tmp = '+'+tmp
+            X.append(tmp)
+    X = ''.join(X)
+    return X
+
+def XZeff2Str(n, Xeff, Zeff):
+    print(Xeff)
+    print(Zeff)
+    X = bindTerm(n, Xeff, 'X')
+    Z = bindTerm(n, Zeff, 'Z')
+
+    return X,Z
+
 def printVecs(n, Xeff, Zeff):
     terms = [PauliTerm(n, f'X{i}*X{(i+1)%n}', Xeff[i]) for i in range(n)] 
     terms += [PauliTerm(n, f'Z{i}*Z{(i+1)%n}', Zeff[i]) for i in range(n)]
@@ -197,7 +220,7 @@ def testEff(n, Xeff, Zeff):
     return testH(n, H)
 
 
-def searchHpen(n, k, path = 'result'):
+def searchHpen(n, k, thres=0, path = 'result'):
     with open(path, 'w') as f:
     # if True:
         Xeff_can = list(product(range(-k, k+1), repeat=n))
@@ -210,8 +233,8 @@ def searchHpen(n, k, path = 'result'):
                 if Zeff[0]<0:
                     continue
                 res, size = testEff(n, Xeff, Zeff)
-                if res:
-                    f.write((f"succeed: {Xeff}, {Zeff}, size: {size}\n"))
+                if res and size>=thres:
+                    f.write((f"succeed: {Xeff}, {Zeff}, size: {size}, {XZeff2Str(n, Xeff, Zeff)}\n"))
                     # print((f"succeed: {Xeff}, {Zeff}, size: {size}"))
 
 
@@ -219,12 +242,15 @@ def searchHpen(n, k, path = 'result'):
 
 if __name__ =='__main__':
 
-    n = 4
+    n = 6
     depth = 3
+    thres = 0
     if len(sys.argv)>1:
         n=int(sys.argv[1])
     if len(sys.argv)>2:
         depth = int(sys.argv[2])
+    if len(sys.argv)>3:
+        thres = int(sys.argv)
     # c1 = ket2Vec(n, ['1000', '0111']) 
     # P = c1 @ c1.conj().T
     # print(P)
@@ -236,6 +262,7 @@ if __name__ =='__main__':
     # exit(0)
     start = time.time()
 
+
     # Xeff = sum([[0,1] for i in range(n//2)], start = [])
     # Zeff = sum([[0,-1] for i in range(n//2)], start=[])
     # print(Xeff)
@@ -246,6 +273,6 @@ if __name__ =='__main__':
     # exit(0)
     # res = testEff(n, Xeff, Zeff)
     # print(res)
-    searchHpen(n, depth)
+    searchHpen(n, depth, thres, f'result{n}')
     end = time.time()
     print(f'use {end-start}s')

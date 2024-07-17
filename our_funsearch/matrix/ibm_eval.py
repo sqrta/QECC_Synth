@@ -199,10 +199,10 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4, init=0):
     Aterms = combin(terms, countA)
     Aterms = pruneTerm(Aterms)
     # print(Aterms)
-    # for i in range(len(Aterms)):
-    #     aterm = Aterms[i]
-    #     print(f"{i}, {'+'.join([PowStr(a1) for a1 in aterm])}")
-    # exit(0)
+    for i in range(len(Aterms)):
+        aterm = Aterms[i]
+        print(f"{i}, {'+'.join([PowStr(a1) for a1 in aterm])}")
+    exit(0)
     iter_count = 0
     for i in range(ri, len(Aterms)):
         aterm = Aterms[i]

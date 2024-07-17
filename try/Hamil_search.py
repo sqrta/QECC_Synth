@@ -5,6 +5,7 @@ from scipy import linalg as LA
 from itertools import product
 import time
 import random
+import sys
 
 PAULI_MATRICES = np.array((
     ((0, 1), (1, 0)),
@@ -219,7 +220,11 @@ def searchHpen(n, k, path = 'result'):
 if __name__ =='__main__':
 
     n = 4
-
+    depth = 3
+    if len(sys.argv)>1:
+        n=int(sys.argv[1])
+    if len(sys.argv)>2:
+        depth = int(sys.argv[2])
     # c1 = ket2Vec(n, ['1000', '0111']) 
     # P = c1 @ c1.conj().T
     # print(P)
@@ -241,6 +246,6 @@ if __name__ =='__main__':
     # exit(0)
     # res = testEff(n, Xeff, Zeff)
     # print(res)
-    searchHpen(n, 3)
+    searchHpen(n, depth)
     end = time.time()
     print(f'use {end-start}s')

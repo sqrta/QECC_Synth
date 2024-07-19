@@ -225,6 +225,8 @@ def searchHpen(n, k, thres=0, path = 'result'):
     # if True:
         Xeff_can = list(product(range(-k, k+1), repeat=n))
         Zeff_can = list(product(range(-k, k+1), repeat=n))
+        random.shuffle(Xeff_can)
+        random.shuffle(Zeff_can)
         for Xeff in Xeff_can:
             if Xeff[0]<0:
                 continue

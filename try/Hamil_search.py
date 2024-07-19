@@ -273,6 +273,6 @@ if __name__ =='__main__':
     # exit(0)
     # res = testEff(n, Xeff, Zeff)
     # print(res)
-    searchHpen(n, depth, thres, f'result{n}')
+    searchHpen(n, depth, thres, f'result{n}_{depth}_{thres}')
     end = time.time()
     print(f'use {end-start}s')

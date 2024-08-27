@@ -41,6 +41,10 @@ def pauliStr2mat(num_qubits, pstrings):
     return eff*pauli2Mat(num_qubits, indexes, paulis)
 
 def pauliExpr2Mat(n, expr):
+    """
+    n: size
+    pstring: e.g. X1*X2 + Z1*Z2
+    """
     exp = expr.split('+')
     terms = [PauliTerm(n, e) for e in exp] 
     H = sum([t.value() for t in terms])    
@@ -71,6 +75,7 @@ class PauliTerm:
 
     def __repr__(self):
         return str(self)
+
     
 def ket2Vec(n, kets):
     vec = np.zeros((2**n, 1))
@@ -78,6 +83,12 @@ def ket2Vec(n, kets):
         index = int(ket, base=2)
         vec[index, 0]=1
     return vec
+
+def checkSame(P1, P2, thres = 1e-4):
+    nonZ = np.nonzero(np.absolute(P1 - P2)>1e-4)
+    if len(nonZ[0])==0:
+        return True
+    return False
 
 def checkLinear(P1, P2):
     indexes = np.nonzero(np.absolute(P1)>1e-4)
@@ -87,11 +98,7 @@ def checkLinear(P1, P2):
     if np.absolute(P2[i1]) < 1e-5:
         return False
     r1 = P1[i1] / P2[i1]
-    nonZ = np.nonzero(np.absolute(P1 - r1*P2)>1e-4)
-
-    if len(nonZ[0])==0:
-        return True
-    return False
+    return checkSame(P1, r1*P2)
 
 
 def testProjector(P, n):
@@ -137,6 +144,15 @@ def XZeff2Str(n, Xeff, Zeff):
     Z = bindTerm(n, Zeff, 'Z')
 
     return X,Z
+
+def phyOpCandiate(n):
+    index = [(i,j) for i in range(n-1) for j in range(i, n)]
+    res = [f'X{i}' for i in range(n)] + [f'Z{i}' for i in range(n)]
+    for ind in index:
+        a,b = ind
+        res += [f'X{a}*X{b}', f'X{a}*Z{b}',f'Z{a}*X{b}',f'Z{a}*Z{b}']
+    return res
+
 
 def printVecs(n, Xeff, Zeff):
     terms = [PauliTerm(n, f'X{i}*X{(i+1)%n}', Xeff[i]) for i in range(n)] 
@@ -205,8 +221,11 @@ def testLogicalOp(n, pauliStr, H, Pc):
     O = P @ op @ P
     return commuteOrNot(O, Pc)
 
-def commuteOrNot(P1, P2):
-    M = P1 @ P2 - P2 @ P1
+def commuteOrNot(P1, P2, sign=1):
+    """
+    test P1@P2 - sign * P2@P1
+    """
+    M = P1 @ P2 - sign * P2 @ P1
     if LA.norm(M) < 1e-4:
         return True
     return False
@@ -243,8 +262,9 @@ def searchHpen(n, k, thres=0, path = 'result'):
 
 
 if __name__ =='__main__':
-
     n = 6
+
+    
     depth = 3
     thres = 0
     if len(sys.argv)>1:

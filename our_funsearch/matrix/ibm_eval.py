@@ -204,6 +204,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4, init=0):
         print(f"{i}, {'+'.join([PowStr(a1) for a1 in aterm])}")
 
     iter_count = 0
+    f = open(filename, 'a')
     for i in range(ri, len(Aterms)):
         aterm = Aterms[i]
         print(f"i: {i}, iter: {iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}")
@@ -229,7 +230,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4, init=0):
             # print(f"{iter_count},{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}")
             if True and goodC(n,k,d):
                 # found.add((n,k,d))
-                with open(filename, 'a') as f:
+                
                     f.write((f"i:{i}, good with n: {n}, k: {k}, d: {d}, r: {r} "))
                     f.write(f"{'+'.join([PowStr(a1) for a1 in aterm])}, {'+'.join([PowStr(a1) for a1 in bterm])}, {l}, {m}\n")
             if k!=0:
@@ -243,6 +244,7 @@ def search_2GBAcode(l, m, countA, countB, kthres = 4, init=0):
     print(f"itercount: {iter_count}")
     terminate(gap)
     sortFile(filename)
+    f.close()
     with open('finished.txt', 'a') as f:
         f.write(f"{(l,m)}\n")
     if count>0:
